@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="yw2html" basedir=".">
+	<property name="release" value="0.1.0" />
+	<property name="src" location="../src" />
+	<property name="test" location="../test" />
+	<property name="dist" location="../dist" />
+	<property name="project-name" value="${ant.project.name}" />
+	<property name="release-name" value="${project-name}_v${release}" />
+
+	<target name="build" description="inline all library modules">
+		
+		<delete dir="${dist}" />
+		<delete file="${test}/yw2html.pyw" />
+			<exec executable="python" failonerror="true">
+			    <arg value="${src}/build_yw2html.py"/>
+			</exec>
+			<exec executable="python" failonerror="true">
+			    <arg value="${test}/test_yw2html.py"/>
+			</exec>
+	</target>
+
+	<target name="dist" description="generate the distribution">
+		
+		<mkdir dir="${dist}" />
+		<mkdir dir="${dist}/yw2html_v${release}" />
+		<mkdir dir="${dist}/yw2html_v${release}/setup" />
+		<mkdir dir="${dist}/yw2html_v${release}/setup/program" />
+
+		<copy file="${test}/yw2html.py" todir="${dist}/yw2html_v${release}/setup/program" />
+		<copy file="${reg}/add_cm.reg" todir="${dist}/yw2html_v${release}/setup" />
+		<copy file="${reg}/del_cm.reg" todir="${dist}/yw2html_v${release}/setup" />
+
+		<copy file="./Install.bat" todir="${dist}/yw2html_v${release}" />
+		<copy file="./Uninstall.bat" todir="${dist}/yw2html_v${release}" />
+		
+		<copy file="../LICENSE" todir="${dist}/yw2html_v${release}" />
+		<copy file="../README.md" todir="${dist}/yw2html_v${release}" />
+
+		<zip destfile="${dist}/yw2html_v${release}.zip" basedir="${dist}/yw2html_v${release}" />
+	</target>
+
+	<target name="clean" description="clean up">
+		
+		<delete file="${test}/yw2html.py" />
+		
+	</target>
+
+</project>

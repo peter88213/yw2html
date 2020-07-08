@@ -1,7 +1,7 @@
 """Export yWriter project to html. 
 
 Copyright (c) 2020 Peter Triesberger
-For further information see https://github.com/peter88213/PyWriter
+For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
 
