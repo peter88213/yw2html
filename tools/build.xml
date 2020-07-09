@@ -8,31 +8,38 @@
 	<property name="release-name" value="${project-name}_v${release}" />
 
 	<target name="build" description="inline all library modules">
-		
 		<delete dir="${dist}" />
 		<delete file="${test}/yw2html.pyw" />
-			<exec executable="python" failonerror="true">
-			    <arg value="${src}/build_yw2html.py"/>
-			</exec>
-			<exec executable="python" failonerror="true">
-			    <arg value="${test}/test_yw2html.py"/>
-			</exec>
+		<exec executable="python" failonerror="true">
+		    <arg value="${src}/build_yw2html.py"/>
+		</exec>
+	</target>
+
+	<target name="test" description="inline all library modules">
+		<exec executable="python" failonerror="true">
+		    <arg value="${test}/test_yw2html.py"/>
+		</exec>
 	</target>
 
 	<target name="dist" description="generate the distribution">
 		
 		<mkdir dir="${dist}" />
 		<mkdir dir="${dist}/yw2html_v${release}" />
-		<mkdir dir="${dist}/yw2html_v${release}/setup" />
-		<mkdir dir="${dist}/yw2html_v${release}/setup/program" />
 
-		<copy file="${test}/yw2html.py" todir="${dist}/yw2html_v${release}/setup/program" />
-		<copy file="${reg}/add_cm.reg" todir="${dist}/yw2html_v${release}/setup" />
-		<copy file="${reg}/del_cm.reg" todir="${dist}/yw2html_v${release}/setup" />
+		<copy file="${test}/yw2html.pyw" todir="${dist}/yw2html_v${release}" />
 
-		<copy file="./Install.bat" todir="${dist}/yw2html_v${release}" />
-		<copy file="./Uninstall.bat" todir="${dist}/yw2html_v${release}" />
-		
+		<copy todir="${dist}/${release-name}/examples/manuscript"> 
+			<fileset dir="${test}/data/manuscript" />
+		</copy>
+
+		<copy todir="${dist}/${release-name}/examples/table"> 
+			<fileset dir="${test}/data/table" />
+		</copy>
+
+		<copy todir="${dist}/${release-name}/examples/csv"> 
+			<fileset dir="${test}/data/csv" />
+		</copy>
+
 		<copy file="../LICENSE" todir="${dist}/yw2html_v${release}" />
 		<copy file="../README.md" todir="${dist}/yw2html_v${release}" />
 
