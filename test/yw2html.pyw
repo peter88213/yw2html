@@ -1,7 +1,7 @@
 """Export yWriter project to html. 
 
-Command:
-yw_to_html.pyw <yWriter Project> <optional: template directory>
+Parameter 1: yWriter Project (full path)
+Parameter 2 (optional): template directory
 
 If no template directory is set, templates are searched for in the yWriter project directory.
 If no templates are found, the output file will be empty.
