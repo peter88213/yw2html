@@ -18,7 +18,7 @@ The yw2html Software comes as a zipfile `yw2html_<version number>.zip`.
 
 ## Usage
 
-`yw_to_html.pyw <yWriter Project> <optional: template directory>`
+`yw2html.pyw <yWriter Project> <optional: template directory>`
 
 If no template directory is set, templates are searched for in the yWriter project directory.
 If no templates are found, the output file will be empty.
