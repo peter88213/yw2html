@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="yw2html" basedir=".">
-	<property name="release" value="0.2.1" />
+	<property name="release" value="0.2.2" />
 	<property name="src" location="../src" />
 	<property name="test" location="../test" />
 	<property name="dist" location="../dist" />
@@ -27,6 +27,7 @@
 		<mkdir dir="${dist}/yw2html_v${release}" />
 
 		<copy file="${test}/yw2html.pyw" todir="${dist}/yw2html_v${release}" />
+		<replace encoding="utf-8" file="${dist}/yw2html_v${release}/yw2html.pyw" token="@release" value="${release}" />
 
 		<copy todir="${dist}/${release-name}/examples"> 
 			<fileset dir="../template" />

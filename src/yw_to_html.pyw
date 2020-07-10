@@ -1,5 +1,7 @@
 """Export yWriter project to html. 
 
+Version @release
+
 Parameter 1: yWriter Project (full path)
 Parameter 2 (optional): template directory
 
