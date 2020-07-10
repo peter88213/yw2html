@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="yw2html" basedir=".">
-	<property name="release" value="0.1.0" />
+	<property name="release" value="0.2.0" />
 	<property name="src" location="../src" />
 	<property name="test" location="../test" />
 	<property name="dist" location="../dist" />
@@ -28,16 +28,8 @@
 
 		<copy file="${test}/yw2html.pyw" todir="${dist}/yw2html_v${release}" />
 
-		<copy todir="${dist}/${release-name}/examples/manuscript"> 
-			<fileset dir="${test}/data/manuscript" />
-		</copy>
-
-		<copy todir="${dist}/${release-name}/examples/table"> 
-			<fileset dir="${test}/data/table" />
-		</copy>
-
-		<copy todir="${dist}/${release-name}/examples/csv"> 
-			<fileset dir="${test}/data/csv" />
+		<copy todir="${dist}/${release-name}/examples"> 
+			<fileset dir="../template" />
 		</copy>
 
 		<copy file="../LICENSE" todir="${dist}/yw2html_v${release}" />

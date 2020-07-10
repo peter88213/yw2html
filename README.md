@@ -69,3 +69,12 @@ If no templates are found, the output file will be empty.
 * $Items - Comma-separated list of items assigned to the scene
 * $Notes - Scene notes, html-formatted
 
+* $Date - Specific scene date ("None" if not set)
+* $Time - Specific scene time ("None" if not set)
+* $Day - Time scene begins: day ("None" if not set)
+* $Hour - Time scene begins: hour ("None" if not set)
+* $Minute - Time scene begins: minute ("None" if not set)
+* $LastsDays - Amount of time scene lasts: days ("None" if not set)
+* $LastsHours - Amount of time scene lasts: hours ("None" if not set)
+* $LastsMinutes - Amount of time scene lasts: minutes ("None" if not set)
+

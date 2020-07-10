@@ -328,15 +328,38 @@ class Scene():
         # list of str
         # xml: <Items><ItemID>
 
-        # xml: <SpecificDateMode>-1</SpecificDateMode>
-        # xml: <SpecificDateTime>1900-06-01 20:38:00</SpecificDateTime>
+        self.date = None
+        # str
+        # xml: <SpecificDateMode>-1
+        # xml: <SpecificDateTime>1900-06-01 20:38:00
 
+        self.time = None
+        # str
+        # xml: <SpecificDateMode>-1
+        # xml: <SpecificDateTime>1900-06-01 20:38:00
+
+        self.minute = None
+        # str
         # xml: <Minute>
+
+        self.hour = None
+        # str
         # xml: <Hour>
+
+        self.day = None
+        # str
         # xml: <Day>
 
+        self.lastsMinutes = None
+        # str
         # xml: <LastsMinutes>
+
+        self.lastsHours = None
+        # str
         # xml: <LastsHours>
+
+        self.lastsDays = None
+        # str
         # xml: <LastsDays>
 
     @property
@@ -791,6 +814,30 @@ class YwFile(Novel):
             else:
                 self.scenes[scId].appendToPrev = False
 
+            if scn.find('SpecificDateTime') is not None:
+                dateTime = scn.find('SpecificDateTime').text.split(' ')
+                self.scenes[scId].date = dateTime[0]
+                self.scenes[scId].time = dateTime[1]
+
+            else:
+                if scn.find('Day') is not None:
+                    self.scenes[scId].day = scn.find('Day').text
+
+                if scn.find('Hour') is not None:
+                    self.scenes[scId].hour = scn.find('Hour').text
+
+                if scn.find('Minute') is not None:
+                    self.scenes[scId].minute = scn.find('Minute').text
+
+            if scn.find('LastsDays') is not None:
+                self.scenes[scId].lastsDays = scn.find('LastsDays').text
+
+            if scn.find('LastsHours') is not None:
+                self.scenes[scId].lastsHours = scn.find('LastsHours').text
+
+            if scn.find('LastsMinutes') is not None:
+                self.scenes[scId].lastsMinutes = scn.find('LastsMinutes').text
+
             if scn.find('ReactionScene') is not None:
                 self.scenes[scId].isReactionScene = True
 
@@ -1022,6 +1069,30 @@ class YwFile(Novel):
 
                 if novel.scenes[scId].appendToPrev is not None:
                     self.scenes[scId].appendToPrev = novel.scenes[scId].appendToPrev
+
+                if novel.scenes[scId].date is not None:
+                    self.scenes[scId].date = novel.scenes[scId].date
+
+                if novel.scenes[scId].time is not None:
+                    self.scenes[scId].time = novel.scenes[scId].time
+
+                if novel.scenes[scId].minute is not None:
+                    self.scenes[scId].minute = novel.scenes[scId].minute
+
+                if novel.scenes[scId].hour is not None:
+                    self.scenes[scId].hour = novel.scenes[scId].hour
+
+                if novel.scenes[scId].day is not None:
+                    self.scenes[scId].day = novel.scenes[scId].day
+
+                if novel.scenes[scId].lastsMinutes is not None:
+                    self.scenes[scId].lastsMinutes = novel.scenes[scId].lastsMinutes
+
+                if novel.scenes[scId].lastsHours is not None:
+                    self.scenes[scId].lastsHours = novel.scenes[scId].lastsHours
+
+                if novel.scenes[scId].lastsDays is not None:
+                    self.scenes[scId].lastsDays = novel.scenes[scId].lastsDays
 
                 if novel.scenes[scId].isReactionScene is not None:
                     self.scenes[scId].isReactionScene = novel.scenes[scId].isReactionScene
@@ -1393,6 +1464,95 @@ class YwFile(Novel):
 
                 elif scn.find('AppendToPrev') is not None:
                     scn.remove(scn.find('AppendToPrev'))
+
+                # Date/time information
+
+                if (self.scenes[scId].date is not None) and (self.scenes[scId].time is not None):
+                    dateTime = ' '.join(
+                        self.scenes[scId].date, self.scenes[scId].time)
+
+                    if scn.find('SpecificDateTime') is not None:
+                        scn.find('SpecificDateTime').text = dateTime
+
+                    else:
+                        ET.SubElement(scn, 'SpecificDateTime').text = dateTime
+                        ET.SubElement(scn, 'SpecificDateMode').text = '-1'
+
+                        if scn.find('Day') is not None:
+                            scn.remove(scn.find('Day'))
+
+                        if scn.find('Hour') is not None:
+                            scn.remove(scn.find('Hour'))
+
+                        if scn.find('Minute') is not None:
+                            scn.remove(scn.find('Minute'))
+
+                elif (self.scenes[scId].day is not None) or (self.scenes[scId].hour is not None) or (self.scenes[scId].minute is not None):
+
+                    if scn.find('SpecificDateTime') is not None:
+                        scn.remove(scn.find('SpecificDateTime'))
+
+                    if scn.find('SpecificDateMode') is not None:
+                        scn.remove(scn.find('SpecificDateMode'))
+
+                    if self.scenes[scId].day is not None:
+
+                        if scn.find('Day') is not None:
+                            scn.find('Day').text = self.scenes[scId].day
+
+                        else:
+                            ET.SubElement(
+                                scn, 'Day').text = self.scenes[scId].day
+
+                    if self.scenes[scId].hour is not None:
+
+                        if scn.find('Hour') is not None:
+                            scn.find('Hour').text = self.scenes[scId].hour
+
+                        else:
+                            ET.SubElement(
+                                scn, 'Hour').text = self.scenes[scId].hour
+
+                    if self.scenes[scId].minute is not None:
+
+                        if scn.find('Minute') is not None:
+                            scn.find('Minute').text = self.scenes[scId].minute
+
+                        else:
+                            ET.SubElement(
+                                scn, 'Minute').text = self.scenes[scId].minute
+
+                if self.scenes[scId].lastsDays is not None:
+
+                    if scn.find('LastsDays') is not None:
+                        scn.find(
+                            'LastsDays').text = self.scenes[scId].lastsDays
+
+                    else:
+                        ET.SubElement(
+                            scn, 'LastsDays').text = self.scenes[scId].lastsDays
+
+                if self.scenes[scId].lastsHours is not None:
+
+                    if scn.find('LastsHours') is not None:
+                        scn.find(
+                            'LastsHours').text = self.scenes[scId].lastsHours
+
+                    else:
+                        ET.SubElement(
+                            scn, 'LastsHours').text = self.scenes[scId].lastsHours
+
+                if self.scenes[scId].lastsMinutes is not None:
+
+                    if scn.find('LastsMinutes') is not None:
+                        scn.find(
+                            'LastsMinutes').text = self.scenes[scId].lastsMinutes
+
+                    else:
+                        ET.SubElement(
+                            scn, 'LastsMinutes').text = self.scenes[scId].lastsMinutes
+
+                # Plot related information
 
                 if self.scenes[scId].isReactionScene:
 
@@ -2671,6 +2831,14 @@ class HtmlExport(Novel):
                     Field2=self.scenes[scId].field2,
                     Field3=self.scenes[scId].field3,
                     Field4=self.scenes[scId].field4,
+                    Date=self.scenes[scId].date,
+                    Time=self.scenes[scId].time,
+                    Day=self.scenes[scId].day,
+                    Hour=self.scenes[scId].hour,
+                    Minute=self.scenes[scId].minute,
+                    LastsDays=self.scenes[scId].lastsDays,
+                    LastsHours=self.scenes[scId].lastsHours,
+                    LastsMinutes=self.scenes[scId].lastsMinutes,
                     ReactionScene=reactionScene,
                     Goal=to_html(self.scenes[scId].goal),
                     Conflict=to_html(self.scenes[scId].conflict),
