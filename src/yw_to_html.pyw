@@ -25,13 +25,11 @@ def run(sourcePath, templatePath, silentMode=True):
 
     if FileExtension in ['.yw6', '.yw7']:
         document = HtmlExport('', templatePath)
-        extension = 'html'
 
     else:
         sys.exit('ERROR: File type is not supported.')
 
-    converter = YwCnvGui(sourcePath, document,
-                         extension, silentMode, '')
+    converter = YwCnvGui(sourcePath, document, silentMode)
 
 
 if __name__ == '__main__':
