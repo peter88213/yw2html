@@ -42,7 +42,7 @@ If no templates are found, the output file will be empty.
 * __unused_chapter_template.html__  (chapter header; applied to chapters marked "unused" or "do not export")
 * __info_chapter_template.html__  (chapter header; applied to chapters marked "other")
 
-* __chapter_end_template.html__  (chapter footer; applied to all "used" and "normal" chapters unless a "part template" exists)
+* __chapter_end_template.html__  (chapter footer; applied to all "used" and "normal" chapters)
 * __unused_chapter_end_template.html__  (chapter footer; applied to chapters marked "unused" or "do not export")
 * __info_chapter_end_template.html__  (chapter footer; applied to chapters marked "other")
 
