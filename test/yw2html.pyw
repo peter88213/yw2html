@@ -1,17 +1,6 @@
 """Export yWriter project to html. 
 
-Version 0.5.0
-
-positional arguments:
-  Project          yWriter project file
-
-optional arguments:
-  -h, --help       show this help message and exit
-  -t template-dir  path to the directory containing the templates
-  -s suffix        suffix to the output file name (optional)
-
-If no template directory is set, templates are searched for in the yWriter
-project directory. If no templates are found, the output file will be empty.
+Version @release
 
 Copyright (c) 2020 Peter Triesberger
 For further information see https://github.com/peter88213/yw2html
@@ -260,7 +249,6 @@ class Chapter():
 
         return text
 
-
 import re
 
 
@@ -425,6 +413,7 @@ class Scene():
         self.letterCount = len(text)
 
 
+
 class Object():
     """yWriter object representation.
     # xml: <LOCATIONS><LOCATION> or # xml: <ITEMS><ITEM>
@@ -476,8 +465,6 @@ class Character(Object):
         # xml: <FullName>
 
         self.isMajor = None
-
-
         # bool
         # xml: <Major>
 from html import unescape
@@ -552,6 +539,8 @@ def xml_postprocess(filePath, fileEncoding, cdataTags: list):
         return 'ERROR: Can not write"' + filePath + '".'
 
     return 'SUCCESS: "' + filePath + '" written.'
+
+
 
 
 class YwFile(Novel):
@@ -1713,6 +1702,8 @@ class YwFile(Novel):
             return False
 
 
+
+
 class YwNewFile(YwFile):
     """yWriter xml project file representation."""
 
@@ -2303,9 +2294,8 @@ class YwCnvGui(YwCnv):
 
     def edit(self):
         pass
-
-
 from string import Template
+
 
 
 class FileExport(Novel):
@@ -2705,6 +2695,7 @@ class HtmlExport(FileExport):
         return(text)
 
 
+
 def read_html_file(filePath):
     """Open a html file being encoded utf-8 or ANSI.
     Return a tuple:
@@ -2724,6 +2715,8 @@ def read_html_file(filePath):
             return ('ERROR: "' + filePath + '" not found.', None)
 
     return ('SUCCESS', text)
+
+
 
 
 class Exporter(HtmlExport):
@@ -2874,7 +2867,16 @@ if __name__ == '__main__':
                         help='path to the directory containing the templates')
     parser.add_argument('-s', dest='suffix', metavar='suffix',
                         help='suffix to the output file name (optional)')
+    parser.add_argument('--silent',
+                        action="store_true",
+                        help='suppress error messages and the request to confirm overwriting')
     args = parser.parse_args()
+
+    if args.templatePath:
+        templatePath = args.templatePath
+
+    else:
+        templatePath = os.path.dirname(args.sourcePath)
 
     if args.templatePath is not None:
         templatePath = args.templatePath
@@ -2891,4 +2893,10 @@ if __name__ == '__main__':
     else:
         suffix = ''
 
-    run(args.sourcePath, templatePath, suffix, False)
+    if args.silent:
+        silentMode = True
+
+    else:
+        silentMode = False
+
+    run(args.sourcePath, templatePath, suffix, silentMode)

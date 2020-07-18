@@ -2,17 +2,6 @@
 
 Version @release
 
-positional arguments:
-  Project          yWriter project file
-
-optional arguments:
-  -h, --help       show this help message and exit
-  -t template-dir  path to the directory containing the templates
-  -s suffix        suffix to the output file name (optional)
-
-If no template directory is set, templates are searched for in the yWriter
-project directory. If no templates are found, the output file will be empty.
-
 Copyright (c) 2020 Peter Triesberger
 For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
@@ -177,6 +166,9 @@ if __name__ == '__main__':
                         help='path to the directory containing the templates')
     parser.add_argument('-s', dest='suffix', metavar='suffix',
                         help='suffix to the output file name (optional)')
+    parser.add_argument('--silent',
+                        action="store_true",
+                        help='suppress error messages and the request to confirm overwriting')
     args = parser.parse_args()
 
     if args.templatePath:
@@ -200,4 +192,10 @@ if __name__ == '__main__':
     else:
         suffix = ''
 
-    run(args.sourcePath, templatePath, suffix, False)
+    if args.silent:
+        silentMode = True
+
+    else:
+        silentMode = False
+
+    run(args.sourcePath, templatePath, suffix, silentMode)
