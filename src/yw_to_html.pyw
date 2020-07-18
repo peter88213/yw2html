@@ -2,8 +2,17 @@
 
 Version @release
 
-Parameter 1: yWriter Project (full path)
-Parameter 2 (optional): template directory
+usage: yw_to_html.pyw [-h] [-t template-dir] [-s suffix] Project
+
+Export yWriter project to html.
+
+positional arguments:
+  Project          yWriter project file
+
+optional arguments:
+  -h, --help       show this help message and exit
+  -t template-dir  path to template directory
+  -s suffix        suffix to output file name
 
 If no template directory is set, templates are searched for in the yWriter project directory.
 If no templates are found, the output file will be empty.
@@ -164,7 +173,8 @@ def run(sourcePath, templatePath, suffix, silentMode=True):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Export yWriter project to html.')
+        description='Export yWriter project to html.',
+        epilog='If no template directory is set, templates are searched for in the yWriter project directory. If no templates are found, the output file will be empty.')
     parser.add_argument('sourcePath', metavar='Project',
                         help='yWriter project file')
     parser.add_argument('-t', dest='templatePath', metavar='template-dir',
