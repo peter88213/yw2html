@@ -30,6 +30,10 @@
 		<replace encoding="utf-8" file="${dist}/yw2html_v${release}/yw2html.pyw" token="@release" value="${release}" />
 
 		<copy todir="${dist}/${release-name}/examples"> 
+			<fileset dir="../batchfile" />
+		</copy>
+
+		<copy todir="${dist}/${release-name}/examples/template"> 
 			<fileset dir="../template" />
 		</copy>
 

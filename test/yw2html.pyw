@@ -1,12 +1,17 @@
 """Export yWriter project to html. 
 
-Version @release
+Version 0.5.0
 
-Parameter 1: yWriter Project (full path)
-Parameter 2 (optional): template directory
+positional arguments:
+  Project          yWriter project file
 
-If no template directory is set, templates are searched for in the yWriter project directory.
-If no templates are found, the output file will be empty.
+optional arguments:
+  -h, --help       show this help message and exit
+  -t template-dir  path to the directory containing the templates
+  -s suffix        suffix to the output file name (optional)
+
+If no template directory is set, templates are searched for in the yWriter
+project directory. If no templates are found, the output file will be empty.
 
 Copyright (c) 2020 Peter Triesberger
 For further information see https://github.com/peter88213/yw2html
@@ -15,6 +20,7 @@ Published under the MIT License (https://opensource.org/licenses/mit-license.php
 
 import sys
 import os
+import argparse
 
 from tkinter import *
 from tkinter import messagebox
@@ -254,6 +260,7 @@ class Chapter():
 
         return text
 
+
 import re
 
 
@@ -418,7 +425,6 @@ class Scene():
         self.letterCount = len(text)
 
 
-
 class Object():
     """yWriter object representation.
     # xml: <LOCATIONS><LOCATION> or # xml: <ITEMS><ITEM>
@@ -470,6 +476,8 @@ class Character(Object):
         # xml: <FullName>
 
         self.isMajor = None
+
+
         # bool
         # xml: <Major>
 from html import unescape
@@ -544,8 +552,6 @@ def xml_postprocess(filePath, fileEncoding, cdataTags: list):
         return 'ERROR: Can not write"' + filePath + '".'
 
     return 'SUCCESS: "' + filePath + '" written.'
-
-
 
 
 class YwFile(Novel):
@@ -1707,8 +1713,6 @@ class YwFile(Novel):
             return False
 
 
-
-
 class YwNewFile(YwFile):
     """yWriter xml project file representation."""
 
@@ -2299,8 +2303,9 @@ class YwCnvGui(YwCnv):
 
     def edit(self):
         pass
-from string import Template
 
+
+from string import Template
 
 
 class FileExport(Novel):
@@ -2700,7 +2705,6 @@ class HtmlExport(FileExport):
         return(text)
 
 
-
 def read_html_file(filePath):
     """Open a html file being encoded utf-8 or ANSI.
     Return a tuple:
@@ -2720,8 +2724,6 @@ def read_html_file(filePath):
             return ('ERROR: "' + filePath + '" not found.', None)
 
     return ('SUCCESS', text)
-
-
 
 
 class Exporter(HtmlExport):
@@ -2849,11 +2851,12 @@ class Exporter(HtmlExport):
             self.sceneDivider = result[1]
 
 
-def run(sourcePath, templatePath, silentMode=True):
+def run(sourcePath, templatePath, suffix, silentMode=True):
     fileName, FileExtension = os.path.splitext(sourcePath)
 
     if FileExtension in ['.yw6', '.yw7']:
         document = Exporter('', templatePath)
+        document.SUFFIX = suffix
 
     else:
         sys.exit('ERROR: File type is not supported.')
@@ -2862,20 +2865,30 @@ def run(sourcePath, templatePath, silentMode=True):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Export yWriter project to html.',
+        epilog='If no template directory is set, templates are searched for in the yWriter project directory. If no templates are found, the output file will be empty.')
+    parser.add_argument('sourcePath', metavar='Project',
+                        help='yWriter project file')
+    parser.add_argument('-t', dest='templatePath', metavar='template-dir',
+                        help='path to the directory containing the templates')
+    parser.add_argument('-s', dest='suffix', metavar='suffix',
+                        help='suffix to the output file name (optional)')
+    args = parser.parse_args()
 
-    try:
-        sourcePath = sys.argv[1]
+    if args.templatePath is not None:
+        templatePath = args.templatePath
 
-    except:
-        sourcePath = ''
-
-    try:
-        templatePath = sys.argv[2]
-
-    except:
-        templatePath = os.path.dirname(sourcePath)
+    else:
+        templatePath = os.path.dirname(args.sourcePath)
 
     if templatePath == '':
         templatePath = '.'
 
-    run(sourcePath, templatePath, False)
+    if args.suffix is not None:
+        suffix = args.suffix
+
+    else:
+        suffix = ''
+
+    run(args.sourcePath, templatePath, suffix, False)

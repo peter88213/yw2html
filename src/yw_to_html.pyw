@@ -185,7 +185,19 @@ if __name__ == '__main__':
     else:
         templatePath = os.path.dirname(args.sourcePath)
 
+    if args.templatePath is not None:
+        templatePath = args.templatePath
+
+    else:
+        templatePath = os.path.dirname(args.sourcePath)
+
     if templatePath == '':
         templatePath = '.'
 
-    run(args.sourcePath, templatePath, args.suffix, False)
+    if args.suffix is not None:
+        suffix = args.suffix
+
+    else:
+        suffix = ''
+
+    run(args.sourcePath, templatePath, suffix, False)
