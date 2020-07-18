@@ -2,20 +2,16 @@
 
 Version @release
 
-usage: yw_to_html.pyw [-h] [-t template-dir] [-s suffix] Project
-
-Export yWriter project to html.
-
 positional arguments:
   Project          yWriter project file
 
 optional arguments:
   -h, --help       show this help message and exit
-  -t template-dir  path to template directory
-  -s suffix        suffix to output file name
+  -t template-dir  path to the directory containing the templates
+  -s suffix        suffix to the output file name (optional)
 
-If no template directory is set, templates are searched for in the yWriter project directory.
-If no templates are found, the output file will be empty.
+If no template directory is set, templates are searched for in the yWriter
+project directory. If no templates are found, the output file will be empty.
 
 Copyright (c) 2020 Peter Triesberger
 For further information see https://github.com/peter88213/yw2html
@@ -178,9 +174,9 @@ if __name__ == '__main__':
     parser.add_argument('sourcePath', metavar='Project',
                         help='yWriter project file')
     parser.add_argument('-t', dest='templatePath', metavar='template-dir',
-                        help='path to template directory')
+                        help='path to the directory containing the templates')
     parser.add_argument('-s', dest='suffix', metavar='suffix',
-                        help='suffix to output file name')
+                        help='suffix to the output file name (optional)')
     args = parser.parse_args()
 
     if args.templatePath:
