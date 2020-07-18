@@ -33,7 +33,7 @@ If no templates are found, the output file will be empty.
 
 ## List of templates
 
-### Project level
+### Project level templates
 
 * __html_header.html__  
 
@@ -43,7 +43,7 @@ If no templates are found, the output file will be empty.
 
 * __html_footer.html__ 
 
-### Chapter level
+### Chapter level templates
 
 * __part_template.html__  (chapter header; applied to chapters marked "section beginning")
 * __chapter_template.html__  (chapter header; applied to all "used" and "normal" chapters unless a "part template" exists)
@@ -55,7 +55,7 @@ If no templates are found, the output file will be empty.
 * __info_chapter_end_template.html__  (chapter footer; applied to chapters marked "other")
 
 
-### Scene level
+### Scene level templates
 
 * __scene_template.html__  (applied to "used" scenes within "normal" chapters)
 * __unused_scene_template.html__  (applied to "unused" scenes)
@@ -63,7 +63,17 @@ If no templates are found, the output file will be empty.
 * __scene_divider.html__  (lead scenes, beginning from the second in chapter)
 
 
-## List of placeholders
+
+
+## Placeholders
+
+### Syntax
+
+There are two options:
+
+1. $Placeholder
+2. ${Placeholder}
+
 
 ### "HTML header" placeholders
 
