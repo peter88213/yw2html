@@ -15,6 +15,7 @@ Published under the MIT License (https://opensource.org/licenses/mit-license.php
 
 import sys
 import os
+import argparse
 
 from pywriter.converter.yw_cnv_gui import YwCnvGui
 from pywriter.html.html_export import HtmlExport
@@ -148,11 +149,12 @@ class Exporter(HtmlExport):
             self.sceneDivider = result[1]
 
 
-def run(sourcePath, templatePath, silentMode=True):
+def run(sourcePath, templatePath, suffix, silentMode=True):
     fileName, FileExtension = os.path.splitext(sourcePath)
 
     if FileExtension in ['.yw6', '.yw7']:
         document = Exporter('', templatePath)
+        document.SUFFIX = suffix
 
     else:
         sys.exit('ERROR: File type is not supported.')
@@ -161,20 +163,23 @@ def run(sourcePath, templatePath, silentMode=True):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Export yWriter project to html.')
+    parser.add_argument('sourcePath', metavar='Project',
+                        help='yWriter project file')
+    parser.add_argument('-t', dest='templatePath', metavar='template-dir',
+                        help='path to template directory')
+    parser.add_argument('-s', dest='suffix', metavar='suffix',
+                        help='suffix to output file name')
+    args = parser.parse_args()
 
-    try:
-        sourcePath = sys.argv[1]
+    if args.templatePath:
+        templatePath = args.templatePath
 
-    except:
-        sourcePath = ''
-
-    try:
-        templatePath = sys.argv[2]
-
-    except:
-        templatePath = os.path.dirname(sourcePath)
+    else:
+        templatePath = os.path.dirname(args.sourcePath)
 
     if templatePath == '':
         templatePath = '.'
 
-    run(sourcePath, templatePath, False)
+    run(args.sourcePath, templatePath, args.suffix, False)
