@@ -17,7 +17,7 @@ The yw2html Software comes as a zipfile `yw2html_<version number>.zip`.
 
 
 ## Usage
-usage: `yw_to_html.pyw [-h] [-t template-dir] [-s suffix] Project`
+usage: `yw_to_html.pyw [-h] [-t template-dir] [-s suffix] [--silent] Project`
 
 #### positional arguments:
   `Project`          yWriter project file
