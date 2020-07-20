@@ -31,6 +31,10 @@ usage: `yw_to_html.pyw [-h] [-t template-dir] [-s suffix] Project`
 If no template directory is set, templates are searched for in the yWriter project directory.
 If no templates are found, the output file will be empty.
 
+## Examples
+The downloaded zip file includes a directory named  _examples_  containing a  _template_  directory with example templates for different purposes and some example batch files showing the correct commands. You can launch the batch files by dragging and dropping your yWriter project on the icons. The results will be written to the yWriter project directory.
+
+
 ## List of templates
 
 ### Project level templates
