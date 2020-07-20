@@ -23,12 +23,13 @@ usage: `yw_to_html.pyw [-h] [-t template-dir] [-s suffix] Project`
   `Project`          yWriter project file
 
 #### optional arguments:
-  `-h, --help`       show this help message and exit
+  `-h, --help`       show a help message and exit
   
   `-t template-dir`  template directory
   
   `-s suffix`        suffix to output file name
   
+  `--silent`         suppress error messages and the request to confirm overwriting
 
 If no template directory is set, templates are searched for in the yWriter project directory.
 
