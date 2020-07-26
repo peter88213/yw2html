@@ -128,14 +128,14 @@ There are two options:
 *  __$Field3__  - Scene rating: field 3
 *  __$Field4__  - Scene rating: field 4
 
-*  __$Date__  - Specific scene date ("None" if not set)
-*  __$Time__  - Specific scene time ("None" if not set)
-*  __$Day__  - Time scene begins: day ("None" if not set)
-*  __$Hour__  - Time scene begins: hour ("None" if not set)
-*  __$Minute__  - Time scene begins: minute ("None" if not set)
-*  __$LastsDays__  - Amount of time scene lasts: days ("None" if not set)
-*  __$LastsHours__  - Amount of time scene lasts: hours ("None" if not set)
-*  __$LastsMinutes__  - Amount of time scene lasts: minutes ("None" if not set)
+*  __$Date__  - Specific scene date
+*  __$Time__  - Specific scene time
+*  __$Day__  - Time scene begins: day
+*  __$Hour__  - Time scene begins: hour
+*  __$Minute__  - Time scene begins: minute
+*  __$LastsDays__  - Amount of time scene lasts: days
+*  __$LastsHours__  - Amount of time scene lasts: hours
+*  __$LastsMinutes__  - Amount of time scene lasts: minutes
 
 *  __$ReactionScene__  - A(ction) or R(eaction)
 *  __$Goal__  - The scene protagonist's goal, html-formatted
