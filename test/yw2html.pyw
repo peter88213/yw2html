@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Export yWriter project to html. 
 
 Version @release
@@ -848,8 +849,14 @@ class YwFile(Novel):
 
             if scn.find('SpecificDateTime') is not None:
                 dateTime = scn.find('SpecificDateTime').text.split(' ')
-                self.scenes[scId].date = dateTime[0]
-                self.scenes[scId].time = dateTime[1]
+
+                for dt in dateTime:
+
+                    if '-' in dt:
+                        self.scenes[scId].date = dt
+
+                    elif ':' in dt:
+                        self.scenes[scId].time = dt
 
             else:
                 if scn.find('Day') is not None:
