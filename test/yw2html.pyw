@@ -209,11 +209,18 @@ class Chapter():
         # 0 = chapter level
         # 1 = section level ("this chapter begins a section")
 
-        self.chType = None
+        self.oldType = None
         # int
         # xml: <Type>
         # 0 = chapter type (marked "Chapter")
         # 1 = other type (marked "Other")
+
+        self.chType = None
+        # int
+        # xml: <ChapterType>
+        # 0 = Normal
+        # 1 = Notes
+        # 2 = Todo
 
         self.isUnused = None
         # bool
@@ -290,6 +297,14 @@ class Scene():
         self.isUnused = None
         # bool
         # xml: <Unused> -1
+
+        self.isNotesScene = None
+        # bool
+        # xml: <Fields><Field_SceneType> 1
+
+        self.isTodoScene = None
+        # bool
+        # xml: <Fields><Field_SceneType> 2
 
         self.doNotExport = None
         # bool
@@ -477,7 +492,7 @@ SAFE_DASH = '--'
 
 def replace_unsafe_glyphs(text):
     """Replace glyphs being corrupted by yWriter with safe substitutes. """
-    return text.replace(EN_DASH, SAFE_DASH).replace(EM_DASH, SAFE_DASH)
+    return text  # .replace(EN_DASH, SAFE_DASH).replace(EM_DASH, SAFE_DASH)
 
 
 def indent(elem, level=0):
@@ -741,7 +756,10 @@ class YwFile(Novel):
                 self.chapters[chId].chLevel = 0
 
             if chp.find('Type') is not None:
-                self.chapters[chId].chType = int(chp.find('Type').text)
+                self.chapters[chId].oldType = int(chp.find('Type').text)
+
+            if chp.find('ChapterType') is not None:
+                self.chapters[chId].chType = int(chp.find('ChapterType').text)
 
             if chp.find('Unused') is not None:
                 self.chapters[chId].isUnused = True
@@ -749,24 +767,24 @@ class YwFile(Novel):
             else:
                 self.chapters[chId].isUnused = False
 
-            for fields in chp.findall('Fields'):
+            for chFields in chp.findall('Fields'):
 
-                if fields.find('Field_SuppressChapterTitle') is not None:
+                if chFields.find('Field_SuppressChapterTitle') is not None:
 
-                    if fields.find('Field_SuppressChapterTitle').text == '1':
+                    if chFields.find('Field_SuppressChapterTitle').text == '1':
                         self.chapters[chId].suppressChapterTitle = True
 
-                if fields.find('Field_IsTrash') is not None:
+                if chFields.find('Field_IsTrash') is not None:
 
-                    if fields.find('Field_IsTrash').text == '1':
+                    if chFields.find('Field_IsTrash').text == '1':
                         self.chapters[chId].isTrash = True
 
                     else:
                         self.chapters[chId].isTrash = False
 
-                if fields.find('Field_SuppressChapterBreak') is not None:
+                if chFields.find('Field_SuppressChapterBreak') is not None:
 
-                    if fields.find('Field_SuppressChapterTitle').text == '0':
+                    if chFields.find('Field_SuppressChapterTitle').text == '0':
                         self.chapters[chId].doNotExport = True
 
                     else:
@@ -807,6 +825,16 @@ class YwFile(Novel):
 
             else:
                 self.scenes[scId].isUnused = False
+
+            for scFields in scn.findall('Fields'):
+
+                if scFields.find('Field_SceneType') is not None:
+
+                    if scFields.find('Field_SceneType').text == '1':
+                        self.scenes[scId].isNotesScene = True
+
+                    if scFields.find('Field_SceneType').text == '2':
+                        self.scenes[scId].isTodoScene = True
 
             if scn.find('ExportCondSpecific') is None:
                 self.scenes[scId].doNotExport = False
@@ -1022,6 +1050,12 @@ class YwFile(Novel):
             if novel.scenes[scId].isUnused is not None:
                 self.scenes[scId].isUnused = novel.scenes[scId].isUnused
 
+            if novel.scenes[scId].isNotesScene is not None:
+                self.scenes[scId].isNotesScene = novel.scenes[scId].isNotesScene
+
+            if novel.scenes[scId].isTodoScene is not None:
+                self.scenes[scId].isTodoScene = novel.scenes[scId].isTodoScene
+
             if novel.scenes[scId].status is not None:
                 self.scenes[scId].status = novel.scenes[scId].status
 
@@ -1127,6 +1161,9 @@ class YwFile(Novel):
 
             if novel.chapters[chId].chLevel is not None:
                 self.chapters[chId].chLevel = novel.chapters[chId].chLevel
+
+            if novel.chapters[chId].oldType is not None:
+                self.chapters[chId].oldType = novel.chapters[chId].oldType
 
             if novel.chapters[chId].chType is not None:
                 self.chapters[chId].chType = novel.chapters[chId].chType
@@ -1401,7 +1438,16 @@ class YwFile(Novel):
                     if self.chapters[chId].chLevel == 0:
                         chp.remove(levelInfo)
 
-                chp.find('Type').text = str(self.chapters[chId].chType)
+                chp.find('Type').text = str(self.chapters[chId].oldType)
+
+                if self.chapters[chId].chType is not None:
+
+                    if chp.find('ChapterType') is not None:
+                        chp.find('ChapterType').text = str(
+                            self.chapters[chId].chType)
+                    else:
+                        ET.SubElement(chp, 'ChapterType').text = str(
+                            self.chapters[chId].chType)
 
                 if self.chapters[chId].isUnused:
 
@@ -1445,6 +1491,44 @@ class YwFile(Novel):
 
                 elif scn.find('Unused') is not None:
                     scn.remove(scn.find('Unused'))
+
+                if self.scenes[scId].isNotesScene:
+
+                    if scn.find('Fields') is None:
+                        scFields = ET.SubElement(scn, 'Fields')
+
+                    else:
+                        scFields = scn.find('Fields')
+
+                    if scFields.find('Field_SceneType') is None:
+                        ET.SubElement(scFields, 'Field_SceneType').text = '1'
+
+                elif scn.find('Fields') is not None:
+                    scFields = scn.find('Fields')
+
+                    if scFields.find('Field_SceneType') is not None:
+
+                        if scFields.find('Field_SceneType').text == '1':
+                            scFields.remove(scFields.find('Field_SceneType'))
+
+                if self.scenes[scId].isTodoScene:
+
+                    if scn.find('Fields') is None:
+                        scFields = ET.SubElement(scn, 'Fields')
+
+                    else:
+                        scFields = scn.find('Fields')
+
+                    if scFields.find('Field_SceneType') is None:
+                        ET.SubElement(scFields, 'Field_SceneType').text = '2'
+
+                elif scn.find('Fields') is not None:
+                    scFields = scn.find('Fields')
+
+                    if scFields.find('Field_SceneType') is not None:
+
+                        if scFields.find('Field_SceneType').text == '2':
+                            scFields.remove(scFields.find('Field_SceneType'))
 
                 if self.scenes[scId].status is not None:
                     scn.find('Status').text = str(self.scenes[scId].status)
@@ -1862,6 +1946,14 @@ class YwNewFile(YwFile):
             if self.scenes[scId].isUnused:
                 ET.SubElement(scn, 'Unused').text = '-1'
 
+            scFields = ET.SubElement(scn, 'Fields')
+
+            if self.scenes[scId].isNotesScene:
+                ET.SubElement(scFields, 'Field_SceneType').text = '1'
+
+            elif self.scenes[scId].isTodoScene:
+                ET.SubElement(scFields, 'Field_SceneType').text = '2'
+
             if self.scenes[scId].status is not None:
                 ET.SubElement(scn, 'Status').text = str(
                     self.scenes[scId].status)
@@ -1977,8 +2069,12 @@ class YwNewFile(YwFile):
             if self.chapters[chId].chLevel == 1:
                 ET.SubElement(chp, 'SectionStart').text = '-1'
 
-            if self.chapters[chId].chType is not None:
+            if self.chapters[chId].oldType is not None:
                 ET.SubElement(chp, 'Type').text = str(
+                    self.chapters[chId].oldType)
+
+            if self.chapters[chId].chType is not None:
+                ET.SubElement(chp, 'ChapterType').text = str(
                     self.chapters[chId].chType)
 
             if self.chapters[chId].isUnused:
@@ -2312,15 +2408,18 @@ class FileExport(Novel):
     fileHeader = ''
     partTemplate = ''
     chapterTemplate = ''
+    notesChapterTemplate = ''
+    todoChapterTemplate = ''
     unusedChapterTemplate = ''
-    infoChapterTemplate = ''
     sceneTemplate = ''
+    appendedSceneTemplate = ''
+    notesSceneTemplate = ''
+    todoSceneTemplate = ''
     unusedSceneTemplate = ''
-    infoSceneTemplate = ''
     sceneDivider = ''
     chapterEndTemplate = ''
     unusedChapterEndTemplate = ''
-    infoChapterEndTemplate = ''
+    notesChapterEndTemplate = ''
     characterTemplate = ''
     locationTemplate = ''
     itemTemplate = ''
@@ -2620,18 +2719,31 @@ class FileExport(Novel):
 
         for chId in self.srtChapters:
 
-            if self.chapters[chId].isUnused:
+            # The order counts; be aware that "Todo" and "Notes" chapters are
+            # always unused.
 
-                if self.unusedChapterTemplate != '':
-                    template = Template(self.unusedChapterTemplate)
+            if self.chapters[chId].chType == 2:
+
+                if self.todoChapterTemplate != '':
+                    template = Template(self.todoChapterTemplate)
 
                 else:
                     continue
 
-            elif self.chapters[chId].chType != 0:
+            elif self.chapters[chId].chType == 1 or self.chapters[chId].oldType == 1:
+                # Chapter is "Notes" (new file format) or "Info" (old file
+                # format) chapter.
 
-                if self.infoChapterTemplate != '':
-                    template = Template(self.infoChapterTemplate)
+                if self.notesChapterTemplate != '':
+                    template = Template(self.notesChapterTemplate)
+
+                else:
+                    continue
+
+            elif self.chapters[chId].isUnused:
+
+                if self.unusedChapterTemplate != '':
+                    template = Template(self.unusedChapterTemplate)
 
                 else:
                     continue
@@ -2651,7 +2763,28 @@ class FileExport(Novel):
                 wordsTotal += self.scenes[scId].wordCount
                 lettersTotal += self.scenes[scId].letterCount
 
-                if self.scenes[scId].isUnused or self.chapters[chId].isUnused or self.scenes[scId].doNotExport:
+                # The order counts; be aware that "Todo" and "Notes" scenes are
+                # always unused.
+
+                if self.scenes[scId].isTodoScene:
+
+                    if self.todoSceneTemplate != '':
+                        template = Template(self.todoSceneTemplate)
+
+                    else:
+                        continue
+
+                elif self.scenes[scId].isNotesScene or self.chapters[chId].oldType == 1:
+                    # Scene is "Notes" (new file format) or "Info" (old file
+                    # format) scene.
+
+                    if self.notesSceneTemplate != '':
+                        template = Template(self.notesSceneTemplate)
+
+                    else:
+                        continue
+
+                elif self.scenes[scId].isUnused or self.chapters[chId].isUnused or self.scenes[scId].doNotExport:
 
                     if self.unusedSceneTemplate != '':
                         template = Template(self.unusedSceneTemplate)
@@ -2659,17 +2792,13 @@ class FileExport(Novel):
                     else:
                         continue
 
-                elif self.chapters[chId].chType != 0:
-
-                    if self.infoSceneTemplate != '':
-                        template = Template(self.infoSceneTemplate)
-
-                    else:
-                        continue
-
                 else:
                     sceneNumber += 1
+
                     template = Template(self.sceneTemplate)
+
+                    if self.scenes[scId].appendToPrev and self.appendedSceneTemplate != '':
+                        template = Template(self.appendedSceneTemplate)
 
                 if not (firstSceneInChapter or self.scenes[scId].appendToPrev):
                     lines.append(self.sceneDivider)
@@ -2679,11 +2808,24 @@ class FileExport(Novel):
 
                 firstSceneInChapter = False
 
-            if self.chapters[chId].isUnused and self.unusedChapterEndTemplate != '':
-                lines.append(self.unusedChapterEndTemplate)
+            if self.chapters[chId].chType == 2:
 
-            elif self.chapters[chId].chType != 0 and self.infoChapterEndTemplate != '':
-                lines.append(self.infoChapterEndTemplate)
+                if self.todoChapterEndTemplate != '':
+                    lines.append(self.todoChapterEndTemplate)
+
+                else:
+                    continue
+
+            elif self.chapters[chId].chType == 1 or self.chapters[chId].oldType == 1:
+
+                if self.notesChapterEndTemplate != '':
+                    lines.append(self.notesChapterEndTemplate)
+
+                else:
+                    continue
+
+            elif self.chapters[chId].isUnused and self.unusedChapterEndTemplate != '':
+                lines.append(self.unusedChapterEndTemplate)
 
             else:
                 lines.append(self.chapterEndTemplate)
@@ -2775,17 +2917,22 @@ class Exporter(HtmlExport):
     _HTML_FOOTER = '/html_footer.html'
 
     _PART_TEMPLATE = '/part_template.html'
-    _CHAPTER_TEMPLATE = '/chapter_template.html'
-    _UNUSED_CHAPTER_TEMPLATE = '/unused_chapter_template.html'
-    _INFO_CHAPTER_TEMPLATE = '/info_chapter_template.html'
 
+    _CHAPTER_TEMPLATE = '/chapter_template.html'
     _CHAPTER_END_TEMPLATE = '/chapter_end_template.html'
+
+    _UNUSED_CHAPTER_TEMPLATE = '/unused_chapter_template.html'
     _UNUSED_CHAPTER_END_TEMPLATE = '/unused_chapter_end_template.html'
-    _INFO_CHAPTER_END_TEMPLATE = '/info_chapter_end_template.html'
+
+    _NOTES_CHAPTER_TEMPLATE = '/notes_chapter_template.html'
+    _NOTES_CHAPTER_END_TEMPLATE = '/notes_chapter_end_template.html'
+
+    _TODO_CHAPTER_TEMPLATE = '/todo_chapter_template.html'
+    _TODO_CHAPTER_END_TEMPLATE = '/todo_chapter_end_template.html'
 
     _SCENE_TEMPLATE = '/scene_template.html'
     _UNUSED_SCENE_TEMPLATE = '/unused_scene_template.html'
-    _INFO_SCENE_TEMPLATE = '/info_scene_template.html'
+    _NOTES_SCENE_TEMPLATE = '/info_scene_template.html'
     _SCENE_DIVIDER = '/scene_divider.html'
 
     def __init__(self, filePath, templatePath='.'):
@@ -2834,22 +2981,16 @@ class Exporter(HtmlExport):
         if result[1] is not None:
             self.chapterTemplate = result[1]
 
+        result = read_html_file(self.templatePath + self._CHAPTER_END_TEMPLATE)
+
+        if result[1] is not None:
+            self.chapterEndTemplate = result[1]
+
         result = read_html_file(
             self.templatePath + self._UNUSED_CHAPTER_TEMPLATE)
 
         if result[1] is not None:
             self.unusedChapterTemplate = result[1]
-
-        result = read_html_file(
-            self.templatePath + self._INFO_CHAPTER_TEMPLATE)
-
-        if result[1] is not None:
-            self.infoChapterTemplate = result[1]
-
-        result = read_html_file(self.templatePath + self._CHAPTER_END_TEMPLATE)
-
-        if result[1] is not None:
-            self.chapterEndTemplate = result[1]
 
         result = read_html_file(
             self.templatePath + self._UNUSED_CHAPTER_END_TEMPLATE)
@@ -2858,10 +2999,28 @@ class Exporter(HtmlExport):
             self.unusedChapterEndTemplate = result[1]
 
         result = read_html_file(
-            self.templatePath + self._INFO_CHAPTER_END_TEMPLATE)
+            self.templatePath + self._NOTES_CHAPTER_TEMPLATE)
 
         if result[1] is not None:
-            self.infoChapterEndTemplate = result[1]
+            self.notesChapterTemplate = result[1]
+
+        result = read_html_file(
+            self.templatePath + self._NOTES_CHAPTER_END_TEMPLATE)
+
+        if result[1] is not None:
+            self.notesChapterEndTemplate = result[1]
+
+        result = read_html_file(
+            self.templatePath + self._TODO_CHAPTER_TEMPLATE)
+
+        if result[1] is not None:
+            self.todoChapterTemplate = result[1]
+
+        result = read_html_file(
+            self.templatePath + self._TODO_CHAPTER_END_TEMPLATE)
+
+        if result[1] is not None:
+            self.todoChapterEndTemplate = result[1]
 
         # Scene level.
 
@@ -2876,10 +3035,15 @@ class Exporter(HtmlExport):
         if result[1] is not None:
             self.unusedSceneTemplate = result[1]
 
-        result = read_html_file(self.templatePath + self._INFO_SCENE_TEMPLATE)
+        result = read_html_file(self.templatePath + self._NOTES_SCENE_TEMPLATE)
 
         if result[1] is not None:
-            self.infoSceneTemplate = result[1]
+            self.notesSceneTemplate = result[1]
+
+        result = read_html_file(self.templatePath + self._TODO_SCENE_TEMPLATE)
+
+        if result[1] is not None:
+            self.todoSceneTemplate = result[1]
 
         result = read_html_file(self.templatePath + self._SCENE_DIVIDER)
 
