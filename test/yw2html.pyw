@@ -6400,8 +6400,8 @@ class FileFactory():
 TITLE = 'yWriter import/export'
 
 
-class YwCnvGui(YwCnv):
-    """Standalone yWriter converter with a simple GUI. 
+class YwCnvTk(YwCnv):
+    """Standalone yWriter converter with a simple tkinter GUI. 
 
     # Arguments
 
@@ -6513,7 +6513,7 @@ class YwCnvGui(YwCnv):
                 self.processInfo.config(
                     text='Project: "' + sourceFile.filePath + '"')
                 self.processInfo.config(
-                    text=YwCnv.convert(sourceFile, targetFile))
+                    text=YwCnv.convert(self, sourceFile, targetFile))
 
             elif isinstance(targetFile, Yw7NewFile):
 
@@ -6527,7 +6527,7 @@ class YwCnvGui(YwCnv):
                     self.processInfo.config(
                         text='New project: "' + targetFile.filePath + '"')
                     self.processInfo.config(
-                        text=YwCnv.convert(sourceFile, targetFile))
+                        text=YwCnv.convert(self, sourceFile, targetFile))
 
             else:
 
@@ -6536,7 +6536,7 @@ class YwCnvGui(YwCnv):
                 self.processInfo.config(
                     text='Project: "' + targetFile.filePath + '"')
                 self.processInfo.config(
-                    text=YwCnv.convert(sourceFile, targetFile))
+                    text=YwCnv.convert(self, sourceFile, targetFile))
 
             # Visualize the outcome.
 
@@ -6743,7 +6743,7 @@ def run(sourcePath, templatePath, suffix, silentMode=True):
     else:
         sys.exit('ERROR: File type is not supported.')
 
-    converter = YwCnvGui(sourcePath, document, silentMode)
+    converter = YwCnvTk(sourcePath, document, silentMode)
 
 
 if __name__ == '__main__':

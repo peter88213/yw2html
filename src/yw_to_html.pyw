@@ -12,7 +12,7 @@ import sys
 import os
 import argparse
 
-from pywriter.converter.yw_cnv_gui import YwCnvGui
+from pywriter.converter.yw_cnv_tk import YwCnvTk
 from pywriter.html.html_export import HtmlExport
 
 from pywriter.file.file_export import FileExport
@@ -176,7 +176,7 @@ def run(sourcePath, templatePath, suffix, silentMode=True):
     else:
         sys.exit('ERROR: File type is not supported.')
 
-    converter = YwCnvGui(sourcePath, document, silentMode)
+    converter = YwCnvTk(sourcePath, document, silentMode)
 
 
 if __name__ == '__main__':
