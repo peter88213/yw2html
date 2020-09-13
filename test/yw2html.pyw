@@ -2234,7 +2234,6 @@ class Yw7File(YwFile):
 
 
 
-
 class Yw7TreeCreator(YwTreeBuilder):
     """Create a new yWriter 7 project xml tree."""
 
@@ -2548,20 +2547,6 @@ class Yw7TreeCreator(YwTreeBuilder):
 
         return 'SUCCESS'
 
-
-class Yw7NewFile(YwFile):
-    """yWriter 7 xml project file representation."""
-
-    EXTENSION = '.yw7'
-
-    def __init__(self, filePath):
-        YwFile.__init__(self, filePath)
-        self.ywTreeReader = Utf8TreeReader()
-        self.ywTreeBuilder = Yw7TreeCreator()
-        self.ywTreeWriter = Utf8TreeWriter()
-        self.ywPostprocessor = Utf8Postprocessor()
-
-
 from shutil import rmtree
 
 
@@ -2628,19 +2613,6 @@ class Yw5TreeCreator(Yw5TreeBuilder):
             return 'ERROR: Can not read xml file "' + ywProject._filePath + '".'
 
         return Yw5TreeBuilder.build_element_tree(self, ywProject)
-
-
-class Yw5NewFile(YwFile):
-    """yWriter 5 xml project file representation."""
-
-    EXTENSION = '.yw5'
-
-    def __init__(self, filePath):
-        YwFile.__init__(self, filePath)
-        self.ywTreeReader = AnsiTreeReader()
-        self.ywTreeBuilder = Yw5TreeCreator()
-        self.ywTreeWriter = AnsiTreeWriter()
-        self.ywPostprocessor = AnsiPostprocessor()
 
 import locale
 from datetime import datetime
@@ -6287,7 +6259,8 @@ class FileFactory():
             # Determine which sort of target is required.
 
             if suffix is None:
-                targetFile = Yw5NewFile(fileName + Yw5NewFile.EXTENSION)
+                targetFile = Yw5File(fileName + Yw5File.EXTENSION)
+                targetFile.ywTreeBuilder = Yw5TreeCreator()
 
             elif suffix == '':
                 targetFile = OdtExport(fileName + OdtExport.EXTENSION)
@@ -6387,7 +6360,8 @@ class FileFactory():
 
                     else:
                         sourceFile = HtmlImport(sourcePath)
-                        targetFile = Yw7NewFile(fileName + '.yw7')
+                        targetFile = Yw7File(fileName + Yw7File.EXTENSION)
+                        targetFile.ywTreeBuilder = Yw7TreeCreator()
 
                 else:
                     return ['ERROR: Cannot read "' + sourcePath + '".', None, None]
@@ -6549,7 +6523,7 @@ class YwCnvTk(YwCnv):
                 self.processInfo.config(
                     text=YwCnv.convert(self, sourceFile, targetFile))
 
-            elif isinstance(targetFile, Yw7NewFile):
+            elif isinstance(targetFile.ywTreeBuilder, Yw7TreeCreator):
 
                 if targetFile.file_exists():
                     self.processInfo.config(
