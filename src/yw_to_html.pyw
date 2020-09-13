@@ -167,16 +167,16 @@ class Exporter(HtmlExport):
 
 
 def run(sourcePath, templatePath, suffix, silentMode=True):
-    fileName, FileExtension = os.path.splitext(sourcePath)
+    fileName, fileExtension = os.path.splitext(sourcePath)
 
-    if FileExtension in ['.yw6', '.yw7']:
+    if fileExtension in ['.yw6', '.yw7']:
         document = Exporter('', templatePath)
         document.SUFFIX = suffix
 
     else:
         sys.exit('ERROR: File type is not supported.')
 
-    converter = YwCnvTk(sourcePath, document, silentMode)
+    converter = YwCnvTk(sourcePath, document.SUFFIX, silentMode)
 
 
 if __name__ == '__main__':
