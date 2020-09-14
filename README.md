@@ -1,4 +1,4 @@
-# yw2html__  - HTML export with templates from yWriter 6/7
+# yw2html - HTML export with templates from yWriter 6/7
 
 The yw2html Python script runs through all chapters and scenes of a yWriter 6/7 project and fills HTML templates.
 
@@ -56,18 +56,21 @@ The downloaded zip file includes a directory named  _examples_  containing a  _t
 * __part_template.html__  (chapter header; applied to chapters marked "section beginning")
 * __chapter_template.html__  (chapter header; applied to all "used" and "normal" chapters unless a "part template" exists)
 * __unused_chapter_template.html__  (chapter header; applied to chapters marked "unused" or "do not export")
-* __info_chapter_template.html__  (chapter header; applied to chapters marked "other")
+* __notes_chapter_template.html__  (chapter header; applied to chapters marked "notes")
+* __todo_chapter_template.html__  (chapter header; applied to chapters marked "todo")
 
 * __chapter_end_template.html__  (chapter footer; applied to all "used" and "normal" chapters)
 * __unused_chapter_end_template.html__  (chapter footer; applied to chapters marked "unused" or "do not export")
-* __info_chapter_end_template.html__  (chapter footer; applied to chapters marked "other")
+* __notes_chapter_end_template.html__  (chapter footer; applied to chapters marked "notes")
+* __todo_chapter_end_template.html__  (chapter footer; applied to chapters marked "todo")
 
 
 ### Scene level templates
 
 * __scene_template.html__  (applied to "used" scenes within "normal" chapters)
 * __unused_scene_template.html__  (applied to "unused" scenes)
-* __info_scene_template.html__  (applied to scenes within chapters marked "other")
+* __notes_scene_template.html__  (applied to scenes marked "notes")
+* __todo_scene_template.html__  (applied to scenes marked "todo")
 * __scene_divider.html__  (lead scenes, beginning from the second in chapter)
 
 
