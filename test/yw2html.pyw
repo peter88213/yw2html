@@ -45,13 +45,13 @@ class YwCnv():
         """Read document file, convert its content to xml, and replace yWriter file."""
 
         if sourceFile.filePath is None:
-            return 'ERROR: "' + sourceFile.filePath + '" is not of the supported type.'
+            return 'ERROR: "' + os.path.normpath(sourceFile.filePath) + '" is not of the supported type.'
 
         if not sourceFile.file_exists():
-            return 'ERROR: "' + sourceFile.filePath + '" not found.'
+            return 'ERROR: "' + os.path.normpath(sourceFile.filePath) + '" not found.'
 
         if targetFile.filePath is None:
-            return 'ERROR: "' + targetFile.filePath + '" is not of the supported type.'
+            return 'ERROR: "' + os.path.normpath(targetFile.filePath) + '" is not of the supported type.'
 
         if targetFile.file_exists() and not self.confirm_overwrite(targetFile.filePath):
             return 'Program abort by user.'
@@ -88,6 +88,7 @@ class Novel():
     of the information included in an yWriter project file).
     """
 
+    DESCRIPTION = 'Novel'
     EXTENSION = None
     SUFFIX = None
     # To be extended by file format specific subclasses.
@@ -244,9 +245,9 @@ class Novel():
             lines.append('ChID:' + str(chId) + '\n')
 
             for scId in self.chapters[chId].srtScenes:
-                lines.append('  ScID:' + str(scId) + '\n')
+                lines.append('  ScID:' + str(scId))
 
-        return ''.join(lines)
+        return '\n'.join(lines)
 
 
 class Chapter():
@@ -303,7 +304,7 @@ class Chapter():
         # True: This chapter is the yw7 project's "trash bin".
         # False: This chapter is not a "trash bin".
 
-        self.doNotExport = None
+        self.suppressChapterBreak = None
         # bool
         # xml: <Fields><Field_SuppressChapterBreak> 0
 
@@ -727,14 +728,14 @@ class YwFile(Novel):
 
                 if chFields.find('Field_SuppressChapterBreak') is not None:
 
-                    if chFields.find('Field_SuppressChapterTitle').text == '0':
-                        self.chapters[chId].doNotExport = True
+                    if chFields.find('Field_SuppressChapterBreak').text == '1':
+                        self.chapters[chId].suppressChapterBreak = True
 
                     else:
-                        self.chapters[chId].doNotExport = False
+                        self.chapters[chId].suppressChapterBreak = False
 
                 else:
-                    self.chapters[chId].doNotExport = False
+                    self.chapters[chId].suppressChapterBreak = False
 
             self.chapters[chId].srtScenes = []
 
@@ -919,15 +920,8 @@ class YwFile(Novel):
             if message.startswith('ERROR'):
                 return message
 
-        prjStructure = novel.get_structure()
-
-        if prjStructure is not None:
-
-            if prjStructure == '':
-                return 'ERROR: Source file contains no yWriter project structure information.'
-
-            if prjStructure != self.get_structure():
-                return 'ERROR: Structure mismatch.'
+        if novel.get_structure() == '':
+            return 'ERROR: Source file contains nothing to write to a yWriter project.'
 
         # Merge locations.
 
@@ -1151,6 +1145,9 @@ class YwFile(Novel):
             if novel.chapters[chId].suppressChapterTitle is not None:
                 self.chapters[chId].suppressChapterTitle = novel.chapters[chId].suppressChapterTitle
 
+            if novel.chapters[chId].suppressChapterBreak is not None:
+                self.chapters[chId].suppressChapterBreak = novel.chapters[chId].suppressChapterBreak
+
             if novel.chapters[chId].isTrash is not None:
                 self.chapters[chId].isTrash = novel.chapters[chId].isTrash
 
@@ -1221,12 +1218,12 @@ class YwFile(Novel):
         if message.startswith('ERROR'):
             return message
 
-        return 'SUCCESS: project data written to "' + self._filePath + '".'
+        return 'SUCCESS: "' + os.path.normpath(self.filePath) + '" written.'
 
     def is_locked(self):
         """Test whether a .lock file placed by yWriter exists.
         """
-        if os.path.isfile(self._filePath + '.lock'):
+        if os.path.isfile(self.filePath + '.lock'):
             return True
 
         else:
@@ -2064,8 +2061,9 @@ class AnsiPostprocessor(YwPostprocessor):
 
 
 class Yw5File(YwFile):
-    """yWriter 5 xml project file representation."""
+    """yWriter 5 project file representation."""
 
+    DESCRIPTION = 'yWriter 5 project'
     EXTENSION = '.yw5'
 
     def __init__(self, filePath):
@@ -2172,8 +2170,9 @@ class Utf8Postprocessor(YwPostprocessor):
 
 
 class Yw6File(YwFile):
-    """yWriter 6 xml project file representation."""
+    """yWriter 6 project file representation."""
 
+    DESCRIPTION = 'yWriter 6 project'
     EXTENSION = '.yw6'
 
     def __init__(self, filePath):
@@ -2221,8 +2220,9 @@ class Yw7TreeBuilder(YwTreeBuilder):
 
 
 class Yw7File(YwFile):
-    """yWriter 7 xml project file representation."""
+    """yWriter 7 project file representation."""
 
+    DESCRIPTION = 'yWriter 7 project'
     EXTENSION = '.yw7'
 
     def __init__(self, filePath):
@@ -4031,14 +4031,17 @@ class FileExport(Novel):
     notesChapterTemplate = ''
     todoChapterTemplate = ''
     unusedChapterTemplate = ''
+    notExportedChapterTemplate = ''
     sceneTemplate = ''
     appendedSceneTemplate = ''
     notesSceneTemplate = ''
     todoSceneTemplate = ''
     unusedSceneTemplate = ''
+    notExportedSceneTemplate = ''
     sceneDivider = ''
     chapterEndTemplate = ''
     unusedChapterEndTemplate = ''
+    notExportedChapterEndTemplate = ''
     notesChapterEndTemplate = ''
     characterTemplate = ''
     locationTemplate = ''
@@ -4344,6 +4347,21 @@ class FileExport(Novel):
             # The order counts; be aware that "Todo" and "Notes" chapters are
             # always unused.
 
+            # Has the chapter only scenes not to be exported?
+
+            sceneCount = 0
+            notExportCount = 0
+            doNotExportChapter = False
+
+            for scId in self.chapters[chId].srtScenes:
+                sceneCount += 1
+
+                if self.scenes[scId].doNotExport:
+                    notExportCount += 1
+
+            if sceneCount > 0 and notExportCount == sceneCount:
+                doNotExportChapter = True
+
             if self.chapters[chId].chType == 2:
 
                 if self.todoChapterTemplate != '':
@@ -4366,6 +4384,14 @@ class FileExport(Novel):
 
                 if self.unusedChapterTemplate != '':
                     template = Template(self.unusedChapterTemplate)
+
+                else:
+                    continue
+
+            elif doNotExportChapter:
+
+                if self.notExportedChapterTemplate != '':
+                    template = Template(self.notExportedChapterTemplate)
 
                 else:
                     continue
@@ -4406,10 +4432,18 @@ class FileExport(Novel):
                     else:
                         continue
 
-                elif self.scenes[scId].isUnused or self.chapters[chId].isUnused or self.scenes[scId].doNotExport:
+                elif self.scenes[scId].isUnused or self.chapters[chId].isUnused:
 
                     if self.unusedSceneTemplate != '':
                         template = Template(self.unusedSceneTemplate)
+
+                    else:
+                        continue
+
+                elif self.scenes[scId].doNotExport or doNotExportChapter:
+
+                    if self.notExportedSceneTemplate != '':
+                        template = Template(self.notExportedSceneTemplate)
 
                     else:
                         continue
@@ -4419,7 +4453,7 @@ class FileExport(Novel):
 
                     template = Template(self.sceneTemplate)
 
-                    if self.scenes[scId].appendToPrev and self.appendedSceneTemplate != '':
+                    if not firstSceneInChapter and self.scenes[scId].appendToPrev and self.appendedSceneTemplate != '':
                         template = Template(self.appendedSceneTemplate)
 
                 if not (firstSceneInChapter or self.scenes[scId].appendToPrev):
@@ -4430,26 +4464,21 @@ class FileExport(Novel):
 
                 firstSceneInChapter = False
 
-            if self.chapters[chId].chType == 2:
-
-                if self.todoChapterEndTemplate != '':
-                    lines.append(self.todoChapterEndTemplate)
-
-                else:
-                    continue
+            if self.chapters[chId].chType == 2 and self.todoChapterEndTemplate != '':
+                lines.append(self.todoChapterEndTemplate)
 
             elif self.chapters[chId].chType == 1 or self.chapters[chId].oldType == 1:
 
                 if self.notesChapterEndTemplate != '':
                     lines.append(self.notesChapterEndTemplate)
 
-                else:
-                    continue
-
             elif self.chapters[chId].isUnused and self.unusedChapterEndTemplate != '':
                 lines.append(self.unusedChapterEndTemplate)
 
-            else:
+            elif doNotExportChapter and self.notExportedChapterEndTemplate != '':
+                lines.append(self.notExportedChapterEndTemplate)
+
+            elif self.chapterEndTemplate != '':
                 lines.append(self.chapterEndTemplate)
 
         for crId in self.characters:
@@ -4474,9 +4503,9 @@ class FileExport(Novel):
                 f.write(text)
 
         except:
-            return 'ERROR: Cannot write "' + self.filePath + '".'
+            return 'ERROR: Cannot write "' + os.path.normpath(self.filePath) + '".'
 
-        return 'SUCCESS: Content written to "' + self.filePath + '".'
+        return 'SUCCESS: "' + os.path.normpath(self.filePath) + '" written.'
 
 
 class OdtFile(FileExport, OdtTemplate):
@@ -4588,18 +4617,19 @@ class OdtFile(FileExport, OdtTemplate):
                     odtTarget.write(file)
         except:
             os.chdir(workdir)
-            return 'ERROR: Cannot generate "' + self._filePath + '".'
+            return 'ERROR: Cannot generate "' + os.path.normpath(self.filePath) + '".'
 
         # Remove temporary data.
 
         os.chdir(workdir)
         self.tear_down()
-        return 'SUCCESS: "' + self._filePath + '" saved.'
+        return 'SUCCESS: "' + os.path.normpath(self.filePath) + '" written.'
 
 
 class OdtProof(OdtFile):
     """OpenDocument xml proof reading file representation."""
 
+    DESCRIPTION = 'Tagged manuscript for proofing'
     SUFFIX = '_proof'
 
     fileHeader = OdtTemplate.CONTENT_XML_HEADER + '''<text:p text:style-name="Title">$Title</text:p>
@@ -4667,6 +4697,7 @@ class OdtProof(OdtFile):
 class OdtManuscript(OdtFile):
     """OpenDocument xml manuscript file representation."""
 
+    DESCRIPTION = 'Editable manuscript'
     SUFFIX = '_manuscript'
 
     fileHeader = OdtTemplate.CONTENT_XML_HEADER + '''<text:p text:style-name="Title">$Title</text:p>
@@ -4721,6 +4752,7 @@ class OdtManuscript(OdtFile):
 class OdtSceneDesc(OdtFile):
     """OpenDocument xml scene summaries file representation."""
 
+    DESCRIPTION = 'Scene descriptions'
     SUFFIX = '_scenes'
 
     fileHeader = OdtTemplate.CONTENT_XML_HEADER + '''<text:p text:style-name="Title">$Title</text:p>
@@ -4767,6 +4799,7 @@ class OdtSceneDesc(OdtFile):
 class OdtChapterDesc(OdtFile):
     """OpenDocument xml chapter summaries file representation."""
 
+    DESCRIPTION = 'Chapter descriptions'
     SUFFIX = '_chapters'
 
     fileHeader = OdtTemplate.CONTENT_XML_HEADER + '''<text:p text:style-name="Title">$Title</text:p>
@@ -4788,6 +4821,7 @@ class OdtChapterDesc(OdtFile):
 class OdtPartDesc(OdtFile):
     """OpenDocument xml part summaries file representation."""
 
+    DESCRIPTION = 'Part descriptions'
     SUFFIX = '_parts'
 
     fileHeader = OdtTemplate.CONTENT_XML_HEADER + '''<text:p text:style-name="Title">$Title</text:p>
@@ -4848,6 +4882,7 @@ class OdtExport(OdtFile):
 class OdtCharacters(OdtFile):
     """OpenDocument xml character descriptions file representation."""
 
+    DESCRIPTION = 'Character descriptions'
     SUFFIX = '_characters'
 
     def get_characterSubst(self, crId):
@@ -4888,6 +4923,7 @@ class OdtCharacters(OdtFile):
 class OdtItems(OdtFile):
     """OpenDocument xml item descriptions file representation."""
 
+    DESCRIPTION = 'Item descriptions'
     SUFFIX = '_items'
 
     def get_itemSubst(self, itId):
@@ -4914,6 +4950,7 @@ class OdtItems(OdtFile):
 class OdtLocations(OdtFile):
     """OpenDocument xml location descriptions file representation."""
 
+    DESCRIPTION = 'Location descriptions'
     SUFFIX = '_locations'
 
     def get_locationSubst(self, lcId):
@@ -4929,7 +4966,7 @@ class OdtLocations(OdtFile):
 '''
 
     locationTemplate = '''<text:h text:style-name="Heading_20_2" text:outline-level="2">$Title$AKA</text:h>
-<text:section text:style-name="Sect1" text:name="ItID:$ID">
+<text:section text:style-name="Sect1" text:name="LcID:$ID">
 <text:p text:style-name="Text_20_body">$Desc</text:p>
 </text:section>
 '''
@@ -4939,6 +4976,7 @@ class OdtLocations(OdtFile):
 
 
 from html.parser import HTMLParser
+
 
 
 
@@ -4958,7 +4996,7 @@ def read_html_file(filePath):
                 text = (f.read())
 
         except(FileNotFoundError):
-            return ('ERROR: "' + filePath + '" not found.', None)
+            return ('ERROR: "' + os.path.normpath(filePath) + '" not found.', None)
 
     return ('SUCCESS', text)
 
@@ -5093,6 +5131,7 @@ class HtmlProof(HtmlFile):
     to be read and written by Open/LibreOffice Writer.
     """
 
+    DESCRIPTION = 'Tagged manuscript for proofing'
     SUFFIX = '_proof'
 
     def __init__(self, filePath):
@@ -5167,6 +5206,7 @@ class HtmlManuscript(HtmlFile):
     OpenOffice/LibreOffice Writer.
     """
 
+    DESCRIPTION = 'Editable manuscript'
     SUFFIX = '_manuscript'
 
     def preprocess(self, text):
@@ -5200,15 +5240,13 @@ class HtmlManuscript(HtmlFile):
         if self._scId is not None:
             self._lines.append(data.rstrip().lstrip())
 
-    def get_structure(self):
-        """This file format has no comparable structure."""
-
 
 
 class HtmlSceneDesc(HtmlFile):
     """HTML file representation of an yWriter project's scene summaries.
     """
 
+    DESCRIPTION = 'Scene descriptions'
     SUFFIX = '_scenes'
 
     def handle_endtag(self, tag):
@@ -5237,14 +5275,12 @@ class HtmlSceneDesc(HtmlFile):
         if self._scId is not None:
             self._lines.append(data.rstrip().lstrip())
 
-    def get_structure(self):
-        """This file format has no comparable structure."""
-
 
 
 class HtmlChapterDesc(HtmlFile):
     """HTML file representation of an yWriter project's chapters summaries."""
 
+    DESCRIPTION = 'Chapter descriptions'
     SUFFIX = '_chapters'
 
     def handle_endtag(self, tag):
@@ -5268,14 +5304,12 @@ class HtmlChapterDesc(HtmlFile):
         if self._chId is not None:
             self._lines.append(data.rstrip().lstrip())
 
-    def get_structure(self):
-        """This file format has no comparable structure."""
-
 
 
 class HtmlPartDesc(HtmlChapterDesc):
     """HTML file representation of an yWriter project's parts summaries."""
 
+    DESCRIPTION = 'Part descriptions'
     SUFFIX = '_parts'
 
 
@@ -5284,6 +5318,7 @@ class HtmlPartDesc(HtmlChapterDesc):
 class HtmlCharacters(HtmlFile):
     """HTML file representation of an yWriter project's character descriptions."""
 
+    DESCRIPTION = 'Character descriptions'
     SUFFIX = '_characters'
 
     def __init__(self, filePath):
@@ -5344,7 +5379,14 @@ class HtmlCharacters(HtmlFile):
             self._lines.append(data.rstrip().lstrip())
 
     def get_structure(self):
-        """This file format has no comparable structure."""
+        """returns a string showing the order characters.
+        """
+        lines = []
+
+        for crId in self.characters:
+            lines.append('  CrID:' + str(crId))
+
+        return '\n'.join(lines)
 
 
 
@@ -5352,6 +5394,7 @@ class HtmlCharacters(HtmlFile):
 class HtmlLocations(HtmlFile):
     """HTML file representation of an yWriter project's location descriptions."""
 
+    DESCRIPTION = 'Location descriptions'
     SUFFIX = '_locations'
 
     def __init__(self, filePath):
@@ -5392,13 +5435,21 @@ class HtmlLocations(HtmlFile):
             self._lines.append(data.rstrip().lstrip())
 
     def get_structure(self):
-        """This file format has no comparable structure."""
+        """returns a string showing the order items.
+        """
+        lines = []
+
+        for lcId in self.locations:
+            lines.append('  LcID:' + str(lcId))
+
+        return '\n'.join(lines)
 
 
 
 class HtmlItems(HtmlFile):
     """HTML file representation of an yWriter project's item descriptions."""
 
+    DESCRIPTION = 'Item descriptions'
     SUFFIX = '_items'
 
     def __init__(self, filePath):
@@ -5439,17 +5490,23 @@ class HtmlItems(HtmlFile):
             self._lines.append(data.rstrip().lstrip())
 
     def get_structure(self):
-        """This file format has no comparable structure."""
+        """returns a string showing the order items.
+        """
+        lines = []
+
+        for itId in self.items:
+            lines.append('  ItID:' + str(itId))
+
+        return '\n'.join(lines)
 
 
 
 class HtmlImport(HtmlFile):
-    """HTML file representation of an yWriter project's OfficeFile part.
-
-    Represents a html file without chapter and scene tags 
-    to be written by Open/LibreOffice Writer.
+    """HTML file representation of a work in progress to be 
+    converted to a new yWriter project yWriter project.
     """
 
+    DESCRIPTION = 'Work in progress'
     SUFFIX = ''
 
     _SCENE_DIVIDER = '* * *'
@@ -5540,9 +5597,6 @@ class HtmlImport(HtmlFile):
         else:
             self._lines.append(data.rstrip().lstrip())
 
-    def get_structure(self):
-        """This file format has no comparable structure."""
-
 
 
 class HtmlOutline(HtmlFile):
@@ -5552,6 +5606,7 @@ class HtmlOutline(HtmlFile):
     to be written by Open/LibreOffice Writer.
     """
 
+    DESCRIPTION = 'Novel outline'
     SUFFIX = ''
 
     def __init__(self, filePath):
@@ -5629,9 +5684,6 @@ class HtmlOutline(HtmlFile):
         """
         self._lines.append(data.rstrip().lstrip())
 
-    def get_structure(self):
-        """This file format has no comparable structure."""
-
 
 
 
@@ -5685,10 +5737,6 @@ class CsvFile(FileExport):
 
         return text
 
-    def get_structure(self):
-        """This file format has no comparable structure."""
-        return None
-
 
 class CsvSceneList(CsvFile):
     """csv file representation of an yWriter project's scenes table. 
@@ -5698,6 +5746,7 @@ class CsvSceneList(CsvFile):
     * Data fields are delimited by the _SEPARATOR character.
     """
 
+    DESCRIPTION = 'Scene list'
     SUFFIX = '_scenelist'
 
     _SCENE_RATINGS = ['2', '3', '4', '5', '6', '7', '8', '9', '10']
@@ -5747,7 +5796,7 @@ class CsvSceneList(CsvFile):
                 lines = (f.readlines())
 
         except(FileNotFoundError):
-            return 'ERROR: "' + self._filePath + '" not found.'
+            return 'ERROR: "' + os.path.normpath(self._filePath) + '" not found.'
 
         cellsInLine = len(self.fileHeader.split(self._SEPARATOR))
 
@@ -5875,6 +5924,16 @@ class CsvSceneList(CsvFile):
 
         return 'SUCCESS: Data read from "' + self._filePath + '".'
 
+    def get_structure(self):
+        """returns a string showing the order of scenes.
+        """
+        lines = []
+
+        for scId in self.scenes:
+            lines.append('  ScID:' + str(scId))
+
+        return '\n'.join(lines)
+
 
 
 
@@ -5886,7 +5945,7 @@ class CsvPlotList(CsvFile):
     * Data fields are delimited by the _SEPARATOR character.
     """
 
-    EXTENSION = '.csv'
+    DESCRIPTION = 'Plot list'
     SUFFIX = '_plotlist'
 
     _SEPARATOR = '|'     # delimits data fields within a record.
@@ -5984,7 +6043,7 @@ class CsvPlotList(CsvFile):
                 lines = (f.readlines())
 
         except(FileNotFoundError):
-            return 'ERROR: "' + self._filePath + '" not found.'
+            return 'ERROR: "' + os.path.normpath(self._filePath) + '" not found.'
 
         cellsInLine = len(self.fileHeader.split(self._SEPARATOR))
 
@@ -6049,6 +6108,16 @@ class CsvPlotList(CsvFile):
 
         return 'SUCCESS: Data read from "' + self._filePath + '".'
 
+    def get_structure(self):
+        """returns a string showing the order of scenes.
+        """
+        lines = []
+
+        for scId in self.scenes:
+            lines.append('  ScID:' + str(scId))
+
+        return '\n'.join(lines)
+
 
 
 
@@ -6060,6 +6129,7 @@ class CsvCharList(CsvFile):
     * Data fields are delimited by the _SEPARATOR character.
     """
 
+    DESCRIPTION = 'Character list'
     SUFFIX = '_charlist'
 
     fileHeader = '''ID|Name|Full name|Aka|Description|Bio|Goals|Importance|Tags|Notes
@@ -6078,7 +6148,7 @@ class CsvCharList(CsvFile):
                 lines = (f.readlines())
 
         except(FileNotFoundError):
-            return 'ERROR: "' + self._filePath + '" not found.'
+            return 'ERROR: "' + os.path.normpath(self._filePath) + '" not found.'
 
         if lines[0] != self.fileHeader:
             return 'ERROR: Wrong lines content.'
@@ -6116,6 +6186,17 @@ class CsvCharList(CsvFile):
         """Copy selected novel attributes.
         """
         self.characters = novel.characters
+        return 'SUCCESS'
+
+    def get_structure(self):
+        """returns a string showing the order characters.
+        """
+        lines = []
+
+        for crId in self.characters:
+            lines.append('  CrID:' + str(crId))
+
+        return '\n'.join(lines)
 
 
 
@@ -6128,6 +6209,7 @@ class CsvLocList(CsvFile):
     * Data fields are delimited by the _SEPARATOR location.
     """
 
+    DESCRIPTION = 'Location list'
     SUFFIX = '_loclist'
 
     fileHeader = '''ID|Name|Description|Aka|Tags
@@ -6146,7 +6228,7 @@ class CsvLocList(CsvFile):
                 lines = (f.readlines())
 
         except(FileNotFoundError):
-            return 'ERROR: "' + self._filePath + '" not found.'
+            return 'ERROR: "' + os.path.normpath(self._filePath) + '" not found.'
 
         if lines[0] != self.fileHeader:
             return 'ERROR: Wrong lines content.'
@@ -6173,6 +6255,17 @@ class CsvLocList(CsvFile):
         """Copy selected novel attributes.
         """
         self.locations = novel.locations
+        return 'SUCCESS'
+
+    def get_structure(self):
+        """returns a string showing the order items.
+        """
+        lines = []
+
+        for lcId in self.locations:
+            lines.append('  LcID:' + str(lcId))
+
+        return '\n'.join(lines)
 
 
 
@@ -6185,6 +6278,7 @@ class CsvItemList(CsvFile):
     * Data fields are delimited by the _SEPARATOR item.
     """
 
+    DESCRIPTION = 'Item list'
     SUFFIX = '_itemlist'
 
     fileHeader = '''ID|Name|Description|Aka|Tags
@@ -6203,7 +6297,7 @@ class CsvItemList(CsvFile):
                 lines = (f.readlines())
 
         except(FileNotFoundError):
-            return 'ERROR: "' + self._filePath + '" not found.'
+            return 'ERROR: "' + os.path.normpath(self._filePath) + '" not found.'
 
         if lines[0] != self.fileHeader:
             return 'ERROR: Wrong lines content.'
@@ -6230,6 +6324,17 @@ class CsvItemList(CsvFile):
         """Copy selected novel attributes.
         """
         self.items = novel.items
+        return 'SUCCESS'
+
+    def get_structure(self):
+        """returns a string showing the order items.
+        """
+        lines = []
+
+        for itId in self.items:
+            lines.append('  ItID:' + str(itId))
+
+        return '\n'.join(lines)
 
 
 
@@ -6237,6 +6342,8 @@ class FileFactory():
     """A simple factory class that instantiates a source file object
     and a target file object for conversion.
     """
+
+    YW_EXTENSIONS = ['.yw5', '.yw6', '.yw7']
 
     def get_file_objects(self, sourcePath, suffix=None):
         fileName, fileExtension = os.path.splitext(sourcePath)
@@ -6316,7 +6423,7 @@ class FileFactory():
                     fileName + suffix + CsvItemList.EXTENSION)
 
             else:
-                return ['ERROR: File type not supported.', None, None]
+                return ['ERROR: File type of "' + os.path.normpath(sourcePath) + '" not supported.', None, None]
 
         else:
             # The source file is not a yWriter project.
@@ -6364,7 +6471,7 @@ class FileFactory():
                         targetFile.ywTreeBuilder = Yw7TreeCreator()
 
                 else:
-                    return ['ERROR: Cannot read "' + sourcePath + '".', None, None]
+                    return ['ERROR: Cannot read "' + os.path.normpath(sourcePath) + '".', None, None]
 
             elif sourcePath.endswith(CsvSceneList.SUFFIX + CsvSceneList.EXTENSION):
                 sourceFile = CsvSceneList(sourcePath)
@@ -6382,7 +6489,7 @@ class FileFactory():
                 sourceFile = CsvItemList(sourcePath)
 
             else:
-                return ['ERROR: File type not supported.', None, None]
+                return ['ERROR: File type of  "' + os.path.normpath(sourcePath) + '" not supported.', None, None]
 
             if targetFile is None:
 
@@ -6511,15 +6618,14 @@ class YwCnvTk(YwCnv):
         # The conversion's direction depends on the sourcePath argument.
 
         if not sourceFile.file_exists():
-            self.processInfo.config(text='ERROR: File not found.')
+            self.processInfo.config(
+                text='ERROR: File "' + os.path.normpath(sourceFile.filePath) + '" not found.')
 
         else:
-            if sourceFile.EXTENSION in ['.yw5', '.yw6', '.yw7']:
+            if sourceFile.EXTENSION in FileFactory.YW_EXTENSIONS:
 
                 self.appInfo.config(
-                    text='Export yWriter project data to ' + targetFile.EXTENSION)
-                self.processInfo.config(
-                    text='Project: "' + sourceFile.filePath + '"')
+                    text='Input: ' + sourceFile.DESCRIPTION + ' "' + os.path.normpath(sourceFile.filePath) + '"\nOutput: ' + targetFile.DESCRIPTION + ' "' + os.path.normpath(targetFile.filePath) + '"')
                 self.processInfo.config(
                     text=YwCnv.convert(self, sourceFile, targetFile))
 
@@ -6527,22 +6633,20 @@ class YwCnvTk(YwCnv):
 
                 if targetFile.file_exists():
                     self.processInfo.config(
-                        text='ERROR: "' + targetFile._filePath + '" already exists.')
+                        text='ERROR: "' + os.path.normpath(targetFile._filePath) + '" already exists.')
 
                 else:
                     self.appInfo.config(
                         text='Create a yWriter project file')
                     self.processInfo.config(
-                        text='New project: "' + targetFile.filePath + '"')
+                        text='New project: "' + os.path.normpath(targetFile.filePath) + '"')
                     self.processInfo.config(
                         text=YwCnv.convert(self, sourceFile, targetFile))
 
             else:
 
                 self.appInfo.config(
-                    text='Import yWriter project data from ' + sourceFile.EXTENSION)
-                self.processInfo.config(
-                    text='Project: "' + targetFile.filePath + '"')
+                    text='Input: ' + sourceFile.DESCRIPTION + ' "' + os.path.normpath(sourceFile.filePath) + '"\nOutput: ' + targetFile.DESCRIPTION + ' "' + os.path.normpath(targetFile.filePath) + '"')
                 self.processInfo.config(
                     text=YwCnv.convert(self, sourceFile, targetFile))
 
@@ -6558,13 +6662,15 @@ class YwCnvTk(YwCnv):
             return True
 
         else:
-            return messagebox.askyesno('WARNING', 'Overwrite existing file "' + filePath + '"?')
+            return messagebox.askyesno('WARNING', 'Overwrite existing file "' + os.path.normpath(filePath) + '"?')
 
     def edit(self):
         pass
 
 
 class HtmlExport(FileExport):
+
+    DESCRIPTION = 'HTML report'
     EXTENSION = '.html'
     # overwrites Novel._FILE_EXTENSION
 
@@ -6623,6 +6729,7 @@ class Exporter(HtmlExport):
     _SCENE_TEMPLATE = '/scene_template.html'
     _UNUSED_SCENE_TEMPLATE = '/unused_scene_template.html'
     _NOTES_SCENE_TEMPLATE = '/info_scene_template.html'
+    _TODO_SCENE_TEMPLATE = '/todo_scene_template.html'
     _SCENE_DIVIDER = '/scene_divider.html'
 
     def __init__(self, filePath, templatePath='.'):
