@@ -61,6 +61,10 @@ def remove_all_testfiles():
         os.remove(TEST_EXEC_PATH + SCRIPT)
     except:
         pass
+    try:
+        os.remove(TEST_EXEC_PATH + CHARAS)
+    except:
+        pass
 
 
 class NormalOperation(unittest.TestCase):
