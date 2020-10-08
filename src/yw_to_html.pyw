@@ -14,9 +14,11 @@ import argparse
 
 from pywriter.converter.yw_cnv_tk import YwCnvTk
 from pywriter.html.html_export import HtmlExport
-
 from pywriter.file.file_export import FileExport
 from pywriter.html.html_fop import read_html_file
+from pywriter.converter.file_factory import FileFactory
+from pywriter.yw.yw6_file import Yw6File
+from pywriter.yw.yw7_file import Yw7File
 
 
 class Exporter(HtmlExport):
@@ -167,17 +169,46 @@ class Exporter(HtmlExport):
             self.sceneDivider = result[1]
 
 
+class HtmlFileFactory(FileFactory):
+
+    def __init__(self, templatePath):
+        self.templatePath = templatePath
+
+    def get_file_objects(self, sourcePath, suffix=''):
+        fileName, fileExtension = os.path.splitext(sourcePath)
+        isYwProject = False
+
+        if fileExtension == Yw7File.EXTENSION:
+            sourceFile = Yw7File(sourcePath)
+            isYwProject = True
+
+        elif fileExtension == Yw6File.EXTENSION:
+            sourceFile = Yw6File(sourcePath)
+            isYwProject = True
+
+        if isYwProject:
+            targetFile = Exporter(fileName + suffix +
+                                  Exporter.EXTENSION, self.templatePath)
+            targetFile.SUFFIX = suffix
+            message = 'SUCCESS'
+
+        else:
+            message = 'ERROR: File type is not supported.'
+
+        return message, sourceFile, targetFile
+
+
+class Converter(YwCnvTk):
+    """yWriter converter with a simple tkinter GUI. 
+    """
+
+    def __init__(self, silentMode, templatePath):
+        YwCnvTk.__init__(self, silentMode)
+        self.fileFactory = HtmlFileFactory(templatePath)
+
+
 def run(sourcePath, templatePath, suffix, silentMode=True):
-    fileName, fileExtension = os.path.splitext(sourcePath)
-
-    if fileExtension in ['.yw6', '.yw7']:
-        document = Exporter('', templatePath)
-        document.SUFFIX = suffix
-
-    else:
-        sys.exit('ERROR: File type is not supported.')
-
-    converter = YwCnvTk(sourcePath, document.SUFFIX, silentMode)
+    Converter(silentMode, templatePath).run(sourcePath, suffix)
 
 
 if __name__ == '__main__':

@@ -7,8 +7,6 @@ Published under the MIT License (https://opensource.org/licenses/mit-license.php
 """
 import os
 import unittest
-import zipfile
-
 import yw2html
 
 
@@ -20,19 +18,15 @@ import yw2html
 TEST_PATH = os.getcwd() + '/../test'
 TEST_DATA_PATH = TEST_PATH + '/data/'
 TEST_EXEC_PATH = TEST_PATH + '/yw7/'
+TEMPLATE_PATH = '../../template/'
 
 # To be placed in TEST_DATA_PATH:
 
 # Test data
-YW7_TEST = TEST_EXEC_PATH + 'yWriter Sample Project.yw7'
-ODT_TEST = 'yWriter Sample Project.odt'
-
-DOCUMENT_CONTENT = 'content.xml'
-DOCUMENT_META = 'meta.xml'
-DOCUMENT_STYLES = 'styles.xml'
-
-YW7_NORMAL = TEST_DATA_PATH + 'normal.yw7'
-DOC_NORMAL = TEST_DATA_PATH + 'normal.odt'
+YW7 = 'normal.yw7'
+SCENELIST = 'normal_scenelist.html'
+SCRIPT = 'normal_manuscript.html'
+CHARAS = 'normal_characters.html'
 
 
 def read_file(inputFile):
@@ -54,20 +48,17 @@ def copy_file(inputFile, outputFile):
 
 
 def remove_all_testfiles():
+
     try:
-        os.remove(YW7_TEST)
+        os.remove(TEST_EXEC_PATH + YW7)
     except:
         pass
     try:
-        os.remove(TEST_EXEC_PATH + DOCUMENT_STYLES)
+        os.remove(TEST_EXEC_PATH + SCENELIST)
     except:
         pass
     try:
-        os.remove(TEST_EXEC_PATH + DOCUMENT_CONTENT)
-    except:
-        pass
-    try:
-        os.remove(TEST_EXEC_PATH + ODT_TEST)
+        os.remove(TEST_EXEC_PATH + SCRIPT)
     except:
         pass
 
@@ -76,44 +67,35 @@ class NormalOperation(unittest.TestCase):
     """Test case: Normal operation."""
 
     def setUp(self):
-
-        try:
-            os.remove(TEST_EXEC_PATH + ODT_TEST)
-        except:
-            pass
-        copy_file(YW7_NORMAL, YW7_TEST)
-
-    def test_yw2html(self):
-        os.chdir(TEST_EXEC_PATH)
-        self.assertEqual(yw2html.main(), 'SUCCESS: "' + ODT_TEST + '" saved.')
-        os.chdir(TEST_PATH)
-
-        with zipfile.ZipFile(TEST_EXEC_PATH + ODT_TEST, 'r') as myzip:
-            myzip.extract(DOCUMENT_CONTENT, TEST_EXEC_PATH)
-            myzip.extract(DOCUMENT_STYLES, TEST_EXEC_PATH)
-
-        self.assertEqual(read_file(TEST_EXEC_PATH + DOCUMENT_CONTENT),
-                         read_file(TEST_DATA_PATH + DOCUMENT_CONTENT))
-        self.assertEqual(read_file(TEST_EXEC_PATH + DOCUMENT_STYLES),
-                         read_file(TEST_DATA_PATH + DOCUMENT_STYLES))
-
-    def tearDown(self):
         remove_all_testfiles()
+        copy_file(TEST_DATA_PATH + YW7, TEST_EXEC_PATH + YW7)
 
+    def test_scenelist(self):
+        os.chdir(TEST_PATH + '/yw7')
 
-class NoProjectFile(unittest.TestCase):
-    """Test case: yWriter project file is not present."""
+        yw2html.run(TEST_EXEC_PATH + YW7, TEMPLATE_PATH +
+                    'scenelist', '_scenelist', True)
 
-    def setUp(self):
-        # Make sure there's no yWriter project file present.
-        try:
-            os.remove(YW7_TEST)
-        except:
-            pass
+        self.assertEqual(read_file(TEST_EXEC_PATH + SCENELIST),
+                         read_file(TEST_DATA_PATH + SCENELIST))
 
-    def test_all(self):
-        """ Test both yw2html and sceti. """
-        self.assertEqual(yw2html.main(), 'ERROR: No yWriter project found.')
+    def test_script(self):
+        os.chdir(TEST_PATH + '/yw7')
+
+        yw2html.run(TEST_EXEC_PATH + YW7, TEMPLATE_PATH +
+                    'manuscript', '_manuscript', True)
+
+        self.assertEqual(read_file(TEST_EXEC_PATH + SCRIPT),
+                         read_file(TEST_DATA_PATH + SCRIPT))
+
+    def test_characters(self):
+        os.chdir(TEST_PATH + '/yw7')
+
+        yw2html.run(TEST_EXEC_PATH + YW7, TEMPLATE_PATH +
+                    'characters', '_characters', True)
+
+        self.assertEqual(read_file(TEST_EXEC_PATH + CHARAS),
+                         read_file(TEST_DATA_PATH + CHARAS))
 
     def tearDown(self):
         remove_all_testfiles()
