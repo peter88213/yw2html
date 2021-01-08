@@ -8,7 +8,6 @@ For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
 
-import sys
 import os
 import argparse
 
@@ -170,32 +169,35 @@ class Exporter(HtmlExport):
 
 
 class HtmlFileFactory(FileFactory):
+    """A factory class that instantiates a source file object
+    and a target file object for conversion.
+    """
 
     def __init__(self, templatePath):
         self.templatePath = templatePath
 
     def get_file_objects(self, sourcePath, suffix=''):
+        """Return a tuple with three elements:
+        * A message string starting with 'SUCCESS' or 'ERROR'
+        * sourceFile: a Novel subclass instance
+        * targetFile: a Novel subclass instance
+        """
         fileName, fileExtension = os.path.splitext(sourcePath)
-        isYwProject = False
 
         if fileExtension == Yw7File.EXTENSION:
             sourceFile = Yw7File(sourcePath)
-            isYwProject = True
 
         elif fileExtension == Yw6File.EXTENSION:
             sourceFile = Yw6File(sourcePath)
-            isYwProject = True
-
-        if isYwProject:
-            targetFile = Exporter(fileName + suffix +
-                                  Exporter.EXTENSION, self.templatePath)
-            targetFile.SUFFIX = suffix
-            message = 'SUCCESS'
 
         else:
-            message = 'ERROR: File type is not supported.'
+            return 'ERROR: File type is not supported.', None, None
 
-        return message, sourceFile, targetFile
+        targetFile = Exporter(fileName + suffix +
+                              Exporter.EXTENSION, self.templatePath)
+        targetFile.SUFFIX = suffix
+
+        return 'SUCCESS', sourceFile, targetFile
 
 
 class Converter(YwCnvTk):
