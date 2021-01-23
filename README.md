@@ -6,7 +6,7 @@ The yw2html Python script runs through all chapters and scenes of a yWriter 6/7 
 
 ## Requirements
 
-* [Python 3.4+](https://www.python.org)
+* [Python 3.4 or newer](https://www.python.org)
 * yWriter 6 or [yWriter 7](http://spacejock.com/yWriter7.html)
 
 ## Download
