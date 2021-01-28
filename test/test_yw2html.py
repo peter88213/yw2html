@@ -71,11 +71,18 @@ class NormalOperation(unittest.TestCase):
     """Test case: Normal operation."""
 
     def setUp(self):
+
+        try:
+            os.mkdir(TEST_EXEC_PATH)
+
+        except:
+            pass
+
         remove_all_testfiles()
         copy_file(TEST_DATA_PATH + YW7, TEST_EXEC_PATH + YW7)
 
     def test_scenelist(self):
-        os.chdir(TEST_PATH + '/yw7')
+        os.chdir(TEST_EXEC_PATH)
 
         yw2html.run(TEST_EXEC_PATH + YW7, TEMPLATE_PATH +
                     'scenelist', '_scenelist', True)
@@ -84,7 +91,7 @@ class NormalOperation(unittest.TestCase):
                          read_file(TEST_DATA_PATH + SCENELIST))
 
     def test_script(self):
-        os.chdir(TEST_PATH + '/yw7')
+        os.chdir(TEST_EXEC_PATH)
 
         yw2html.run(TEST_EXEC_PATH + YW7, TEMPLATE_PATH +
                     'manuscript', '_manuscript', True)
@@ -93,7 +100,7 @@ class NormalOperation(unittest.TestCase):
                          read_file(TEST_DATA_PATH + SCRIPT))
 
     def test_characters(self):
-        os.chdir(TEST_PATH + '/yw7')
+        os.chdir(TEST_EXEC_PATH)
 
         yw2html.run(TEST_EXEC_PATH + YW7, TEMPLATE_PATH +
                     'characters', '_characters', True)
