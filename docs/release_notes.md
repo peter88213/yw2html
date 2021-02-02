@@ -1,4 +1,4 @@
-Download `yw2html_v0.7.2.zip`.
+Download `yw2html_<version>.zip`.
 Unzip the file and read README.md.
 
 ## Changelog
