@@ -43,18 +43,19 @@ class YwCnv():
     """
 
     def convert(self, sourceFile, targetFile):
-        """Read document file, convert its content to xml, and replace yWriter file.
+        """Read the source file, merge its content with that of the target,
+        and write the result to the target file.
         Return a message beginning with SUCCESS or ERROR.
         """
 
         if sourceFile.filePath is None:
-            return 'ERROR: "' + os.path.normpath(sourceFile.filePath) + '" is not of the supported type.'
+            return 'ERROR: Source "' + os.path.normpath(sourceFile.filePath) + '" is not of the supported type.'
 
         if not sourceFile.file_exists():
             return 'ERROR: "' + os.path.normpath(sourceFile.filePath) + '" not found.'
 
         if targetFile.filePath is None:
-            return 'ERROR: "' + os.path.normpath(targetFile.filePath) + '" is not of the supported type.'
+            return 'ERROR: Target "' + os.path.normpath(targetFile.filePath) + '" is not of the supported type.'
 
         if targetFile.file_exists() and not self.confirm_overwrite(targetFile.filePath):
             return 'Program abort by user.'
@@ -1019,14 +1020,14 @@ class YwCnvUi(YwCnv):
     def create_yw7(self, sourceFile, targetFile):
         """Template method for creation of a new yw7 project.
         """
+        self.userInterface.set_info_what(
+            'Create a yWriter project file from ' + sourceFile.DESCRIPTION + '\nNew project: "' + os.path.normpath(targetFile.filePath) + '"')
 
         if targetFile.file_exists():
             self.userInterface.set_info_how(
-                'ERROR: "' + os.path.normpath(targetFile._filePath) + '" already exists.')
+                'ERROR: "' + os.path.normpath(targetFile.filePath) + '" already exists.')
 
         else:
-            self.userInterface.set_info_what(
-                'Create a yWriter project file from ' + sourceFile.DESCRIPTION + '\nNew project: "' + os.path.normpath(targetFile.filePath) + '"')
             message = self.convert(sourceFile, targetFile)
             self.userInterface.set_info_how(message)
 
@@ -1150,6 +1151,8 @@ class YwCnvTk(YwCnvUi):
 
     def finish(self, sourcePath):
         self.userInterface.finish()
+import re
+
 from string import Template
 
 
@@ -1209,7 +1212,6 @@ class Character(Object):
         # bool
         # xml: <Major>
 
-import re
 
 
 class Scene():
@@ -1534,8 +1536,8 @@ class Novel():
         """
 
     def file_exists(self):
-        """Check whether the file specified by _filePath exists. """
-        if os.path.isfile(self._filePath):
+        """Check whether the file specified by filePath exists. """
+        if os.path.isfile(self.filePath):
             return True
 
         else:
@@ -2068,6 +2070,10 @@ class HtmlExport(FileExport):
             ['[/i]', '</em>'],
             ['[b]', '<strong>'],
             ['[/b]', '</strong>'],
+            ['[u]', '<u>'],
+            ['[/u]', '</u>'],
+            ['[s]', '<strike>'],
+            ['[/s]', '</strike>'],
             ['<p></p>', '<p><br /></p>'],
             ['/*', '<!--'],
             ['*/', '-->'],
@@ -2077,6 +2083,10 @@ class HtmlExport(FileExport):
 
             for r in HTML_REPLACEMENTS:
                 text = text.replace(r[0], r[1])
+
+            # Remove highlighting and alignment tags.
+
+            text = re.sub('\[\/*[h|c|r]\d*\]', '', text)
 
         except AttributeError:
             text = ''
@@ -2555,7 +2565,7 @@ class YwFile(Novel):
 
                     self.scenes[scId].items.append(itId.text)
 
-        return 'SUCCESS: ' + str(len(self.scenes)) + ' Scenes read from "' + self._filePath + '".'
+        return 'SUCCESS: ' + str(len(self.scenes)) + ' Scenes read from "' + os.path.normpath(self.filePath) + '".'
 
     def merge(self, novel):
         """Copy required attributes of the novel object.
@@ -2653,10 +2663,10 @@ class Utf8TreeReader(YwTreeReader):
         """
 
         try:
-            ywFile._tree = ET.parse(ywFile._filePath)
+            ywFile._tree = ET.parse(ywFile.filePath)
 
         except:
-            return 'ERROR: Can not process "' + os.path.normpath(ywFile._filePath) + '".'
+            return 'ERROR: Can not process "' + os.path.normpath(ywFile.filePath) + '".'
 
         return 'SUCCESS: XML element tree read in.'
 
@@ -2976,10 +2986,10 @@ class Utf8TreeWriter(YwTreeWriter):
 
         try:
             ywProject._tree.write(
-                ywProject._filePath, xml_declaration=False, encoding='utf-8')
+                ywProject.filePath, xml_declaration=False, encoding='utf-8')
 
         except(PermissionError):
-            return 'ERROR: "' + os.path.normpath(ywProject._filePath) + '" is write protected.'
+            return 'ERROR: "' + os.path.normpath(ywProject.filePath) + '" is write protected.'
 
         return 'SUCCESS'
 

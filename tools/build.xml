@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="yw2html" basedir=".">
-	<property name="release" value="0.7.2" />
+	<property name="release" value="0.8.0" />
 	<property name="src" location="../src" />
 	<property name="test" location="../test" />
 	<property name="dist" location="../dist" />
