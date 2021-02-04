@@ -3,6 +3,12 @@ Unzip the file and read README.md.
 
 ## Changelog
 
+### v0.9.0 Underline and strikethrough no longer supported
+
+That is because a real support would require considering nesting and multi paragraph formatting. That would make everything too complicated, considering that such formatting is not common in a fictional prose text.
+
+Based on PyWriter v2.9.0
+
 ### v0.8.0
 
 Process all yWriter formatting tags.

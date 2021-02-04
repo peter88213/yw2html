@@ -2070,10 +2070,6 @@ class HtmlExport(FileExport):
             ['[/i]', '</em>'],
             ['[b]', '<strong>'],
             ['[/b]', '</strong>'],
-            ['[u]', '<u>'],
-            ['[/u]', '</u>'],
-            ['[s]', '<strike>'],
-            ['[/s]', '</strike>'],
             ['<p></p>', '<p><br /></p>'],
             ['/*', '<!--'],
             ['*/', '-->'],
@@ -2084,9 +2080,10 @@ class HtmlExport(FileExport):
             for r in HTML_REPLACEMENTS:
                 text = text.replace(r[0], r[1])
 
-            # Remove highlighting and alignment tags.
+            # Remove highlighting, alignment,
+            # strikethrough, and underline tags.
 
-            text = re.sub('\[\/*[h|c|r]\d*\]', '', text)
+            text = re.sub('\[\/*[h|c|r|s|u]\d*\]', '', text)
 
         except AttributeError:
             text = ''
