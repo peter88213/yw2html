@@ -15,7 +15,7 @@ The yw2html Software comes as a zipfile `yw2html_<version number>.zip`.
 * Download `yw2html_<version>.zip`.
 * Unzip the file and read README.md.
 
-[Changelog](https://peter88213.github.io/yw2html/changelog).
+[Changelog](https://peter88213.github.io/yw2html/changelog)
 
 ## Usage
 usage: `yw_to_html.pyw [-h] [-t template-dir] [-s suffix] [--silent] Project`
