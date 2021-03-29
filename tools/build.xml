@@ -40,7 +40,7 @@
 		</copy>
 
 		<copy file="../LICENSE" todir="${dist}/yw2html_v${release}" />
-		<copy file="${docs}/README.md" todir="${dist}/yw2html_v${release}" />
+		<copy file="${docs}/instructions.md" tofile="${dist}/yw2html_v${release}/README.md" />
 
 		<zip destfile="${dist}/yw2html_v${release}.zip" basedir="${dist}/yw2html_v${release}" />
 	</target>

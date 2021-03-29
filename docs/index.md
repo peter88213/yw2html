@@ -19,4 +19,4 @@ The yw2html Software comes as a zipfile `yw2html_<version number>.zip`.
 
 ## Usage
 
-See the [instructions](README)
+See the [instructions](instructions)
