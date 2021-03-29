@@ -19,4 +19,9 @@ The yw2html Software comes as a zipfile `yw2html_<version number>.zip`.
 
 ## Usage
 
-See the [instructions](instructions)
+See the [usage instructions](usage)
+
+## License
+
+This extension is distributed under the [MIT
+License](http://www.opensource.org/licenses/mit-license.php).
