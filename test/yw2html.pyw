@@ -1525,7 +1525,6 @@ class FileExport(Novel):
     To be overwritten by subclasses providing file type specific 
     markup converters and templates.
     """
-
     fileHeader = ''
     partTemplate = ''
     chapterTemplate = ''
@@ -1548,6 +1547,28 @@ class FileExport(Novel):
     locationTemplate = ''
     itemTemplate = ''
     fileFooter = ''
+
+    def get_string(self, elements):
+        """Return a string which is the concatenation of the 
+        members of the list of strings "elements", separated by 
+        a comma plus a space. The space allows word wrap in 
+        spreadsheet cells.
+        """
+        text = (', ').join(elements)
+        return text
+
+    def get_list(self, text):
+        """Split a sequence of strings into a list of strings
+        using a comma as delimiter. Remove leading and trailing
+        spaces, if any.
+        """
+        elements = []
+        tempList = text.split(',')
+
+        for element in tempList:
+            elements.append(element.lstrip().rstrip())
+
+        return elements
 
     def convert_from_yw(self, text):
         """Convert yw7 markup to target format.
@@ -1661,7 +1682,7 @@ class FileExport(Novel):
         """
 
         if self.scenes[scId].tags is not None:
-            tags = ', '.join(self.scenes[scId].tags)
+            tags = self.get_string(self.scenes[scId].tags)
 
         else:
             tags = ''
@@ -1674,7 +1695,7 @@ class FileExport(Novel):
             for chId in self.scenes[scId].characters:
                 sChList.append(self.characters[chId].title)
 
-            sceneChars = ', '.join(sChList)
+            sceneChars = self.get_string(sChList)
             viewpointChar = sChList[0]
 
         except:
@@ -1687,7 +1708,7 @@ class FileExport(Novel):
             for lcId in self.scenes[scId].locations:
                 sLcList.append(self.locations[lcId].title)
 
-            sceneLocs = ', '.join(sLcList)
+            sceneLocs = self.get_string(sLcList)
 
         else:
             sceneLocs = ''
@@ -1698,7 +1719,7 @@ class FileExport(Novel):
             for itId in self.scenes[scId].items:
                 sItList.append(self.items[itId].title)
 
-            sceneItems = ', '.join(sItList)
+            sceneItems = self.get_string(sItList)
 
         else:
             sceneItems = ''
@@ -1757,7 +1778,7 @@ class FileExport(Novel):
         """
 
         if self.characters[crId].tags is not None:
-            tags = ', '.join(self.characters[crId].tags)
+            tags = self.get_string(self.characters[crId].tags)
 
         else:
             tags = ''
@@ -1780,6 +1801,8 @@ class FileExport(Novel):
             FullName=FileExport.convert_from_yw(
                 self, self.characters[crId].fullName),
             Status=characterStatus,
+            ProjectName=self.projectName,
+            ProjectPath=self.projectPath,
         )
         return characterMapping
 
@@ -1788,7 +1811,7 @@ class FileExport(Novel):
         """
 
         if self.locations[lcId].tags is not None:
-            tags = ', '.join(self.locations[lcId].tags)
+            tags = self.get_string(self.locations[lcId].tags)
 
         else:
             tags = ''
@@ -1799,6 +1822,8 @@ class FileExport(Novel):
             Desc=self.convert_from_yw(self.locations[lcId].desc),
             Tags=tags,
             AKA=FileExport.convert_from_yw(self, self.locations[lcId].aka),
+            ProjectName=self.projectName,
+            ProjectPath=self.projectPath,
         )
         return locationMapping
 
@@ -1807,7 +1832,7 @@ class FileExport(Novel):
         """
 
         if self.items[itId].tags is not None:
-            tags = ', '.join(self.items[itId].tags)
+            tags = self.get_string(self.items[itId].tags)
 
         else:
             tags = ''
@@ -1818,6 +1843,8 @@ class FileExport(Novel):
             Desc=self.convert_from_yw(self.items[itId].desc),
             Tags=tags,
             AKA=FileExport.convert_from_yw(self, self.items[itId].aka),
+            ProjectName=self.projectName,
+            ProjectPath=self.projectPath,
         )
         return itemMapping
 
@@ -1826,18 +1853,15 @@ class FileExport(Novel):
         Return a list of strings.
         """
         lines = []
-
         template = Template(self.fileHeader)
         lines.append(template.safe_substitute(
             self.get_fileHeaderMapping()))
-
         return lines
 
     def get_scenes(self, chId, sceneNumber, wordsTotal, lettersTotal, doNotExport):
         """Process the scenes.
         Return a list of strings.
         """
-
         lines = []
         firstSceneInChapter = True
 
@@ -2006,9 +2030,9 @@ class FileExport(Novel):
         Return a list of strings.
         """
         lines = []
+        template = Template(self.characterTemplate)
 
         for crId in self.srtCharacters:
-            template = Template(self.characterTemplate)
             lines.append(template.safe_substitute(
                 self.get_characterMapping(crId)))
 
@@ -2019,9 +2043,9 @@ class FileExport(Novel):
         Return a list of strings.
         """
         lines = []
+        template = Template(self.locationTemplate)
 
         for lcId in self.srtLocations:
-            template = Template(self.locationTemplate)
             lines.append(template.safe_substitute(
                 self.get_locationMapping(lcId)))
 
@@ -2032,9 +2056,9 @@ class FileExport(Novel):
         Return a list of strings.
         """
         lines = []
+        template = Template(self.itemTemplate)
 
         for itId in self.srtItems:
-            template = Template(self.itemTemplate)
             lines.append(template.safe_substitute(self.get_itemMapping(itId)))
 
         return lines
@@ -2191,6 +2215,17 @@ class YwFile(Novel):
     To be overwritten by version-specific subclasses. 
     """
 
+    def strip_spaces(self, elements):
+        """remove leading and trailing spaces from the elements
+        of a list of strings.
+        """
+        stripped = []
+
+        for element in elements:
+            stripped.append(element.lstrip().rstrip())
+
+        return stripped
+
     def read(self):
         """Parse the yWriter xml file located at filePath, fetching the Novel attributes.
         Return a message beginning with SUCCESS or ERROR.
@@ -2226,8 +2261,8 @@ class YwFile(Novel):
             if loc.find('Tags') is not None:
 
                 if loc.find('Tags').text is not None:
-                    self.locations[lcId].tags = loc.find(
-                        'Tags').text.split(';')
+                    tags = loc.find('Tags').text.split(';')
+                    self.locations[lcId].tags = self.strip_spaces(tags)
 
         # Read items from the xml element tree.
 
@@ -2249,8 +2284,8 @@ class YwFile(Novel):
             if itm.find('Tags') is not None:
 
                 if itm.find('Tags').text is not None:
-                    self.items[itId].tags = itm.find(
-                        'Tags').text.split(';')
+                    tags = itm.find('Tags').text.split(';')
+                    self.items[itId].tags = self.strip_spaces(tags)
 
         # Read characters from the xml element tree.
 
@@ -2272,8 +2307,8 @@ class YwFile(Novel):
             if crt.find('Tags') is not None:
 
                 if crt.find('Tags').text is not None:
-                    self.characters[crId].tags = crt.find(
-                        'Tags').text.split(';')
+                    tags = crt.find('Tags').text.split(';')
+                    self.characters[crId].tags = self.strip_spaces(tags)
 
             if crt.find('Notes') is not None:
                 self.characters[crId].notes = crt.find('Notes').text
@@ -2453,8 +2488,8 @@ class YwFile(Novel):
             if scn.find('Tags') is not None:
 
                 if scn.find('Tags').text is not None:
-                    self.scenes[scId].tags = scn.find(
-                        'Tags').text.split(';')
+                    tags = scn.find('Tags').text.split(';')
+                    self.scenes[scId].tags = self.strip_spaces(tags)
 
             if scn.find('Field1') is not None:
                 self.scenes[scId].field1 = scn.find('Field1').text
