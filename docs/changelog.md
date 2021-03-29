@@ -2,7 +2,7 @@
 
 ## Changelog
 
-### v010.0 Improve the processing of comma-separated lists
+### v0.10.0 Improve the processing of comma-separated lists
 
 - Fix incorrectly defined tags during yWriter import.
 - Protect the processing of comma-separated lists against wrongly set

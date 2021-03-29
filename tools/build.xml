@@ -4,6 +4,7 @@
 	<property name="src" location="../src" />
 	<property name="test" location="../test" />
 	<property name="dist" location="../dist" />
+	<property name="docs" location="../docs" />
 	<property name="project-name" value="${ant.project.name}" />
 	<property name="release-name" value="${project-name}_v${release}" />
 
@@ -39,7 +40,7 @@
 		</copy>
 
 		<copy file="../LICENSE" todir="${dist}/yw2html_v${release}" />
-		<copy file="../README.md" todir="${dist}/yw2html_v${release}" />
+		<copy file="${docs}/README.md" todir="${dist}/yw2html_v${release}" />
 
 		<zip destfile="${dist}/yw2html_v${release}.zip" basedir="${dist}/yw2html_v${release}" />
 	</target>
