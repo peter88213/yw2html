@@ -9,7 +9,7 @@ The yw2html Python script runs through all chapters and scenes of a yWriter 6/7 
 ## Download and install
 
 
-[Download the latest release (version 0.10.0)](https://raw.githubusercontent.com/peter88213/yw-cnv/master/dist/yw2html_v0.10.0.zip)
+[Download the latest release (version 0.10.0)](https://raw.githubusercontent.com/peter88213/yw2html/master/dist/yw2html_v0.10.0.zip)
 
 * Unzip the downloaded zipfile "yw2html_v0.10.0.zip" into a new folder and open "README.md" for usage instructions.
 

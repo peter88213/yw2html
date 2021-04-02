@@ -1,7 +1,6 @@
 # yw2html - HTML export with templates from yWriter 6/7
 
-* [Description](https://peter88213.github.io/yw2html)
-* [Download page](https://github.com/peter88213/yw2html/releases/latest)
+For more information, see the [project homepage](https://peter88213.github.io/yw2html) with description and download instructions.
 
 
 ## Want to fork this project?
