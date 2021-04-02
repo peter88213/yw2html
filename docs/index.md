@@ -1,6 +1,6 @@
 The yw2html Python script runs through all chapters and scenes of a yWriter 6/7 project and fills HTML templates.
 
-![Screenshot: Example](https://raw.githubusercontent.com/peter88213/yw2html/master/docs/Screenshots/manuscript.png)
+![Screenshot: Example](Screenshots/manuscript.png)
 
 ## Requirements
 
@@ -13,7 +13,7 @@ The yw2html Python script runs through all chapters and scenes of a yWriter 6/7 
 
 * Unzip the downloaded zipfile "yw2html_v0.10.0.zip" into a new folder and open "README.md" for usage instructions.
 
-[Changelog](https://peter88213.github.io/yw2html/changelog)
+[Changelog](changelog)
 
 ## Usage
 
