@@ -1,9 +1,9 @@
 """ Build a python script for the yw2html distribution.
         
 In order to distribute a single script without dependencies, 
-this script "inlines" all modules imported from the pywriter package.
+this script "inlines" all modules imported from the.pyriter package.
 
-The PyWriter project (see see https://github.com/peter88213/PyWriter)
+The.pyriter project (see see https://github.com/peter88213.pyriter)
 must be located on the same directory level as the yW2OO project. 
 
 For further information see https://github.com/peter88213/yW2OO
@@ -18,7 +18,7 @@ BUILD = '../test/'
 
 def main():
     os.chdir(SRC)
-    inliner.run('yw_to_html.pyw', BUILD + 'yw2html.pyw', 'pywriter')
+    inliner.run('yw_to_html.py', BUILD + 'yw2html.py', 'pywriter')
     print('Done.')
 
 

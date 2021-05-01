@@ -931,13 +931,13 @@ class Yw7TreeCreator(YwTreeBuilder):
 
 
 class YwCnvUi(YwCnv):
-    """Standalone yWriter converter with a simple tkinter GUI. 
+    """Standalone yWriter converter with a 'silent' user interface. 
     """
 
     YW_EXTENSIONS = ['.yw5', '.yw6', '.yw7']
 
     def __init__(self):
-        self.userInterface = Ui('yWriter import/export')
+        self.userInterface = Ui('')
         self.success = False
         self.fileFactory = None
 
@@ -1035,81 +1035,31 @@ class YwCnvUi(YwCnv):
     def finish(self, sourcePath):
         """Hook for actions to take place after the conversion."""
 
-from tkinter import *
-from tkinter import messagebox
 
-
-class UiTk(Ui):
-    """UI subclass implementing a Tkinter facade."""
+class UiCmd(Ui):
+    """UI subclass implementing a console interface."""
 
     def __init__(self, title):
-        """Prepare the graphical user interface. """
-
-        self.root = Tk()
-        self.root.geometry("800x360")
-        self.root.title(title)
-        self.header = Label(self.root, text=__doc__)
-        self.header.pack(padx=5, pady=5)
-        self.appInfo = Label(self.root, text='')
-        self.appInfo.pack(padx=5, pady=5)
-        self.successInfo = Label(self.root)
-        self.successInfo.pack(fill=X, expand=1, padx=50, pady=5)
-        self.processInfo = Label(self.root, text='')
-        self.processInfo.pack(padx=5, pady=5)
-
-        self.infoWhatText = ''
-        self.infoHowText = ''
+        """initialize UI. """
+        print(title)
 
     def ask_yes_no(self, text):
-        return messagebox.askyesno('WARNING', text)
+        result = input('WARNING: ' + text + ' (y/n)')
+
+        if result.lower() == 'y':
+            return True
+
+        else:
+            return False
 
     def set_info_what(self, message):
         """What's the converter going to do?"""
-
-        self.infoWhatText = message
-        self.appInfo.config(text=message)
+        print(message)
 
     def set_info_how(self, message):
         """How's the converter doing?"""
-
         self.infoHowText = message
-        self.processInfo.config(text=message)
-
-        if message.startswith('SUCCESS'):
-            self.successInfo.config(bg='green')
-
-        else:
-            self.successInfo.config(bg='red')
-
-    def show_edit_button(self, edit_cmd):
-        self.root.editButton = Button(text="Edit", command=edit_cmd)
-        self.root.editButton.config(height=1, width=10)
-        self.root.editButton.pack(padx=5, pady=5)
-
-    def finish(self):
-        self.root.quitButton = Button(text="Quit", command=quit)
-        self.root.quitButton.config(height=1, width=10)
-        self.root.quitButton.pack(padx=5, pady=5)
-        self.root.mainloop()
-
-
-class YwCnvTk(YwCnvUi):
-    """Standalone yWriter converter with a simple tkinter GUI. 
-    """
-
-    def __init__(self, silentMode=False):
-
-        if silentMode:
-            self.userInterface = Ui('')
-
-        else:
-            self.userInterface = UiTk('yWriter import/export')
-
-        self.success = False
-        self.fileFactory = None
-
-    def finish(self, sourcePath):
-        self.userInterface.finish()
+        print(message)
 from string import Template
 
 
@@ -3468,13 +3418,16 @@ class HtmlFileFactory(FileFactory):
         return 'SUCCESS', sourceFile, targetFile
 
 
-class Converter(YwCnvTk):
-    """yWriter converter with a simple tkinter GUI. 
+class Converter(YwCnvUi):
+    """yWriter converter with a command line UI. 
     """
 
     def __init__(self, silentMode, templatePath):
-        YwCnvTk.__init__(self, silentMode)
+        YwCnvUi.__init__(self)
         self.fileFactory = HtmlFileFactory(templatePath)
+
+        if not silentMode:
+            self.userInterface = UiCmd('Export yWriter project to html')
 
 
 def run(sourcePath, templatePath, suffix, silentMode=True):

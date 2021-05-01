@@ -11,7 +11,8 @@ import re
 import os
 import argparse
 
-from pywriter.converter.yw_cnv_tk import YwCnvTk
+from pywriter.converter.yw_cnv_ui import YwCnvUi
+from pywriter.converter.ui_cmd import UiCmd
 from pywriter.file.file_export import FileExport
 from pywriter.html.html_fop import read_html_file
 from pywriter.converter.file_factory import FileFactory
@@ -233,13 +234,16 @@ class HtmlFileFactory(FileFactory):
         return 'SUCCESS', sourceFile, targetFile
 
 
-class Converter(YwCnvTk):
-    """yWriter converter with a simple tkinter GUI. 
+class Converter(YwCnvUi):
+    """yWriter converter with a command line UI. 
     """
 
     def __init__(self, silentMode, templatePath):
-        YwCnvTk.__init__(self, silentMode)
+        YwCnvUi.__init__(self)
         self.fileFactory = HtmlFileFactory(templatePath)
+
+        if not silentMode:
+            self.userInterface = UiCmd('Export yWriter project to html')
 
 
 def run(sourcePath, templatePath, suffix, silentMode=True):

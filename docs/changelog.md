@@ -2,6 +2,15 @@
 
 ## Changelog
 
+### v1.0.0 Rename the script and change the user interface
+
+- Change the script's file extension from `.pyw` to `.py` and implement a command line-only UI.
+
+__Please note:__  If you update yw2html, be sure to change the extensions in your existing custom batch files.
+
+Based on PyWriter 2.14.4
+
+
 ### v0.10.0 Improve the processing of comma-separated lists
 
 - Fix incorrectly defined tags during yWriter import.

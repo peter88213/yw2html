@@ -1,1 +1,1 @@
-python ..\yw2html.pyw %1 -t template\proofread -s _proof
+python ..\yw2html.py %1 -t template\proofread -s _proof

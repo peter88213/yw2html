@@ -1,1 +1,1 @@
-python ..\yw2html.pyw %1 -t template\export
+python ..\yw2html.py %1 -t template\export

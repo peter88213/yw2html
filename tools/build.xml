@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="yw2html" basedir=".">
-	<property name="release" value="0.10.0" />
+	<property name="release" value="1.0.0" />
 	<property name="src" location="../src" />
 	<property name="test" location="../test" />
 	<property name="build" location="../build" />
@@ -12,11 +12,11 @@
 	<target name="build" description="inline all library modules">
 		<delete dir="${build}" />
 		<delete dir="${dist}" />
-		<delete file="${test}/yw2html.pyw" />
+		<delete file="${test}/yw2html.py" />
 		<exec executable="python" failonerror="true">
 		    <arg value="${src}/build_yw2html.py"/>
 		</exec>
-		<fixcrlf eol="lf" srcdir="${test}" includes="**/*.pyw" />
+		<fixcrlf eol="lf" srcdir="${test}" includes="**/*.py" />
 	</target>
 
 	<target name="test" description="inline all library modules">
@@ -31,8 +31,8 @@
 		<mkdir dir="${dist}" />
 		<mkdir dir="${build}/yw2html_v${release}" />
 
-		<copy file="${test}/yw2html.pyw" todir="${build}/yw2html_v${release}" />
-		<replace encoding="utf-8" file="${build}/yw2html_v${release}/yw2html.pyw" token="@release" value="${release}" />
+		<copy file="${test}/yw2html.py" todir="${build}/yw2html_v${release}" />
+		<replace encoding="utf-8" file="${build}/yw2html_v${release}/yw2html.py" token="@release" value="${release}" />
 
 		<copy todir="${build}/${release-name}/examples"> 
 			<fileset dir="../bat" />

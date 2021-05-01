@@ -4,7 +4,7 @@
 The yw2html Python script runs through all chapters and scenes of a yWriter 6/7 project and fills HTML templates.
 
 ## Usage
-usage: `yw_to_html.pyw [-h] [-t template-dir] [-s suffix] [--silent] Project`
+usage: `yw_to_html.py [-h] [-t template-dir] [-s suffix] [--silent] Project`
 
 #### positional arguments:
   `Project`          yWriter project file
