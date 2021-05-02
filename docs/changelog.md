@@ -2,6 +2,15 @@
 
 ## Changelog
 
+### v1.0.1 Service release
+
+Refactor the code
+* Move the HtmlExport class to the Pywriter library.
+* Replace it by the MyExport subclass.
+
+Based on PyWriter v2.15.1
+
+
 ### v1.0.0 Rename the script and change the user interface
 
 - Change the script's file extension from `.pyw` to `.py` and implement a command line-only UI.
