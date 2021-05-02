@@ -7,25 +7,21 @@ Copyright (c) 2021 Peter Triesberger
 For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
-import re
 import os
 import argparse
 
 from pywriter.converter.yw_cnv_ui import YwCnvUi
 from pywriter.converter.ui_cmd import UiCmd
-from pywriter.file.file_export import FileExport
+from pywriter.html.html_export import HtmlExport
 from pywriter.html.html_fop import read_html_file
 from pywriter.converter.file_factory import FileFactory
 from pywriter.yw.yw6_file import Yw6File
 from pywriter.yw.yw7_file import Yw7File
 
 
-class HtmlExport(FileExport):
+class MyExport(HtmlExport):
     """Export content or metadata from an yWriter project to a HTML file.
     """
-
-    DESCRIPTION = 'HTML export'
-    EXTENSION = '.html'
 
     # Template files
 
@@ -58,7 +54,7 @@ class HtmlExport(FileExport):
     _SCENE_DIVIDER = '/scene_divider.html'
 
     def __init__(self, filePath, templatePath='.'):
-        FileExport.__init__(self, filePath)
+        HtmlExport.__init__(self, filePath)
 
         # Initialize templates.
 
@@ -172,35 +168,6 @@ class HtmlExport(FileExport):
         if result[1] is not None:
             self.sceneDivider = result[1]
 
-    def convert_from_yw(self, text):
-        """Convert yw7 markup to HTML.
-        """
-        HTML_REPLACEMENTS = [
-            ['\n', '</p>\n<p>'],
-            ['[i]', '<em>'],
-            ['[/i]', '</em>'],
-            ['[b]', '<strong>'],
-            ['[/b]', '</strong>'],
-            ['<p></p>', '<p><br /></p>'],
-            ['/*', '<!--'],
-            ['*/', '-->'],
-        ]
-
-        try:
-
-            for r in HTML_REPLACEMENTS:
-                text = text.replace(r[0], r[1])
-
-            # Remove highlighting, alignment,
-            # strikethrough, and underline tags.
-
-            text = re.sub('\[\/*[h|c|r|s|u]\d*\]', '', text)
-
-        except AttributeError:
-            text = ''
-
-        return(text)
-
 
 class HtmlFileFactory(FileFactory):
     """A factory class that instantiates a source file object
@@ -227,8 +194,8 @@ class HtmlFileFactory(FileFactory):
         else:
             return 'ERROR: File type is not supported.', None, None
 
-        targetFile = HtmlExport(fileName + suffix +
-                                HtmlExport.EXTENSION, self.templatePath)
+        targetFile = MyExport(fileName + suffix +
+                              MyExport.EXTENSION, self.templatePath)
         targetFile.SUFFIX = suffix
 
         return 'SUCCESS', sourceFile, targetFile
