@@ -10,7 +10,7 @@ You can download the full source code of this project [here](https://github.com/
 
 ## License
 
-This extension is distributed under the [MIT License](http://www.opensource.org/licenses/mit-license.php).
+yw2html is distributed under the [MIT License](http://www.opensource.org/licenses/mit-license.php).
 
 
 

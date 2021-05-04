@@ -21,5 +21,5 @@ See the [usage instructions](usage)
 
 ## License
 
-This extension is distributed under the [MIT
+yw2html is distributed under the [MIT
 License](http://www.opensource.org/licenses/mit-license.php).

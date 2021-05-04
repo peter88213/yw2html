@@ -2165,13 +2165,13 @@ from abc import abstractmethod
 
 
 class FileFactory(ABC):
-    """Abstract factory class that instantiates a source file object
+    """Abstract class that instantiates a source file object
     and a target file object for conversion.
     """
 
     @abstractmethod
     def get_file_objects(self, sourcePath, suffix=None):
-        """Abstract method to be overwritten by subclasses.
+        """Factory method to be overwritten by subclasses.
         Return a tuple with three elements:
         * A message string starting with 'SUCCESS' or 'ERROR'
         * sourceFile: a Novel subclass instance
@@ -2377,7 +2377,9 @@ class YwFile(Novel):
         # Read attributes at novel level from the xml element tree.
 
         prj = root.find('PROJECT')
-        self.title = prj.find('Title').text
+
+        if prj.find('Title') is not None:
+            self.title = prj.find('Title').text
 
         if prj.find('AuthorName') is not None:
             self.author = prj.find('AuthorName').text
