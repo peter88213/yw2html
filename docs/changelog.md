@@ -2,6 +2,15 @@
 
 ## Changelog
 
+### v1.1.0 Make GUI customization easier
+
+The converter is now even more loosely coupled with its user interface. 
+This should make it easier for application developers to customize user interaction, 
+and use any GUI framework.
+
+Based on PyWriter v2.17.0 (development version)
+
+
 ### v1.0.1 Service release
 
 Refactor the code
