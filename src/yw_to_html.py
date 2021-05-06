@@ -10,8 +10,9 @@ Published under the MIT License (https://opensource.org/licenses/mit-license.php
 import os
 import argparse
 
+from pywriter.ui.ui import Ui
+from pywriter.ui.ui_cmd import UiCmd
 from pywriter.converter.yw_cnv_ui import YwCnvUi
-from pywriter.converter.ui_cmd import UiCmd
 from pywriter.html.html_export import HtmlExport
 from pywriter.html.html_fop import read_html_file
 from pywriter.converter.file_factory import FileFactory
@@ -201,20 +202,17 @@ class HtmlFileFactory(FileFactory):
         return 'SUCCESS', sourceFile, targetFile
 
 
-class Converter(YwCnvUi):
-    """yWriter converter with a command line UI. 
-    """
-
-    def __init__(self, silentMode, templatePath):
-        YwCnvUi.__init__(self)
-        self.fileFactory = HtmlFileFactory(templatePath)
-
-        if not silentMode:
-            self.userInterface = UiCmd('Export yWriter project to html')
-
-
 def run(sourcePath, templatePath, suffix, silentMode=True):
-    Converter(silentMode, templatePath).run(sourcePath, suffix)
+
+    if silentMode:
+        ui = Ui('')
+    else:
+        ui = UiCmd('yw2html')
+
+    converter = YwCnvUi()
+    converter.ui = ui
+    converter.fileFactory = HtmlFileFactory(templatePath)
+    converter.run(sourcePath, MyExport.SUFFIX)
 
 
 if __name__ == '__main__':
