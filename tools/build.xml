@@ -16,7 +16,7 @@
 		<exec executable="python" failonerror="true">
 		    <arg value="${src}/build_yw2html.py"/>
 		</exec>
-		<fixcrlf eol="lf" srcdir="${test}" includes="**/*.py" />
+		<fixcrlf encoding="utf-8" eol="lf" srcdir="${test}" includes="**/*.py" />
 	</target>
 
 	<target name="test" description="inline all library modules">
