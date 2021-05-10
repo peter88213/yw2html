@@ -4,9 +4,9 @@ In order to distribute a single script without dependencies,
 this script "inlines" all modules imported from the.pyriter package.
 
 The.pyriter project (see see https://github.com/peter88213.pyriter)
-must be located on the same directory level as the yW2OO project. 
+must be located on the same directory level as the yw2html project. 
 
-For further information see https://github.com/peter88213/yW2OO
+For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
 import os
@@ -14,11 +14,23 @@ import inliner
 
 SRC = '../src/'
 BUILD = '../test/'
+SOURCE_FILE = 'yw_to_html.py'
+TARGET_FILE = BUILD + 'yw2html.py'
 
 
 def main():
     os.chdir(SRC)
-    inliner.run('yw_to_html.py', BUILD + 'yw2html.py', 'pywriter')
+
+    try:
+        os.remove(TARGET_FILE)
+
+    except:
+        pass
+
+    inliner.run(SOURCE_FILE,
+                TARGET_FILE, 'pywhtml', '../src/')
+    inliner.run(TARGET_FILE,
+                TARGET_FILE, 'pywriter', '../../PyWriter/src/')
     print('Done.')
 
 

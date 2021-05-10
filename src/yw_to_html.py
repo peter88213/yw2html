@@ -13,11 +13,12 @@ import argparse
 from pywriter.ui.ui import Ui
 from pywriter.ui.ui_cmd import UiCmd
 from pywriter.converter.yw_cnv_ui import YwCnvUi
-from pywriter.html.html_export import HtmlExport
 from pywriter.html.html_fop import read_html_file
 from pywriter.converter.file_factory import FileFactory
 from pywriter.yw.yw6_file import Yw6File
 from pywriter.yw.yw7_file import Yw7File
+
+from pywhtml.html_export import HtmlExport
 
 
 class MyExport(HtmlExport):
@@ -170,7 +171,7 @@ class MyExport(HtmlExport):
             self.sceneDivider = result[1]
 
 
-class HtmlFileFactory(FileFactory):
+class MyFileFactory(FileFactory):
     """A factory class that instantiates a source file object
     and a target file object for conversion.
     """
@@ -211,8 +212,8 @@ def run(sourcePath, templatePath, suffix, silentMode=True):
 
     converter = YwCnvUi()
     converter.ui = ui
-    converter.fileFactory = HtmlFileFactory(templatePath)
-    converter.run(sourcePath, MyExport.SUFFIX)
+    converter.fileFactory = MyFileFactory(templatePath)
+    converter.run(sourcePath, suffix)
 
 
 if __name__ == '__main__':
