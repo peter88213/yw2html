@@ -2,6 +2,13 @@
 
 ## Changelog
 
+v1.1.2 Bugfix
+
+Fix a bug setting the suffix erroneously to None.
+
+Based on PyWriter v2.17.4 (development version)
+
+
 ### v1.1.0 Make GUI customization easier
 
 The converter is now even more loosely coupled with its user interface. 
