@@ -25,7 +25,16 @@ class MyExport(HtmlExport):
     """Export content or metadata from an yWriter project to a HTML file.
     """
 
-    # Template files
+    # Reset default templates.
+
+    fileHeader = ''
+    partTemplate = ''
+    chapterTemplate = ''
+    sceneTemplate = ''
+    sceneDivider = ''
+    fileFooter = ''
+
+    # Define template files.
 
     _HTML_HEADER = '/html_header.html'
 
