@@ -278,10 +278,11 @@ class ImportTargetFactory(FileFactory):
         fileName, fileExtension = os.path.splitext(sourcePath)
         sourceSuffix = kwargs['suffix']
 
-        if sourceSuffix is None:
-            sourceSuffix = ''
+        if sourceSuffix:
+            ywPathBasis = fileName.split(sourceSuffix)[0]
 
-        ywPathBasis = fileName.split(sourceSuffix)[0]
+        else:
+            ywPathBasis = fileName
 
         # Look for an existing yWriter project to rewrite.
 
@@ -346,7 +347,7 @@ class YwCnvUi(YwCnv):
             return
 
         message, sourceFile, dummy = self.exportSourceFactory.make_file_objects(
-            sourcePath)
+            sourcePath, **kwargs)
 
         if message.startswith('SUCCESS'):
             # The source file is a yWriter project.
@@ -364,7 +365,7 @@ class YwCnvUi(YwCnv):
             # The source file is not a yWriter project.
 
             message, sourceFile, dummy = self.importSourceFactory.make_file_objects(
-                sourcePath)
+                sourcePath, **kwargs)
 
             if message.startswith('SUCCESS'):
                 kwargs['suffix'] = sourceFile.SUFFIX
@@ -381,7 +382,7 @@ class YwCnvUi(YwCnv):
                 # A new yWriter project might be required.
 
                 message, sourceFile, targetFile = self.newProjectFactory.make_file_objects(
-                    sourcePath)
+                    sourcePath, **kwargs)
 
                 if message.startswith('SUCCESS'):
                     self.create_yw7(sourceFile, targetFile)
@@ -3329,7 +3330,16 @@ class MyExport(HtmlExport):
     """Export content or metadata from an yWriter project to a HTML file.
     """
 
-    # Template files
+    # Reset default templates.
+
+    fileHeader = ''
+    partTemplate = ''
+    chapterTemplate = ''
+    sceneTemplate = ''
+    sceneDivider = ''
+    fileFooter = ''
+
+    # Define template files.
 
     _HTML_HEADER = '/html_header.html'
 
@@ -3486,7 +3496,7 @@ class MyExporter(YwCnvUi):
         """Extend the superclass constructor.
 
         Override exportTargetFactory by a project
-        specific implemantation that accepts all
+        specific implementation that accepts all
         suffixes. 
         """
         YwCnvUi.__init__(self)

@@ -191,7 +191,7 @@ class MyExporter(YwCnvUi):
         """Extend the superclass constructor.
 
         Override exportTargetFactory by a project
-        specific implemantation that accepts all
+        specific implementation that accepts all
         suffixes. 
         """
         YwCnvUi.__init__(self)
