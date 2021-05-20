@@ -45,7 +45,7 @@ class Ui():
 
 
 class UiCmd(Ui):
-    """UI subclass implementing a console interface."""
+    """Ui subclass implementing a console interface."""
 
     def __init__(self, title):
         """initialize UI. """
@@ -241,14 +241,14 @@ class ExportTargetFactory(FileFactory):
 
 
 class ImportSourceFactory(FileFactory):
-    """A factory class that instantiates a source file object for import or export."""
+    """A factory class that instantiates an import source file object."""
 
     def make_file_objects(self, sourcePath, **kwargs):
         """Instantiate a source object for conversion to a yWriter format.
 
         Return a tuple with three elements:
         - A message string starting with 'SUCCESS' or 'ERROR'
-        - sourceFile: a YwFile subclass instance, or None in case of error
+        - sourceFile: a Novel subclass instance, or None in case of error
         - targetFile: None
         """
 
@@ -265,14 +265,14 @@ class ImportSourceFactory(FileFactory):
 
 
 class ImportTargetFactory(FileFactory):
-    """A factory class that instantiates a target file object for import."""
+    """A factory class that instantiates an import target file object."""
 
     def make_file_objects(self, sourcePath, **kwargs):
         """Factory method.
         Return a tuple with three elements:
         - A message string starting with 'SUCCESS' or 'ERROR'
-        - sourceFile: a Novel subclass instance
-        - targetFile: a Novel subclass instance
+        - sourceFile: None
+        - targetFile: a YwFile subclass instance, or None in case of error
 
         """
         fileName, fileExtension = os.path.splitext(sourcePath)
@@ -1038,7 +1038,7 @@ class Character(WorldElement):
 
 class YwFile(Novel):
     """Abstract yWriter xml project file representation.
-    To be overwritten by version-specific subclasses. 
+    To be overwritten by yWriter-version-specific subclasses. 
     """
 
     def strip_spaces(self, elements):
@@ -2047,7 +2047,7 @@ class YwTreeReader(ABC):
 
 
 class Utf8TreeReader(YwTreeReader):
-    """Read yWriter xml project file."""
+    """Read utf-8 encoded yWriter xml project file."""
 
     def read_element_tree(self, ywFile):
         """Parse the yWriter xml file located at filePath, fetching the Novel attributes.
@@ -2065,13 +2065,12 @@ class Utf8TreeReader(YwTreeReader):
 
 
 class YwProjectMerger():
-    """Merge two yWriter projects.
-    """
+    """Merge the attributes of two yWriter project structures."""
 
     def merge_projects(self, target, source):
         """Overwrite existing target attributes with source attributes.
-        Create target attributes, if not existing, but return ERROR.
         Return a message beginning with SUCCESS or ERROR.
+        Create target attributes, if not existing, but return ERROR.
         """
 
         # Merge and re-order locations.
@@ -2614,8 +2613,7 @@ class Yw7TreeBuilder(YwTreeBuilder):
 
 
 class Yw7File(YwFile):
-    """yWriter 7 project file representation.
-    """
+    """yWriter 7 project file representation."""
 
     DESCRIPTION = 'yWriter 7 project'
     EXTENSION = '.yw7'

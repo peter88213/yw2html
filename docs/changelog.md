@@ -2,7 +2,13 @@
 
 ## Changelog
 
-v1.1.2 Bugfix
+### v1.2.0 Service release
+
+- Update the underlying class library with changed API for better maintainability.
+
+Based on PyWriter v3.0.0
+
+### v1.1.2 Bugfix
 
 Fix a bug setting the suffix erroneously to None.
 
@@ -21,8 +27,8 @@ Based on PyWriter v2.17.0 (development version)
 ### v1.0.1 Service release
 
 Refactor the code
-* Move the HtmlExport class to the Pywriter library.
-* Replace it by the MyExport subclass.
+- Move the HtmlExport class to the Pywriter library.
+- Replace it by the MyExport subclass.
 
 Based on PyWriter v2.15.1
 
