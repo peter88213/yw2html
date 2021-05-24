@@ -1,4 +1,6 @@
-[Project homepage](index.md)
+[Project home page](index) > Changelog
+
+------------------------------------------------------------------------
 
 ## Changelog
 
