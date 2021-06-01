@@ -4,7 +4,7 @@
 
 ## Changelog
 
-### v1.2.0 Service release
+### v1.2.0 Optional update
 
 - Update the underlying class library with changed API for better maintainability.
 
@@ -26,7 +26,7 @@ and use any GUI framework.
 Based on PyWriter v2.17.0 (development version)
 
 
-### v1.0.1 Service release
+### v1.0.1 Optional update
 
 Refactor the code
 - Move the HtmlExport class to the Pywriter library.
