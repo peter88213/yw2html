@@ -7,7 +7,7 @@
 ### v1.2.1 Optional update
 
 This update is recommended for Linux users. It makes the "Open" button
-working on non-Windows operating systems.
+work on non-Windows operating systems.
 
 - Make the YwCnvUi.open_newFile() method os-independent.
 
