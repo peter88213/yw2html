@@ -4,6 +4,15 @@
 
 ## Changelog
 
+### v1.2.1 Optional update
+
+This update is recommended for Linux users. It makes the "Open" button
+working on non-Windows operating systems.
+
+- Make the YwCnvUi.open_newFile() method os-independent.
+
+Based on PyWriter v3.6.7
+
 ### v1.2.0 Optional update
 
 - Update the underlying class library with changed API for better maintainability.
