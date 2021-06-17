@@ -4,6 +4,12 @@
 
 ## Changelog
 
+### v1.2.2 Optional update
+
+- Major refactoring of the yw7 file processing.
+
+Based on PyWriter v3.8.0
+
 ### v1.2.1 Optional update
 
 This update is recommended for Linux users. It makes the "Open" button
