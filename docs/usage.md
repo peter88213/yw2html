@@ -1,7 +1,7 @@
 [Project homepage](https://peter88213.github.io/yw2html)
 
 
-The yw2html Python script runs through all chapters and scenes of a yWriter 6/7 project and fills HTML templates.
+The yw2html Python script runs through all chapters and scenes of a yWriter 7 project and fills HTML templates.
 
 ## Usage
 usage: `yw_to_html.py [-h] [-t template-dir] [-s suffix] [--silent] Project`

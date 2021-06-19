@@ -1,4 +1,4 @@
-The yw2html Python script runs through all chapters and scenes of a yWriter 6/7 project and fills HTML templates.
+The yw2html Python script runs through all chapters and scenes of a yWriter 7 project and fills HTML templates.
 
 ![Screenshot: Example](Screenshots/manuscript.png)
 
