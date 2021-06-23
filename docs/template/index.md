@@ -19,6 +19,10 @@ The yw2html Python script runs through all chapters and scenes of a yWriter 7 pr
 
 See the [usage instructions](usage)
 
+## See also
+
+If you are looking for a simpler solution with a graphical user interface, take a look at [yw-reporter](https://peter88213.github.io/yw-reporter).
+
 ## License
 
 yw2html is distributed under the [MIT
