@@ -4,6 +4,14 @@
 
 ## Changelog
 
+### v1.4.0 Add alternative chapter count designs
+
+New: 
+- $ChNumberEnglish: Chapter number written out in English
+- $ChNumberRoman: Chapter number in Roman numbers
+
+Based on PyWriter v3.10.2
+
 ### v1.2.2 Optional update
 
 - Major refactoring of the yw7 file processing.

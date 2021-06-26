@@ -388,6 +388,8 @@ class YwCnvUi(YwCnv):
 
         This is a template method that calls primitive operations by case.
         """
+        self.newFile = None
+
         if not os.path.isfile(sourcePath):
             self.ui.set_info_how(
                 'ERROR: File "' + os.path.normpath(sourcePath) + '" not found.')
@@ -1864,28 +1866,29 @@ from html import unescape
 class Utf8Postprocessor():
     """Postprocess ANSI encoded yWriter project."""
 
+    def __init__(self):
+        """Initialize instance variables."""
+        self.cdataTags = ['Title', 'AuthorName', 'Bio', 'Desc',
+                           'FieldTitle1', 'FieldTitle2', 'FieldTitle3',
+                           'FieldTitle4', 'LaTeXHeaderFile', 'Tags',
+                           'AKA', 'ImageFile', 'FullName', 'Goals',
+                           'Notes', 'RTFFile', 'SceneContent',
+                           'Outcome', 'Goal', 'Conflict']
+        # Names of yWriter xml elements containing CDATA.
+        # ElementTree.write omits CDATA tags, so they have to be inserted
+        # afterwards.
+
     def format_xml(self, text):
         '''Postprocess the xml file created by ElementTree:
            Insert the missing CDATA tags,
            and replace xml entities by plain text.
         '''
-
-        cdataTags = ['Title', 'AuthorName', 'Bio', 'Desc',
-                     'FieldTitle1', 'FieldTitle2', 'FieldTitle3',
-                     'FieldTitle4', 'LaTeXHeaderFile', 'Tags',
-                     'AKA', 'ImageFile', 'FullName', 'Goals',
-                     'Notes', 'RTFFile', 'SceneContent',
-                     'Outcome', 'Goal', 'Conflict']
-        # Names of yWriter xml elements containing CDATA.
-        # ElementTree.write omits CDATA tags, so they have to be inserted
-        # afterwards.
-
         lines = text.split('\n')
         newlines = []
 
         for line in lines:
 
-            for tag in cdataTags:
+            for tag in self.cdataTags:
                 line = re.sub('\<' + tag + '\>', '<' +
                               tag + '><![CDATA[', line)
                 line = re.sub('\<\/' + tag + '\>',
@@ -2998,6 +3001,7 @@ class FileExport(Novel):
     def get_sceneMapping(self, scId, sceneNumber, wordsTotal, lettersTotal):
         """Return a mapping dictionary for a scene section. 
         """
+        # Create a comma separated tag list.
 
         if self.scenes[scId].tags is not None:
             tags = self.get_string(self.scenes[scId].tags)
@@ -3005,9 +3009,12 @@ class FileExport(Novel):
         else:
             tags = ''
 
+        # Create a comma separated character list.
+
         try:
             # Note: Due to a bug, yWriter scenes might hold invalid
             # viepoint characters
+
             sChList = []
 
             for chId in self.scenes[scId].characters:
@@ -3020,6 +3027,8 @@ class FileExport(Novel):
             sceneChars = ''
             viewpointChar = ''
 
+        # Create a comma separated location list.
+
         if self.scenes[scId].locations is not None:
             sLcList = []
 
@@ -3030,6 +3039,8 @@ class FileExport(Novel):
 
         else:
             sceneLocs = ''
+
+        # Create a comma separated item list.
 
         if self.scenes[scId].items is not None:
             sItList = []
@@ -3042,11 +3053,60 @@ class FileExport(Novel):
         else:
             sceneItems = ''
 
+        # Create A/R marker string.
+
         if self.scenes[scId].isReactionScene:
             reactionScene = Scene.REACTION_MARKER
 
         else:
             reactionScene = Scene.ACTION_MARKER
+
+        # Create a combined date information.
+
+        if self.scenes[scId].date is None:
+
+            if self.scenes[scId].day is None:
+                scDate = ''
+            else:
+                scDate = 'Day ' + self.scenes[scId].day
+
+        else:
+            scDate = self.scenes[scId].date
+
+        # Create a combined time information.
+
+        if self.scenes[scId].time is None:
+
+            if self.scenes[scId].hour is None:
+                scTime = ''
+            else:
+                scTime = self.scenes[scId].hour.zfill(2) + \
+                    ':' + self.scenes[scId].minute.zfill(2)
+
+        else:
+            scTime = self.scenes[scId].time.rsplit(':', 1)[0]
+
+        # Create a combined duration information.
+
+        if self.scenes[scId].lastsDays is None:
+            days = ''
+        else:
+            days = self.scenes[scId].lastsDays + 'd '
+
+        if self.scenes[scId].lastsHours is None:
+            hours = ''
+
+        else:
+            hours = self.scenes[scId].lastsHours + 'h '
+
+        if self.scenes[scId].lastsMinutes is None:
+
+            minutes = ''
+
+        else:
+            minutes = self.scenes[scId].lastsMinutes + 'min'
+
+        duration = days + hours + minutes
 
         sceneMapping = dict(
             ID=scId,
@@ -3073,9 +3133,12 @@ class FileExport(Novel):
             Day=self.scenes[scId].day,
             Hour=self.scenes[scId].hour,
             Minute=self.scenes[scId].minute,
+            ScDate=scDate,
+            ScTime=scTime,
             LastsDays=self.scenes[scId].lastsDays,
             LastsHours=self.scenes[scId].lastsHours,
             LastsMinutes=self.scenes[scId].lastsMinutes,
+            Duration=duration,
             ReactionScene=reactionScene,
             Goal=self.convert_from_yw(self.scenes[scId].goal),
             Conflict=self.convert_from_yw(self.scenes[scId].conflict),
@@ -3089,6 +3152,7 @@ class FileExport(Novel):
             ProjectName=self.projectName,
             ProjectPath=self.projectPath,
         )
+
         return sceneMapping
 
     def get_characterMapping(self, crId):
@@ -3176,6 +3240,13 @@ class FileExport(Novel):
             self.get_fileHeaderMapping()))
         return lines
 
+    def reject_scene(self, scId):
+        """Return True if the scene is to be filtered out.
+        This is a stub to be overridden by subclass methods
+        implementing scene filters.
+        """
+        return False
+
     def get_scenes(self, chId, sceneNumber, wordsTotal, lettersTotal, doNotExport):
         """Process the scenes.
         Return a list of strings.
@@ -3184,8 +3255,9 @@ class FileExport(Novel):
         firstSceneInChapter = True
 
         for scId in self.chapters[chId].srtScenes:
-            wordsTotal += self.scenes[scId].wordCount
-            lettersTotal += self.scenes[scId].letterCount
+
+            if self.reject_scene(scId):
+                continue
 
             # The order counts; be aware that "Todo" and "Notes" scenes are
             # always unused.
@@ -3234,6 +3306,8 @@ class FileExport(Novel):
 
             else:
                 sceneNumber += 1
+                wordsTotal += self.scenes[scId].wordCount
+                lettersTotal += self.scenes[scId].letterCount
 
                 template = Template(self.sceneTemplate)
 
@@ -3486,8 +3560,74 @@ strong {font-weight:normal; text-transform: uppercase}
     def get_chapterMapping(self, chId, chapterNumber):
         """Return a mapping dictionary for a chapter section. 
         """
+
+        ROMAN = [
+            (1000, "M"),
+            (900, "CM"),
+            (500, "D"),
+            (400, "CD"),
+            (100, "C"),
+            (90, "XC"),
+            (50, "L"),
+            (40, "XL"),
+            (10, "X"),
+            (9, "IX"),
+            (5, "V"),
+            (4, "IV"),
+            (1, "I"),
+        ]
+
+        def number_to_roman(n):
+
+            result = []
+
+            for (arabic, roman) in ROMAN:
+                (factor, n) = divmod(n, arabic)
+                result.append(roman * factor)
+
+                if n == 0:
+                    break
+
+            return "".join(result)
+
+        TENS = {30: 'thirty', 40: 'forty', 50: 'fifty',
+                60: 'sixty', 70: 'seventy', 80: 'eighty', 90: 'ninety'}
+        ZERO_TO_TWENTY = (
+            'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+            'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'
+        )
+
+        def number_to_english(n):
+
+            if any(not x.isdigit() for x in str(n)):
+                return ''
+
+            if n <= 20:
+                return ZERO_TO_TWENTY[n]
+
+            elif n < 100 and n % 10 == 0:
+                return TENS[n]
+
+            elif n < 100:
+                return number_to_english(n - (n % 10)) + ' ' + number_to_english(n % 10)
+
+            elif n < 1000 and n % 100 == 0:
+                return number_to_english(n / 100) + ' hundred'
+
+            elif n < 1000:
+                return number_to_english(n / 100) + ' hundred ' + number_to_english(n % 100)
+
+            elif n < 1000000:
+                return number_to_english(n / 1000) + ' thousand ' + number_to_english(n % 1000)
+
+            return ''
+
         chapterMapping = FileExport.get_chapterMapping(
             self, chId, chapterNumber)
+
+        chapterMapping['ChNumberEnglish'] = number_to_english(
+            chapterNumber).capitalize()
+        chapterMapping['ChNumberRoman'] = number_to_roman(chapterNumber)
 
         if self.chapters[chId].suppressChapterTitle:
             chapterMapping['Title'] = ''
