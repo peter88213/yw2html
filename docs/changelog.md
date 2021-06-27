@@ -4,6 +4,13 @@
 
 ## Changelog
 
+### v1.6.0 Add a special template for scenes at the beginning of the chapter
+
+New:
+- first_scene_template.html
+
+Based on PyWriter v3.12.0
+
 ### v1.4.0 Add alternative chapter count designs
 
 New: 

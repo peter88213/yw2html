@@ -55,6 +55,7 @@ The downloaded zip file includes a directory named *examples* containing a *temp
 ### Scene level templates
 
 - **scene_template.html** (applied to "used" scenes within "normal" chapters)
+- **first_scene_template.html** (applied  to scenes at the beginning of the chapter)
 - **unused_scene_template.html** (applied to "unused" scenes)
 - **notes_scene_template.html** (applied to scenes marked "notes")
 - **todo_scene_template.html** (applied to scenes marked "todo")

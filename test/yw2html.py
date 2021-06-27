@@ -2840,6 +2840,19 @@ from string import Template
 
 
 
+class Filter():
+    """Strategy class, implementing filtering criteria 
+    for template-based export.
+    """
+
+    def accept(self, source, id):
+        """Return True if the entity is not to be filtered out.
+        This is a stub to be overridden by subclass methods
+        implementing filters.
+        """
+        return True
+
+
 class FileExport(Novel):
     """Abstract yWriter project file exporter representation.
     This class is generic and contains no conversion algorithm and no templates.
@@ -2854,6 +2867,7 @@ class FileExport(Novel):
     unusedChapterTemplate = ''
     notExportedChapterTemplate = ''
     sceneTemplate = ''
+    firstSceneTemplate = ''
     appendedSceneTemplate = ''
     notesSceneTemplate = ''
     todoSceneTemplate = ''
@@ -2868,6 +2882,17 @@ class FileExport(Novel):
     locationTemplate = ''
     itemTemplate = ''
     fileFooter = ''
+
+    def __init__(self, filePath, **kwargs):
+        """Extend the superclass constructor,
+        initializing a filter class.
+        """
+        Novel.__init__(self, filePath, **kwargs)
+        self.sceneFilter = Filter()
+        self.chapterFilter = Filter()
+        self.characterFilter = Filter()
+        self.locationFilter = Filter()
+        self.itemFilter = Filter()
 
     def get_string(self, elements):
         """Return a string which is the concatenation of the 
@@ -3240,13 +3265,6 @@ class FileExport(Novel):
             self.get_fileHeaderMapping()))
         return lines
 
-    def reject_scene(self, scId):
-        """Return True if the scene is to be filtered out.
-        This is a stub to be overridden by subclass methods
-        implementing scene filters.
-        """
-        return False
-
     def get_scenes(self, chId, sceneNumber, wordsTotal, lettersTotal, doNotExport):
         """Process the scenes.
         Return a list of strings.
@@ -3256,7 +3274,7 @@ class FileExport(Novel):
 
         for scId in self.chapters[chId].srtScenes:
 
-            if self.reject_scene(scId):
+            if not self.sceneFilter.accept(self, scId):
                 continue
 
             # The order counts; be aware that "Todo" and "Notes" scenes are
@@ -3317,6 +3335,9 @@ class FileExport(Novel):
             if not (firstSceneInChapter or self.scenes[scId].appendToPrev):
                 lines.append(self.sceneDivider)
 
+            if firstSceneInChapter and self.firstSceneTemplate != '':
+                template = Template(self.firstSceneTemplate)
+
             lines.append(template.safe_substitute(self.get_sceneMapping(
                 scId, sceneNumber, wordsTotal, lettersTotal)))
 
@@ -3335,6 +3356,9 @@ class FileExport(Novel):
         lettersTotal = 0
 
         for chId in self.srtChapters:
+
+            if not self.chapterFilter.accept(self, chId):
+                continue
 
             # The order counts; be aware that "Todo" and "Notes" chapters are
             # always unused.
@@ -3446,8 +3470,10 @@ class FileExport(Novel):
         template = Template(self.characterTemplate)
 
         for crId in self.srtCharacters:
-            lines.append(template.safe_substitute(
-                self.get_characterMapping(crId)))
+
+            if self.characterFilter.accept(self, crId):
+                lines.append(template.safe_substitute(
+                    self.get_characterMapping(crId)))
 
         return lines
 
@@ -3459,8 +3485,10 @@ class FileExport(Novel):
         template = Template(self.locationTemplate)
 
         for lcId in self.srtLocations:
-            lines.append(template.safe_substitute(
-                self.get_locationMapping(lcId)))
+
+            if self.locationFilter.accept(self, lcId):
+                lines.append(template.safe_substitute(
+                    self.get_locationMapping(lcId)))
 
         return lines
 
@@ -3472,7 +3500,10 @@ class FileExport(Novel):
         template = Template(self.itemTemplate)
 
         for itId in self.srtItems:
-            lines.append(template.safe_substitute(self.get_itemMapping(itId)))
+
+            if self.itemFilter.accept(self, itId):
+                lines.append(template.safe_substitute(
+                    self.get_itemMapping(itId)))
 
         return lines
 
@@ -3702,6 +3733,7 @@ class MyExport(HtmlExport):
     _TODO_CHAPTER_END_TEMPLATE = '/todo_chapter_end_template.html'
 
     _SCENE_TEMPLATE = '/scene_template.html'
+    _FIRST_SCENE_TEMPLATE = '/first_scene_template.html'
     _UNUSED_SCENE_TEMPLATE = '/unused_scene_template.html'
     _NOTES_SCENE_TEMPLATE = '/info_scene_template.html'
     _TODO_SCENE_TEMPLATE = '/todo_scene_template.html'
@@ -3802,6 +3834,12 @@ class MyExport(HtmlExport):
 
         if result[1] is not None:
             self.sceneTemplate = result[1]
+
+        result = read_html_file(
+            templatePath + self._FIRST_SCENE_TEMPLATE)
+
+        if result[1] is not None:
+            self.firstSceneTemplate = result[1]
 
         result = read_html_file(
             templatePath + self._UNUSED_SCENE_TEMPLATE)

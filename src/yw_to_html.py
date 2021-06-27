@@ -59,6 +59,7 @@ class MyExport(HtmlExport):
     _TODO_CHAPTER_END_TEMPLATE = '/todo_chapter_end_template.html'
 
     _SCENE_TEMPLATE = '/scene_template.html'
+    _FIRST_SCENE_TEMPLATE = '/first_scene_template.html'
     _UNUSED_SCENE_TEMPLATE = '/unused_scene_template.html'
     _NOTES_SCENE_TEMPLATE = '/info_scene_template.html'
     _TODO_SCENE_TEMPLATE = '/todo_scene_template.html'
@@ -159,6 +160,12 @@ class MyExport(HtmlExport):
 
         if result[1] is not None:
             self.sceneTemplate = result[1]
+
+        result = read_html_file(
+            templatePath + self._FIRST_SCENE_TEMPLATE)
+
+        if result[1] is not None:
+            self.firstSceneTemplate = result[1]
 
         result = read_html_file(
             templatePath + self._UNUSED_SCENE_TEMPLATE)
