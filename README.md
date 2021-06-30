@@ -3,10 +3,10 @@
 For more information, see the [project homepage](https://peter88213.github.io/yw2html) with description and download instructions.
 
 
-## Want to fork this project?
+## Credits
 
-You can download the full source code of this project [here](https://github.com/peter88213/yw2html/releases/latest). If you have got your own GitHub account, you might want to give my cool project a star to bookmark it. If you are still considering forking this project, read [this](https://ericgreer.info/post/judging-the-stupidity-of-github-projects/) first.
-
+- User *Hunter_71* presented the number to English conversion algorithm on stack overflow.
+- User *Aristide* presented the integer to roman numeral conversion on stack overflow.
 
 ## License
 

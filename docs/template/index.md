@@ -23,6 +23,11 @@ See the [usage instructions](usage)
 
 If you are looking for a simpler solution with a graphical user interface, take a look at [yw-reporter](https://peter88213.github.io/yw-reporter).
 
+## Credits
+
+- User *Hunter_71* presented the number to English conversion algorithm on stack overflow.
+- User *Aristide* presented the integer to roman numeral conversion on stack overflow.
+
 ## License
 
 yw2html is distributed under the [MIT
