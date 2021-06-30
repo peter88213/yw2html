@@ -4,6 +4,10 @@
 
 ## Changelog
 
+### v1.6.1 Fix "chapter end" template processing
+
+Based on PyWriter v3.12.3
+
 ### v1.6.0 Add a special template for scenes at the beginning of the chapter
 
 New:

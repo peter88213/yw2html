@@ -138,9 +138,15 @@ strong {font-weight:normal; text-transform: uppercase}
         chapterMapping = FileExport.get_chapterMapping(
             self, chId, chapterNumber)
 
-        chapterMapping['ChNumberEnglish'] = number_to_english(
-            chapterNumber).capitalize()
-        chapterMapping['ChNumberRoman'] = number_to_roman(chapterNumber)
+        if chapterNumber:
+            chapterMapping['ChNumberEnglish'] = number_to_english(
+                int(chapterNumber)).capitalize()
+            chapterMapping['ChNumberRoman'] = number_to_roman(
+                int(chapterNumber))
+
+        else:
+            chapterMapping['ChNumberEnglish'] = ''
+            chapterMapping['ChNumberRoman'] = ''
 
         if self.chapters[chId].suppressChapterTitle:
             chapterMapping['Title'] = ''
