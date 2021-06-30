@@ -25,8 +25,8 @@ If you are looking for a simpler solution with a graphical user interface, take 
 
 ## Credits
 
-- User *Hunter_71* presented the number to English conversion algorithm on stack overflow.
-- User *Aristide* presented the integer to roman numeral conversion on stack overflow.
+- User *Hunter_71* presented the number to English conversion algorithm on [stack overflow](https://stackoverflow.com/a/51849443).
+- User *Aristide* presented the integer to roman numeral conversion on [stack overflow](https://stackoverflow.com/a/47713392).
 
 ## License
 
