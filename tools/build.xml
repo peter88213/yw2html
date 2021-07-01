@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="yw2html" basedir=".">
-	<property name="release" value="1.6.1" />
+	<property name="release" value="1.6.2" />
 	<property name="src" location="../src" />
 	<property name="test" location="../test" />
 	<property name="build" location="../build" />
@@ -33,6 +33,10 @@
 
 		<copy file="${test}/yw2html.py" todir="${build}/yw2html_v${release}" />
 		<replace encoding="utf-8" file="${build}/yw2html_v${release}/yw2html.py" token="@release" value="${release}" />
+
+		<copy todir="${build}/${release-name}/examples/add-on"> 
+			<fileset dir="../add-on" />
+		</copy>
 
 		<copy todir="${build}/${release-name}/examples"> 
 			<fileset dir="../bat" />

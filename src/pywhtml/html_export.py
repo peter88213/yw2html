@@ -140,9 +140,8 @@ strong {font-weight:normal; text-transform: uppercase}
 
         if chapterNumber:
             chapterMapping['ChNumberEnglish'] = number_to_english(
-                int(chapterNumber)).capitalize()
-            chapterMapping['ChNumberRoman'] = number_to_roman(
-                int(chapterNumber))
+                chapterNumber).capitalize()
+            chapterMapping['ChNumberRoman'] = number_to_roman(chapterNumber)
 
         else:
             chapterMapping['ChNumberEnglish'] = ''

@@ -61,7 +61,7 @@ class MyExport(HtmlExport):
     _SCENE_TEMPLATE = '/scene_template.html'
     _FIRST_SCENE_TEMPLATE = '/first_scene_template.html'
     _UNUSED_SCENE_TEMPLATE = '/unused_scene_template.html'
-    _NOTES_SCENE_TEMPLATE = '/info_scene_template.html'
+    _NOTES_SCENE_TEMPLATE = '/notes_scene_template.html'
     _TODO_SCENE_TEMPLATE = '/todo_scene_template.html'
     _SCENE_DIVIDER = '/scene_divider.html'
 

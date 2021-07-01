@@ -4,6 +4,14 @@
 
 ## Changelog
 
+### v1.6.2 Bugfix
+
+- Fix _NOTES_SCENE_TEMPLATE file name.
+- Preprocess date/time information before export.
+- Add more examples.
+
+Based on PyWriter v3.12.5
+
 ### v1.6.1 Fix "chapter end" template processing
 
 Based on PyWriter v3.12.3
