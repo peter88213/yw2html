@@ -8,7 +8,7 @@ Published under the MIT License (https://opensource.org/licenses/mit-license.php
 import os
 import unittest
 import yw2html
-
+from shutil import copyfile
 
 # Test environment
 
@@ -39,7 +39,7 @@ def read_file(inputFile):
             return f.read()
 
 
-def copy_file(inputFile, outputFile):
+def copyfile(inputFile, outputFile):
     with open(inputFile, 'rb') as f:
         myData = f.read()
     with open(outputFile, 'wb') as f:
@@ -79,7 +79,7 @@ class NormalOperation(unittest.TestCase):
             pass
 
         remove_all_testfiles()
-        copy_file(TEST_DATA_PATH + YW7, TEST_EXEC_PATH + YW7)
+        copyfile(TEST_DATA_PATH + YW7, TEST_EXEC_PATH + YW7)
 
     def test_scenelist(self):
         os.chdir(TEST_EXEC_PATH)
