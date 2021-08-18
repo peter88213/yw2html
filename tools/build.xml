@@ -10,8 +10,6 @@
 	<property name="release-name" value="${project-name}_v${release}" />
 
 	<target name="build" description="inline all library modules">
-		<delete dir="${build}" />
-		<delete dir="${dist}" />
 		<delete file="${test}/yw2html.py" />
 		<exec executable="python" failonerror="true">
 		    <arg value="${src}/build_yw2html.py"/>
@@ -25,8 +23,10 @@
 		</exec>
 	</target>
 
-	<target name="dist" description="generate the distribution">
+	<target name="dist" description="generate the distribution">		
 		
+		<delete dir="${build}" />
+		<delete dir="${dist}" />
 		<mkdir dir="${build}" />
 		<mkdir dir="${dist}" />
 		<mkdir dir="${build}/yw2html_v${release}" />
