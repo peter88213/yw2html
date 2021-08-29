@@ -14,7 +14,7 @@ import inliner
 
 SRC = '../src/'
 BUILD = '../test/'
-SOURCE_FILE = 'yw_to_html.py'
+SOURCE_FILE = 'yw2html_.py'
 TARGET_FILE = BUILD + 'yw2html.py'
 
 
