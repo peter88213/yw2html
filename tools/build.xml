@@ -18,6 +18,8 @@
 	</target>
 
 	<target name="test" description="inline all library modules">
+		<copy file="${test}/test_yw2html_.py" tofile="${test}/test_yw2html.py" />
+		<replace encoding="utf-8" file="${test}/test_yw2html.py" token="yw2html_" value="yw2html" />
 		<exec executable="python" failonerror="true">
 		    <arg value="${test}/test_yw2html.py"/>
 		</exec>
@@ -59,6 +61,7 @@
 	<target name="clean" description="clean up">
 		
 		<delete file="${test}/yw2html.py" />
+		<delete file="${test}/test_yw2html.py" />
 		
 	</target>
 
