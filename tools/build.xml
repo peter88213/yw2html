@@ -35,7 +35,7 @@
 		<mkdir dir="${build-path}/${release}" />
 		
 		<copy file="${test-path}/${test-app}.py" tofile="${build-path}/${release}/${application}.py" />
-		<replace encoding="utf-8" file="${build-path}/${release}/${application}.py" token="@version" value="${version}" />
+		<replace encoding="utf-8" file="${build-path}/${release}/${application}.py" token="@release" value="${version}" />
 		
 		<copy file="../LICENSE" todir="${build-path}/${release}" />	
 		<copy file="${docs-path}/usage.md" tofile="${build-path}/${release}/README.md" />
