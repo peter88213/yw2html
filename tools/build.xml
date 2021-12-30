@@ -1,68 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="yw2html" basedir=".">
-	<property name="release" value="1.6.3" />
-	<property name="src" location="../src" />
-	<property name="test" location="../test" />
-	<property name="build" location="../build" />
-	<property name="dist" location="../dist" />
-	<property name="docs" location="../docs" />
-	<property name="project-name" value="${ant.project.name}" />
-	<property name="release-name" value="${project-name}_v${release}" />
+	<property name="version" value="1.6.3" />
+	<property name="test-app" value="yw2html" />
+	<!-- This is a project-specific build script -->
+	
+	<property name="source-path" location="../src" />
+	<property name="test-path" location="../test" />
+	<property name="build-path" location="../build" />
+	<property name="dist-path" location="../dist" />
+	<property name="docs-path" location="../docs" />
+	<property name="application" value="${ant.project.name}" />
+	<property name="release" value="${application}_v${version}" />
 
 	<target name="build" description="inline all library modules">
-		<delete file="${test}/yw2html.py" />
+		<delete file="${test-path}/${test-app}.py" />
 		<exec executable="python" failonerror="true">
-		    <arg value="${src}/build_yw2html.py"/>
+		    <arg value="${source-path}/build_${test-app}.py"/>
 		</exec>
-		<fixcrlf encoding="utf-8" eol="lf" srcdir="${test}" includes="**/*.py" />
 	</target>
 
-	<target name="test" description="inline all library modules">
-		<copy file="${test}/test_yw2html_.py" tofile="${test}/test_yw2html.py" />
-		<replace encoding="utf-8" file="${test}/test_yw2html.py" token="yw2html_" value="yw2html" />
+	<target name="test" description="integration test">
+		<copy file="${test-path}/test_${test-app}_.py" tofile="${test-path}/test_${test-app}.py" />
+		<replace encoding="utf-8" file="${test-path}/test_${test-app}.py" token="${test-app}_" value="${test-app}" />
 		<exec executable="python" failonerror="true">
-		    <arg value="${test}/test_yw2html.py"/>
+		    <arg value="${test-path}/test_${test-app}.py"/>
 		</exec>
 	</target>
 
 	<target name="dist" description="generate the distribution">		
+		<delete dir="${build-path}" />
+		<delete dir="${dist-path}" />
+		<mkdir dir="${build-path}" />
+		<mkdir dir="${dist-path}" />
+		<mkdir dir="${build-path}/${release}" />
 		
-		<delete dir="${build}" />
-		<delete dir="${dist}" />
-		<mkdir dir="${build}" />
-		<mkdir dir="${dist}" />
-		<mkdir dir="${build}/yw2html_v${release}" />
-
-		<copy file="${test}/yw2html.py" todir="${build}/yw2html_v${release}" />
-		<replace encoding="utf-8" file="${build}/yw2html_v${release}/yw2html.py" token="@release" value="${release}" />
-
-		<copy todir="${build}/${release-name}/examples/add-on"> 
+		<copy file="${test-path}/${test-app}.py" tofile="${build-path}/${release}/${application}.py" />
+		<replace encoding="utf-8" file="${build-path}/${release}/${application}.py" token="@version" value="${version}" />
+		
+		<copy file="../LICENSE" todir="${build-path}/${release}" />	
+		<copy file="${docs-path}/usage.md" tofile="${build-path}/${release}/README.md" />
+				
+		<copy todir="${build-path}/${release}/examples/add-on"> 
 			<fileset dir="../add-on" />
 		</copy>
 
-		<copy todir="${build}/${release-name}/examples"> 
+		<copy todir="${build-path}/${release}/examples"> 
 			<fileset dir="../bat" />
 		</copy>
 
-		<copy todir="${build}/${release-name}/examples/template"> 
+		<copy todir="${build-path}/${release}/examples/template"> 
 			<fileset dir="../template" />
 		</copy>
-
-		<copy file="../LICENSE" todir="${build}/yw2html_v${release}" />
-		<copy file="${docs}/usage.md" tofile="${build}/yw2html_v${release}/README.md" />
-
-		<zip destfile="${dist}/yw2html_v${release}.zip" basedir="${build}/yw2html_v${release}" />
-
-		<copy file="${docs}/template/index.md" overwrite="True" todir="${docs}" />
-		<replace encoding="utf-8" file="${docs}/index.md" token="0.99.0" value="${release}" />
-
+		
+		<fixcrlf encoding="utf-8" eol="lf" srcdir="${build-path}/${release}" includes="**/*.*" />
+			
+		<zip destfile="${dist-path}/${release}.zip" basedir="${build-path}/${release}" />
+		
+		<copy file="${docs-path}/template/index.md" overwrite="True" todir="${docs-path}" />
+		<replace encoding="utf-8" file="${docs-path}/index.md" token="0.99.0" value="${version}" />
 	</target>
 
-	<target name="clean" description="clean up">
-		
-		<delete file="${test}/yw2html.py" />
-		<delete file="${test}/test_yw2html.py" />
-		
+	<target name="clean" description="clean up">		
+		<delete file="${test-path}/${test-app}.py" />
+		<delete file="${test-path}/test_${test-app}.py" />		
 	</target>
 
 </project>
