@@ -22,7 +22,7 @@ from pywhtml.html_export import HtmlExport
 
 
 class MyExport(HtmlExport):
-    """Export content or metadata from an yWriter project to a HTML file.
+    """Export content or metadata from a yWriter project to a HTML file.
     """
 
     # Reset default templates.
