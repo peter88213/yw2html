@@ -3,7 +3,7 @@
 
 Version @release
 
-Copyright (c) 2021 Peter Triesberger
+Copyright (c) 2022 Peter Triesberger
 For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
@@ -15,7 +15,6 @@ from pywriter.ui.ui_cmd import UiCmd
 from pywriter.html.html_fop import read_html_file
 
 from pywriter.converter.yw_cnv_ui import YwCnvUi
-from pywriter.yw.yw6_file import Yw6File
 from pywriter.yw.yw7_file import Yw7File
 from pywhtml.export_target_factory import ExportTargetFactory
 from pywhtml.html_export import HtmlExport
@@ -191,7 +190,7 @@ class MyExport(HtmlExport):
 
 class MyExporter(YwCnvUi):
     """A converter class for html export."""
-    EXPORT_SOURCE_CLASSES = [Yw7File, Yw6File]
+    EXPORT_SOURCE_CLASSES = [Yw7File]
     EXPORT_TARGET_CLASSES = [MyExport]
 
     def __init__(self):
