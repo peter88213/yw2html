@@ -1,6 +1,6 @@
-"""Export yWriter project to html. 
+"""Provide a class for HTML file representation.
 
-Copyright (c) 2021 Peter Triesberger
+Copyright (c) 2022 Peter Triesberger
 For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
@@ -10,7 +10,7 @@ from pywriter.file.file_export import FileExport
 
 
 class HtmlExport(FileExport):
-    """Export content or metadata from an yWriter project to a HTML file.
+    """HTML file representation.
     """
 
     DESCRIPTION = 'HTML export'
@@ -135,12 +135,10 @@ strong {font-weight:normal; text-transform: uppercase}
 
             return ''
 
-        chapterMapping = FileExport.get_chapterMapping(
-            self, chId, chapterNumber)
+        chapterMapping = super().get_chapterMapping(chId, chapterNumber)
 
         if chapterNumber:
-            chapterMapping['ChNumberEnglish'] = number_to_english(
-                chapterNumber).capitalize()
+            chapterMapping['ChNumberEnglish'] = number_to_english(chapterNumber).capitalize()
             chapterMapping['ChNumberRoman'] = number_to_roman(chapterNumber)
 
         else:

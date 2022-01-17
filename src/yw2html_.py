@@ -14,7 +14,7 @@ from pywriter.ui.ui import Ui
 from pywriter.ui.ui_cmd import UiCmd
 from pywriter.html.html_fop import read_html_file
 
-from pywriter.converter.yw_cnv_ui import YwCnvUi
+from pywriter.converter.yw_cnv_ff import YwCnvFf
 from pywriter.yw.yw7_file import Yw7File
 from pywhtml.export_target_factory import ExportTargetFactory
 from pywhtml.html_export import HtmlExport
@@ -188,7 +188,7 @@ class MyExport(HtmlExport):
             self.sceneDivider = result[1]
 
 
-class MyExporter(YwCnvUi):
+class MyExporter(YwCnvFf):
     """A converter class for html export."""
     EXPORT_SOURCE_CLASSES = [Yw7File]
     EXPORT_TARGET_CLASSES = [MyExport]
@@ -200,9 +200,8 @@ class MyExporter(YwCnvUi):
         specific implementation that accepts all
         suffixes. 
         """
-        YwCnvUi.__init__(self)
-        self.exportTargetFactory = ExportTargetFactory(
-            self.EXPORT_TARGET_CLASSES)
+        super().__init__()
+        self.exportTargetFactory = ExportTargetFactory(self.EXPORT_TARGET_CLASSES)
 
 
 def run(sourcePath, templatePath, suffix, silentMode=True):
