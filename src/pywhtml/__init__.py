@@ -1,4 +1,4 @@
-"""Modules for exporting html documents via templates.
+"""Package for exporting html documents via templates.
 
 Modules:
 
