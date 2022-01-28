@@ -39,14 +39,6 @@ def read_file(inputFile):
             return f.read()
 
 
-def copyfile(inputFile, outputFile):
-    with open(inputFile, 'rb') as f:
-        myData = f.read()
-    with open(outputFile, 'wb') as f:
-        f.write(myData)
-    return()
-
-
 def remove_all_testfiles():
 
     try:

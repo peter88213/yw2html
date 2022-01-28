@@ -56,7 +56,7 @@ strong {font-weight:normal; text-transform: uppercase}
 <p>$SceneContent</p>
 '''
 
-    sceneDivider = '<p class="scenedivider">' + SCENE_DIVIDER + '</p>'
+    sceneDivider = '<p class="scenedivider">{}</p>'.format(SCENE_DIVIDER)
 
     fileFooter = '''</body>
 </html>

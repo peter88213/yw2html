@@ -28,8 +28,7 @@ class ExportTargetFactory(FileFactory):
             if suffix is None:
                 suffix = ''
 
-            targetFile = fileClass(fileName + suffix +
-                                   fileClass.EXTENSION, **kwargs)
+            targetFile = fileClass(fileName + suffix + fileClass.EXTENSION, **kwargs)
             return 'SUCCESS', None, targetFile
 
-        return 'ERROR: File type of "' + os.path.normpath(sourcePath) + '" not supported.', None, None
+        return 'ERROR: File type of "{}" not supported.'.format(os.path.normpath(sourcePath)), None, None
