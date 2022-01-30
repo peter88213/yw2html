@@ -4,6 +4,13 @@
 
 ## Changelog
 
+### v1.10.0 Optional update
+
+- Rework the error messaging system.
+- Refactor.
+
+Based on PyWriter v5.0.0
+
 ### v1.8.0 Drop the support of the .yw6 file format.
 
 Since yWriter5, yWriter6 and yWriter7 all use .yw7 now, the .yw6 conversion is dispensable.
