@@ -12,7 +12,7 @@ import re
 def inline_module(file, package, packagePath, text, processedModules):
 
     with open(file, 'r', encoding='utf-8') as f:
-        print('Processing "' + file + '"...')
+        print(f'Processing "{file}"...')
         lines = f.readlines()
         inSuppressedComment = False
         inHeader = True
@@ -39,7 +39,7 @@ def inline_module(file, package, packagePath, text, processedModules):
                         # docstring begins
                         inSuppressedComment = True
                 else:
-                    text = text + line
+                    text = f'{text}{line}'
 
             elif not inSuppressedComment:
 
@@ -61,18 +61,18 @@ def inline_module(file, package, packagePath, text, processedModules):
                         if not (moduleName in processedModules):
                             processedModules.append(moduleName)
                             text = inline_module(
-                                moduleName + '.py', package, packagePath, text, processedModules)
+                                f'{moduleName}.py', package, packagePath, text, processedModules)
                     elif line.lstrip().startswith('import'):
                         moduleName = line.replace('import ', '').rstrip()
 
                         if not (moduleName in processedModules):
                             processedModules.append(moduleName)
-                            text = text + line
+                            text = f'{text}{line}'
 
                     else:
-                        text = text + line
+                        text = f'{text}{line}'
                 else:
-                    text = text + line
+                    text = f'{text}{line}'
 
         return(text)
 
@@ -86,7 +86,7 @@ def run(sourceFile, targetFile, package, packagePath):
 
     with open(targetFile, 'w', encoding='utf-8') as f:
 
-        print('Writing "' + targetFile + '"...\n')
+        print(f'Writing "{targetFile}"...\n')
         f.write(text)
 
 
