@@ -26,12 +26,12 @@ class MyExport(HtmlExport):
 
     # Reset default templates.
 
-    fileHeader = ''
-    partTemplate = ''
-    chapterTemplate = ''
-    sceneTemplate = ''
-    sceneDivider = ''
-    fileFooter = ''
+    _fileHeader = ''
+    _partTemplate = ''
+    _chapterTemplate = ''
+    _sceneTemplate = ''
+    _sceneDivider = ''
+    _fileFooter = ''
 
     # Define template files.
 
@@ -78,114 +78,114 @@ class MyExport(HtmlExport):
         result = read_html_file(templatePath + self._HTML_HEADER)
 
         if result[1] is not None:
-            self.fileHeader = result[1]
+            self._fileHeader = result[1]
 
         result = read_html_file(templatePath + self._CHARACTER_TEMPLATE)
 
         if result[1] is not None:
-            self.characterTemplate = result[1]
+            self._characterTemplate = result[1]
 
         result = read_html_file(templatePath + self._LOCATION_TEMPLATE)
 
         if result[1] is not None:
-            self.locationTemplate = result[1]
+            self._locationTemplate = result[1]
 
         result = read_html_file(templatePath + self._ITEM_TEMPLATE)
 
         if result[1] is not None:
-            self.itemTemplate = result[1]
+            self._itemTemplate = result[1]
 
         result = read_html_file(templatePath + self._HTML_FOOTER)
 
         if result[1] is not None:
-            self.fileFooter = result[1]
+            self._fileFooter = result[1]
 
         # Chapter level.
 
         result = read_html_file(templatePath + self._PART_TEMPLATE)
 
         if result[1] is not None:
-            self.partTemplate = result[1]
+            self._partTemplate = result[1]
 
         result = read_html_file(templatePath + self._CHAPTER_TEMPLATE)
 
         if result[1] is not None:
-            self.chapterTemplate = result[1]
+            self._chapterTemplate = result[1]
 
         result = read_html_file(templatePath + self._CHAPTER_END_TEMPLATE)
 
         if result[1] is not None:
-            self.chapterEndTemplate = result[1]
+            self._chapterEndTemplate = result[1]
 
         result = read_html_file(
             templatePath + self._UNUSED_CHAPTER_TEMPLATE)
 
         if result[1] is not None:
-            self.unusedChapterTemplate = result[1]
+            self._unusedChapterTemplate = result[1]
 
         result = read_html_file(
             templatePath + self._UNUSED_CHAPTER_END_TEMPLATE)
 
         if result[1] is not None:
-            self.unusedChapterEndTemplate = result[1]
+            self._unusedChapterEndTemplate = result[1]
 
         result = read_html_file(
             templatePath + self._NOTES_CHAPTER_TEMPLATE)
 
         if result[1] is not None:
-            self.notesChapterTemplate = result[1]
+            self._notesChapterTemplate = result[1]
 
         result = read_html_file(
             templatePath + self._NOTES_CHAPTER_END_TEMPLATE)
 
         if result[1] is not None:
-            self.notesChapterEndTemplate = result[1]
+            self._notesChapterEndTemplate = result[1]
 
         result = read_html_file(
             templatePath + self._TODO_CHAPTER_TEMPLATE)
 
         if result[1] is not None:
-            self.todoChapterTemplate = result[1]
+            self._todoChapterTemplate = result[1]
 
         result = read_html_file(
             templatePath + self._TODO_CHAPTER_END_TEMPLATE)
 
         if result[1] is not None:
-            self.todoChapterEndTemplate = result[1]
+            self._todoChapterEndTemplate = result[1]
 
         # Scene level.
 
         result = read_html_file(templatePath + self._SCENE_TEMPLATE)
 
         if result[1] is not None:
-            self.sceneTemplate = result[1]
+            self._sceneTemplate = result[1]
 
         result = read_html_file(
             templatePath + self._FIRST_SCENE_TEMPLATE)
 
         if result[1] is not None:
-            self.firstSceneTemplate = result[1]
+            self._firstSceneTemplate = result[1]
 
         result = read_html_file(
             templatePath + self._UNUSED_SCENE_TEMPLATE)
 
         if result[1] is not None:
-            self.unusedSceneTemplate = result[1]
+            self._unusedSceneTemplate = result[1]
 
         result = read_html_file(templatePath + self._NOTES_SCENE_TEMPLATE)
 
         if result[1] is not None:
-            self.notesSceneTemplate = result[1]
+            self._notesSceneTemplate = result[1]
 
         result = read_html_file(templatePath + self._TODO_SCENE_TEMPLATE)
 
         if result[1] is not None:
-            self.todoSceneTemplate = result[1]
+            self._todoSceneTemplate = result[1]
 
         result = read_html_file(templatePath + self._SCENE_DIVIDER)
 
         if result[1] is not None:
-            self.sceneDivider = result[1]
+            self._sceneDivider = result[1]
 
 
 class MyExporter(YwCnvFf):

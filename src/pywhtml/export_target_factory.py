@@ -24,7 +24,7 @@ class ExportTargetFactory(FileFactory):
         fileName, fileExtension = os.path.splitext(sourcePath)
         suffix = kwargs['suffix']
 
-        for fileClass in self.fileClasses:
+        for fileClass in self._fileClasses:
 
             if suffix is None:
                 suffix = ''

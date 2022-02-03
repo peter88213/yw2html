@@ -18,7 +18,7 @@ class HtmlExport(FileExport):
 
     SCENE_DIVIDER = '* * *'
 
-    fileHeader = '''<html>
+    _fileHeader = '''<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
@@ -46,23 +46,23 @@ strong {font-weight:normal; text-transform: uppercase}
 
 '''
 
-    partTemplate = '''<h1><a name="ChID:$ID" />$Title</h1>
+    _partTemplate = '''<h1><a name="ChID:$ID" />$Title</h1>
 '''
 
-    chapterTemplate = '''<h2><a name="ChID:$ID" />$Title</h2>
+    _chapterTemplate = '''<h2><a name="ChID:$ID" />$Title</h2>
 '''
 
-    sceneTemplate = '''<a name="ScID:$ID" /><!-- ${Title} -->
+    _sceneTemplate = '''<a name="ScID:$ID" /><!-- ${Title} -->
 <p>$SceneContent</p>
 '''
 
-    sceneDivider = f'<p class="scenedivider">{SCENE_DIVIDER}</p>'
+    _sceneDivider = f'<p class="scenedivider">{SCENE_DIVIDER}</p>'
 
-    fileFooter = '''</body>
+    _fileFooter = '''</body>
 </html>
 '''
 
-    def get_chapterMapping(self, chId, chapterNumber):
+    def _get_chapterMapping(self, chId, chapterNumber):
         """Return a mapping dictionary for a chapter section. 
         """
 
@@ -135,7 +135,7 @@ strong {font-weight:normal; text-transform: uppercase}
 
             return ''
 
-        chapterMapping = super().get_chapterMapping(chId, chapterNumber)
+        chapterMapping = super()._get_chapterMapping(chId, chapterNumber)
 
         if chapterNumber:
             chapterMapping['ChNumberEnglish'] = number_to_english(chapterNumber).capitalize()
@@ -150,7 +150,7 @@ strong {font-weight:normal; text-transform: uppercase}
 
         return chapterMapping
 
-    def convert_from_yw(self, text):
+    def _convert_from_yw(self, text):
         """Convert yw7 markup to HTML.
         """
         HTML_REPLACEMENTS = [
