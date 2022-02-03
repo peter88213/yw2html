@@ -4,14 +4,14 @@ The yw2html Python script runs through all chapters and scenes of a yWriter 7 pr
 
 ## Requirements
 
-* [Python 3](https://www.python.org). Python 3.4 or more recent will work. However, Python 3.7 or above is highly recommended.
+- [Python 3.6+](https://www.python.org). 
 
 ## Download and install
 
 
 [Download the latest release (version 1.9.2)](https://raw.githubusercontent.com/peter88213/yw2html/main/dist/yw2html_v1.9.2.zip)
 
-* Unzip the downloaded zipfile "yw2html_v1.9.2.zip" into a new folder and open "README.md" for usage instructions.
+- Unzip the downloaded zipfile "yw2html_v1.9.2.zip" into a new folder and open "README.md" for usage instructions.
 
 [Changelog](changelog)
 
