@@ -150,18 +150,28 @@ strong {font-weight:normal; text-transform: uppercase}
 
         return chapterMapping
 
-    def _convert_from_yw(self, text):
+    def _convert_from_yw(self, text, quick=False):
         """Convert yw7 markup to HTML.
         """
+        
+        if quick:
+            # Just clean up a one-liner without sophisticated formatting.
+            
+            if text is None:
+                return ''
+            
+            else:
+                return text
+            
         HTML_REPLACEMENTS = [
-            ['\n', '</p>\n<p>'],
-            ['[i]', '<em>'],
-            ['[/i]', '</em>'],
-            ['[b]', '<strong>'],
-            ['[/b]', '</strong>'],
-            ['<p></p>', '<p><br /></p>'],
-            ['/*', '<!--'],
-            ['*/', '-->'],
+            ('\n', '</p>\n<p>'),
+            ('[i]', '<em>'),
+            ('[/i]', '</em>'),
+            ('[b]', '<strong>'),
+            ('[/b]', '</strong>'),
+            ('<p></p>', '<p><br /></p>'),
+            ('/*', '<!--'),
+            ('*/', '-->'),
         ]
 
         try:
