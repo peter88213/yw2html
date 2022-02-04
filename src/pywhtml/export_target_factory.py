@@ -21,7 +21,7 @@ class ExportTargetFactory(FileFactory):
         - sourceFile: None
         - targetFile: a FileExport subclass instance, or None in case of error 
         """
-        fileName, fileExtension = os.path.splitext(sourcePath)
+        fileName, __ = os.path.splitext(sourcePath)
         suffix = kwargs['suffix']
 
         for fileClass in self._fileClasses:
