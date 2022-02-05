@@ -176,8 +176,8 @@ strong {font-weight:normal; text-transform: uppercase}
 
         try:
 
-            for r in HTML_REPLACEMENTS:
-                text = text.replace(r[0], r[1])
+            for yw, htm in HTML_REPLACEMENTS:
+                text = text.replace(yw, htm)
 
             # Remove highlighting, alignment,
             # strikethrough, and underline tags.
