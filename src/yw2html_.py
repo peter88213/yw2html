@@ -245,7 +245,7 @@ if __name__ == '__main__':
     else:
         templatePath = os.path.dirname(args.sourcePath)
 
-    if templatePath == '':
+    if not templatePath:
         templatePath = '.'
 
     if args.suffix is not None:
