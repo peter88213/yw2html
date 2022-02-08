@@ -4,8 +4,9 @@
 
 ## Changelog
 
-### v1.10.0 Bugfix release
+### v2.0.0
 
+- Optionally, specify the HTML templates as yWriter scenes.
 - Fix a regression from v1.6.3 where the example files are unreadable.
 - Improve the overall code quality.
 

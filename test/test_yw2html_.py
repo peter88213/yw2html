@@ -24,6 +24,8 @@ TEMPLATE_PATH = '../../template/'
 
 # Test data
 YW7 = 'normal.yw7'
+YW7_INCL = 'with_templates.yw7'
+PAPERBACK = 'normal_paperback.html'
 SCENELIST = 'normal_scenelist.html'
 SCRIPT = 'normal_manuscript.html'
 CHARAS = 'normal_characters.html'
@@ -55,6 +57,10 @@ def remove_all_testfiles():
         pass
     try:
         os.remove(TEST_EXEC_PATH + CHARAS)
+    except:
+        pass
+    try:
+        os.remove(TEST_EXEC_PATH + PAPERBACK)
     except:
         pass
 
@@ -99,7 +105,15 @@ class NormalOperation(unittest.TestCase):
 
         self.assertEqual(read_file(TEST_EXEC_PATH + CHARAS),
                          read_file(TEST_DATA_PATH + CHARAS))
+        
+    def test_templates_included(self):
+        os.chdir(TEST_EXEC_PATH)
+        
+        copyfile(TEST_DATA_PATH + YW7_INCL, TEST_EXEC_PATH + YW7)
+        yw2html_.run(TEST_EXEC_PATH + YW7, '', '_paperback', True)
 
+        self.assertEqual(read_file(TEST_EXEC_PATH + PAPERBACK),
+                         read_file(TEST_DATA_PATH + PAPERBACK))
     def tearDown(self):
         remove_all_testfiles()
 
