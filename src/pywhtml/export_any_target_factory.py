@@ -10,7 +10,7 @@ from pywriter.pywriter_globals import ERROR
 from pywriter.converter.file_factory import FileFactory
 
 
-class ExportTargetFactory(FileFactory):
+class ExportAnyTargetFactory(FileFactory):
     """A factory class that instantiates an export target file object."""
 
     def make_file_objects(self, sourcePath, **kwargs):

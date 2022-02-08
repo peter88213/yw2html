@@ -11,6 +11,8 @@ from pywriter.file.file_export import FileExport
 
 class HtmlExport(FileExport):
     """HTML file representation.
+    
+    Provide basid HTML templates for exporting chapters and scenes.
     """
 
     DESCRIPTION = 'HTML export'

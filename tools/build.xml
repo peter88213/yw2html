@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="yw2html" basedir=".">
-	<property name="version" value="1.9.4" />
+	<property name="version" value="1.9.5" />
 	<property name="test-app" value="yw2html" />
 	<!-- This is a project-specific build script -->
 	
@@ -40,10 +40,6 @@
 		<copy file="../LICENSE" todir="${build-path}/${release}" />	
 		<copy file="${docs-path}/usage.md" tofile="${build-path}/${release}/README.md" />
 				
-		<copy todir="${build-path}/${release}/examples/add-on"> 
-			<fileset dir="../add-on" />
-		</copy>
-
 		<copy todir="${build-path}/${release}/examples"> 
 			<fileset dir="../bat" />
 		</copy>
@@ -51,9 +47,14 @@
 		<copy todir="${build-path}/${release}/examples/template"> 
 			<fileset dir="../template" />
 		</copy>
+				
+		<copy todir="${build-path}/${release}/examples/add-on"> 
+			<fileset dir="../add-on" />
+		</copy>
 		
-		<fixcrlf encoding="utf-8" eol="lf" srcdir="${build-path}/${release}" includes="**/*.*" />
-			
+		<fixcrlf encoding="utf-8" eol="lf" srcdir="${build-path}/${release}" includes="**/*.html" />
+		<fixcrlf encoding="utf-8" eol="lf" srcdir="${build-path}/${release}" includes="**/*.py" />
+
 		<zip destfile="${dist-path}/${release}.zip" basedir="${build-path}/${release}" />
 		
 		<copy file="${docs-path}/template/index.md" overwrite="True" todir="${docs-path}" />

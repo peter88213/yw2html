@@ -4,10 +4,10 @@
 
 ## Changelog
 
-### v1.10.0 Optional update
+### v1.10.0 Bugfix release
 
-- Rework the error messaging system.
-- Refactor.
+- Fix a regression from v1.6.3 where the example files are unreadable.
+- Improve the overall code quality.
 
 Based on PyWriter v5.0.0
 
