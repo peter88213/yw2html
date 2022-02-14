@@ -2,6 +2,9 @@ The yw2html Python script runs through all chapters and scenes of a yWriter 7 pr
 
 ![Screenshot: Example](Screenshots/manuscript.png)
 
+The HTML templates can be defined "externally" via HTML files or "internally" via yWriter scenes marked as unused.
+
+
 ## Requirements
 
 - [Python 3.6+](https://www.python.org). 
