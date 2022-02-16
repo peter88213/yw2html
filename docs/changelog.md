@@ -6,8 +6,9 @@
 
 ### v2.0.0
 
-- Optionally, specify the HTML templates as yWriter scenes.
 - Fix a regression from v1.6.3 where the example files are unreadable.
+- Optionally, specify the HTML templates as yWriter scenes.
+- Add $AuthorBio placeholder.
 - Improve the overall code quality.
 
 Based on PyWriter v5.0.0

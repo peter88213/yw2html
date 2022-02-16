@@ -2,6 +2,9 @@ The yw2html Python script runs through all chapters and scenes of a yWriter 7 pr
 
 ![Screenshot: Example](Screenshots/manuscript.png)
 
+The HTML templates can be defined "externally" via HTML files or "internally" via yWriter scenes marked as unused.
+
+
 ## Requirements
 
 - [Python 3.6+](https://www.python.org). 
@@ -9,9 +12,9 @@ The yw2html Python script runs through all chapters and scenes of a yWriter 7 pr
 ## Download and install
 
 
-[Download the latest release (version 1.9.6)](https://raw.githubusercontent.com/peter88213/yw2html/main/dist/yw2html_v1.9.6.zip)
+[Download the latest release (version 1.9.7)](https://raw.githubusercontent.com/peter88213/yw2html/main/dist/yw2html_v1.9.7.zip)
 
-- Unzip the downloaded zipfile "yw2html_v1.9.6.zip" into a new folder and open "README.md" for usage instructions.
+- Unzip the downloaded zipfile "yw2html_v1.9.7.zip" into a new folder and open "README.md" for usage instructions.
 
 [Changelog](changelog)
 
