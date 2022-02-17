@@ -87,7 +87,7 @@ There are two options:
 - **$Title** - Project title
 - **$Desc** - Project description, html-formatted
 - **$AuthorName** - Author's name
-- **$AuthorBio** - Author's biography
+- **$AuthorBio** - Information about the author
 
 - **$FieldTitle1** - Rating names: field 1
 - **$FieldTitle2** - Rating names: field 2
