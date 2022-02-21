@@ -13,7 +13,7 @@ import argparse
 from pywriter.ui.ui import Ui
 from pywriter.ui.ui_cmd import UiCmd
 
-from pywhtml.html_exporter import HtmlExporter
+from yw2htmllib.html_exporter import HtmlExporter
 
 
 def run(sourcePath, templatePath, suffix, silentMode=True):

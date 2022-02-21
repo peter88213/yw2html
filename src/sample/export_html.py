@@ -14,7 +14,7 @@ from pywriter.ui.ui_tk import UiTk
 from pywriter.converter.yw_cnv_ui import YwCnvUi
 
 from pywriter.yw.yw7_file import Yw7File
-from pywhtml.html_export import HtmlExport
+from yw2htmllib.html_export import HtmlExport
 
 
 class Exporter(YwCnvUi):

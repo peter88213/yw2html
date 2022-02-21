@@ -21,7 +21,7 @@ TARGET_FILE = f'{BUILD}yw2html.py'
 
 
 def main():
-    inliner.run(SOURCE_FILE,TARGET_FILE, 'pywhtml', '../src/')
+    inliner.run(SOURCE_FILE,TARGET_FILE, 'yw2htmllib', '../src/')
     inliner.run(TARGET_FILE, TARGET_FILE, 'pywriter', '../../PyWriter/src/')
     print('Done.')
 

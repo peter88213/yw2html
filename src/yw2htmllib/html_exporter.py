@@ -7,8 +7,8 @@ Published under the MIT License (https://opensource.org/licenses/mit-license.php
 from pywriter.converter.yw_cnv_ff import YwCnvFf
 from pywriter.yw.yw7_file import Yw7File
 
-from pywhtml.html_templatefile_export import HtmlTemplatefileExport
-from pywhtml.export_any_target_factory import ExportAnyTargetFactory
+from yw2htmllib.html_templatefile_export import HtmlTemplatefileExport
+from yw2htmllib.export_any_target_factory import ExportAnyTargetFactory
 
 class HtmlExporter(YwCnvFf):
     """A converter class for html export."""

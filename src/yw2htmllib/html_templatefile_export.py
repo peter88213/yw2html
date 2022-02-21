@@ -5,7 +5,7 @@ For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
 from pywriter.html.html_fop import read_html_file
-from pywhtml.html_export import HtmlExport
+from yw2htmllib.html_export import HtmlExport
 
 class HtmlTemplatefileExport(HtmlExport):
     """Export content or metadata from a yWriter project to a HTML file.
