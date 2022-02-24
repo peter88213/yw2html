@@ -6,6 +6,7 @@
 
 ### v2.0.0
 
+- Fix a bug where "To do" chapters cause an exception.
 - Fix a regression from v1.6.3 where the example files are unreadable.
 - Optionally, specify the HTML templates as yWriter scenes.
 - Add $AuthorBio placeholder.
