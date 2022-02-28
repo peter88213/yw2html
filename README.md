@@ -7,6 +7,20 @@ For more information, see the [project homepage](https://peter88213.github.io/yw
 
 *yw2html* depends on the [pywriter](https://github.com/peter88213/PyWriter) library which must be present in your file system. It is organized as an Eclipse PyDev project. The official release branch on GitHub is *main*.
 
+### Mandatory directory structure for building the application script
+
+```
+.
+├── PyWriter/
+│   └── src/
+│       └── pywriter/
+└── yw2html/
+    ├── src/
+    ├── test/
+    └── tools/ 
+        └── build.xml
+```
+
 ### Conventions
 
 - Minimum Python version is 3.6. 
