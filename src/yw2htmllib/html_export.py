@@ -5,7 +5,6 @@ For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
 import re
-
 from pywriter.file.file_export import FileExport
 
 
@@ -14,10 +13,8 @@ class HtmlExport(FileExport):
     
     Provide basid HTML templates for exporting chapters and scenes.
     """
-
     DESCRIPTION = 'HTML export'
     EXTENSION = '.html'
-
     SCENE_DIVIDER = '* * *'
 
     _fileHeader = '''<html>
@@ -66,8 +63,13 @@ strong {font-weight:normal; text-transform: uppercase}
 
     def _get_chapterMapping(self, chId, chapterNumber):
         """Return a mapping dictionary for a chapter section. 
-        """
 
+        Positional arguments:
+            chId -- str: chapter ID.
+            chapterNumber -- int: chapter number.
+
+        Extends the superclass method.
+        """
         ROMAN = [
             (1000, "M"),
             (900, "CM"),
@@ -86,16 +88,14 @@ strong {font-weight:normal; text-transform: uppercase}
 
         def number_to_roman(n):
             """Return n as a Roman number.
+            
             Credit goes to the user 'Aristide' on stack overflow.
             https://stackoverflow.com/a/47713392
             """
-
             result = []
-
             for (arabic, roman) in ROMAN:
                 (factor, n) = divmod(n, arabic)
                 result.append(roman * factor)
-
                 if n == 0:
                     break
 
@@ -110,10 +110,10 @@ strong {font-weight:normal; text-transform: uppercase}
 
         def number_to_english(n):
             """Return n as a number written out in English.
+
             Credit goes to the user 'Hunter_71' on stack overflow.
             https://stackoverflow.com/a/51849443
             """
-
             if any(not x.isdigit() for x in str(n)):
                 return ''
 
@@ -138,30 +138,31 @@ strong {font-weight:normal; text-transform: uppercase}
             return ''
 
         chapterMapping = super()._get_chapterMapping(chId, chapterNumber)
-
         if chapterNumber:
             chapterMapping['ChNumberEnglish'] = number_to_english(chapterNumber).capitalize()
             chapterMapping['ChNumberRoman'] = number_to_roman(chapterNumber)
-
         else:
             chapterMapping['ChNumberEnglish'] = ''
             chapterMapping['ChNumberRoman'] = ''
-
         if self.chapters[chId].suppressChapterTitle:
             chapterMapping['Title'] = ''
-
         return chapterMapping
 
     def _convert_from_yw(self, text, quick=False):
-        """Convert yw7 markup to HTML.
-        """
+        """Return text, converted from yw7 markup to HTML markup.
         
+        Positional arguments:
+            text -- string to convert.
+        
+        Optional arguments:
+            quick -- bool: if True, apply a conversion mode for one-liners without formatting.
+        
+        Overrides the superclass method.
+        """
         if quick:
             # Just clean up a one-liner without sophisticated formatting.
-            
             if text is None:
                 return ''
-            
             else:
                 return text
             
@@ -175,18 +176,13 @@ strong {font-weight:normal; text-transform: uppercase}
             ('/*', '<!--'),
             ('*/', '-->'),
         ]
-
         try:
-
             for yw, htm in HTML_REPLACEMENTS:
                 text = text.replace(yw, htm)
 
             # Remove highlighting, alignment,
             # strikethrough, and underline tags.
-
             text = re.sub('\[\/*[h|c|r|s|u]\d*\]', '', text)
-
         except AttributeError:
             text = ''
-
         return(text)

@@ -9,23 +9,19 @@ Published under the MIT License (https://opensource.org/licenses/mit-license.php
 """
 import os
 import argparse
-
 from pywriter.ui.ui import Ui
 from pywriter.ui.ui_cmd import UiCmd
-
 from yw2htmllib.html_exporter import HtmlExporter
 
 
 def run(sourcePath, templatePath, suffix, silentMode=True):
-
     if silentMode:
         ui = Ui('')
     else:
         ui = UiCmd('Export html from yWriter')
-
     converter = HtmlExporter()
     converter.ui = ui
-    kwargs = {'suffix': suffix, 'templatePath': templatePath}
+    kwargs = {'suffix': suffix, 'template_path': templatePath}
     converter.run(sourcePath, **kwargs)
     ui.start()
 
@@ -44,32 +40,18 @@ if __name__ == '__main__':
                         action="store_true",
                         help='suppress error messages and the request to confirm overwriting')
     args = parser.parse_args()
-
     if args.templatePath:
         templatePath = args.templatePath
-
     else:
         templatePath = os.path.dirname(args.sourcePath)
-
     if args.templatePath is not None:
         templatePath = args.templatePath
-
     else:
         templatePath = os.path.dirname(args.sourcePath)
-
     if not templatePath:
         templatePath = '.'
-
     if args.suffix is not None:
         suffix = args.suffix
-
     else:
         suffix = ''
-
-    if args.silent:
-        silentMode = True
-
-    else:
-        silentMode = False
-
-    run(args.sourcePath, templatePath, suffix, silentMode)
+    run(args.sourcePath, templatePath, suffix, args.silent)

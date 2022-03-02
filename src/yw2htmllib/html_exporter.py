@@ -11,16 +11,21 @@ from yw2htmllib.html_templatefile_export import HtmlTemplatefileExport
 from yw2htmllib.export_any_target_factory import ExportAnyTargetFactory
 
 class HtmlExporter(YwCnvFf):
-    """A converter class for html export."""
+    """A converter class for html export.
+
+    Class constants:
+        EXPORT_SOURCE_CLASSES -- List of YwFile subclasses from which can be exported.
+        EXPORT_TARGET_CLASSES -- List of FileExport subclasses to which export is possible.
+    """
     EXPORT_SOURCE_CLASSES = [Yw7File]
     EXPORT_TARGET_CLASSES = [HtmlTemplatefileExport]
 
     def __init__(self):
-        """Extend the superclass constructor.
+        """Extends the superclass constructor.
 
-        Override exportTargetFactory by a project
-        specific implementation that accepts all
-        suffixes. 
+        Delegate the exportTargetFactory to a project
+        specific class that accepts all suffixes.
+        Overrides the superclass constructor.
         """
         super().__init__()
         self.exportTargetFactory = ExportAnyTargetFactory(self.EXPORT_TARGET_CLASSES)

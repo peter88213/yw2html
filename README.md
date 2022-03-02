@@ -29,9 +29,7 @@ For more information, see the [project homepage](https://peter88213.github.io/yw
 ### Development tools
 
 - [Python](https://python.org) version 3.9
-- [Eclipse IDE](https://eclipse.org)
-- [PyDev](https://pydev.org) Python development plugin for the Eclipse IDE
-- [EGit](https://www.eclipse.org/egit/) Eclipse Team provider for the Git version control system
+- [Eclipse IDE](https://eclipse.org) with [PyDev](https://pydev.org) and [EGit](https://www.eclipse.org/egit/)
 - [Apache Ant](https://ant.apache.org/) for building the application script
 
 ## Credits
