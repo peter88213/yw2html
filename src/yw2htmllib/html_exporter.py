@@ -25,7 +25,7 @@ class HtmlExporter(YwCnvFf):
 
         Delegate the exportTargetFactory to a project
         specific class that accepts all suffixes.
-        Overrides the superclass constructor.
+        Extends the superclass constructor.
         """
         super().__init__()
         self.exportTargetFactory = ExportAnyTargetFactory(self.EXPORT_TARGET_CLASSES)
