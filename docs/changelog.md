@@ -4,6 +4,12 @@
 
 ## Changelog
 
+### v2.0.4 Consider inline code
+
+- Remove inline code when exporting.
+
+Based on PyWriter v5.12.5
+
 ### v2.0.3 Improved word counting
 
 - Fix word counting considering ellipses.

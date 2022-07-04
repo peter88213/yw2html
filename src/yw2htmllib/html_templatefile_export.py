@@ -7,6 +7,7 @@ Published under the MIT License (https://opensource.org/licenses/mit-license.php
 from pywriter.html.html_fop import read_html_file
 from yw2htmllib.html_export import HtmlExport
 
+
 class HtmlTemplatefileExport(HtmlExport):
     """Export content or metadata from a yWriter project to a HTML file.
     
@@ -128,33 +129,120 @@ class HtmlTemplatefileExport(HtmlExport):
         if content is not None:
             self._sceneDivider = content
 
+    def _get_chapterMapping(self, chId, chapterNumber):
+        """Return a mapping dictionary for a chapter section. 
+
+        Positional arguments:
+            chId -- str: chapter ID.
+            chapterNumber -- int: chapter number.
+
+        Extends the superclass method.
+        """
+        ROMAN = [
+            (1000, "M"),
+            (900, "CM"),
+            (500, "D"),
+            (400, "CD"),
+            (100, "C"),
+            (90, "XC"),
+            (50, "L"),
+            (40, "XL"),
+            (10, "X"),
+            (9, "IX"),
+            (5, "V"),
+            (4, "IV"),
+            (1, "I"),
+        ]
+
+        def number_to_roman(n):
+            """Return n as a Roman number.
+            
+            Credit goes to the user 'Aristide' on stack overflow.
+            https://stackoverflow.com/a/47713392
+            """
+            result = []
+            for (arabic, roman) in ROMAN:
+                (factor, n) = divmod(n, arabic)
+                result.append(roman * factor)
+                if n == 0:
+                    break
+
+            return "".join(result)
+
+        TENS = {30: 'thirty', 40: 'forty', 50: 'fifty',
+                60: 'sixty', 70: 'seventy', 80: 'eighty', 90: 'ninety'}
+        ZERO_TO_TWENTY = (
+            'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+            'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'
+        )
+
+        def number_to_english(n):
+            """Return n as a number written out in English.
+
+            Credit goes to the user 'Hunter_71' on stack overflow.
+            https://stackoverflow.com/a/51849443
+            """
+            if any(not x.isdigit() for x in str(n)):
+                return ''
+
+            if n <= 20:
+                return ZERO_TO_TWENTY[n]
+
+            elif n < 100 and n % 10 == 0:
+                return TENS[n]
+
+            elif n < 100:
+                return f'{number_to_english(n - (n % 10))} {number_to_english(n % 10)}'
+
+            elif n < 1000 and n % 100 == 0:
+                return f'{number_to_english(n / 100)} hundred'
+
+            elif n < 1000:
+                return f'{number_to_english(n / 100)} hundred {number_to_english(n % 100)}'
+
+            elif n < 1000000:
+                return f'{number_to_english(n / 1000)} thousand {number_to_english(n % 1000)}'
+
+            return ''
+
+        chapterMapping = super()._get_chapterMapping(chId, chapterNumber)
+        if chapterNumber:
+            chapterMapping['ChNumberEnglish'] = number_to_english(chapterNumber).capitalize()
+            chapterMapping['ChNumberRoman'] = number_to_roman(chapterNumber)
+        else:
+            chapterMapping['ChNumberEnglish'] = ''
+            chapterMapping['ChNumberRoman'] = ''
+        if self.chapters[chId].suppressChapterTitle:
+            chapterMapping['Title'] = ''
+        return chapterMapping
+
     def write(self):
         """Read templates from the source file, if any.
 
         Extends the superclass constructor.
         """
-        
+
         def get_template(scId, title):
             """Retrieve a template from a yWriter scene.
             
             Return scene content if title matches. Otherwise return None.
             """
             if self.scenes[scId].title == title:
-                content = self.scenes[scId].sceneContent 
-            else: 
-                content = None 
+                content = self.scenes[scId].sceneContent
+            else:
+                content = None
             return content
-        
+
         # Find template chapter.
         for chId in self.chapters:
             if not self.chapters[chId].isUnused:
                 continue
-                
+
             if self.chapters[chId].title != self._TEMPLATE_CHAPTER_TITLE:
                 continue
-                     
+
             for scId in self.chapters[chId].srtScenes:
-        
+
                 # Project level.
                 content = get_template(scId, self._HTML_HEADER)
                 if content is not None:
@@ -171,9 +259,9 @@ class HtmlTemplatefileExport(HtmlExport):
                 content = get_template(scId, self._HTML_FOOTER)
                 if content is not None:
                     self._fileFooter = content
-        
+
                 # Chapter level.
-        
+
                 content = get_template(scId, self._PART_TEMPLATE)
                 if content is not None:
                     self._partTemplate = content
@@ -201,7 +289,7 @@ class HtmlTemplatefileExport(HtmlExport):
                 content = get_template(scId, self._TODO_CHAPTER_END_TEMPLATE)
                 if content is not None:
                     self._todoChapterEndTemplate = content
-        
+
                 # Scene level.
                 content = get_template(scId, self._SCENE_TEMPLATE)
                 if content is not None:
