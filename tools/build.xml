@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="yw2html" basedir=".">
-	<property name="version" value="2.0.4" />
+	<property name="version" value="2.0.5" />
 	<property name="test-app" value="yw2html" />
 	<!-- This is a project-specific build script -->
 	

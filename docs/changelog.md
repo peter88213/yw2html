@@ -4,6 +4,12 @@
 
 ## Changelog
 
+### v2.0.5 Bugfix release
+
+- Fix and refactor inline code removal.
+
+Based on PyWriter v5.16.1
+
 ### v2.0.4 Consider inline code
 
 - Remove inline code when exporting.
