@@ -235,7 +235,7 @@ class HtmlTemplatefileExport(HtmlExport):
 
         # Find template chapter.
         for chId in self.chapters:
-            if not self.chapters[chId].isUnused:
+            if self.chapters[chId].chType != 3:
                 continue
 
             if self.chapters[chId].title != self._TEMPLATE_CHAPTER_TITLE:
