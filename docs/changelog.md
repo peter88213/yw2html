@@ -4,6 +4,12 @@
 
 ## Changelog
 
+### v2.0.6 Optional release
+
+- Code refactoring and library update.
+
+Based on PyWriter v7.2.1
+
 ### v2.0.5 Bugfix release
 
 - Fix and refactor inline code removal.
