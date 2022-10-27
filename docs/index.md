@@ -7,7 +7,7 @@ The HTML templates can be defined "externally" via HTML files or "internally" vi
 
 ## Requirements
 
-- [Python 3.6+](https://www.python.org). 
+- [Python](https://www.python.org/) 3.6 =< version <= 3.10.
 
 ## Download and install
 
