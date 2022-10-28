@@ -10,7 +10,7 @@ from pywriter.pywriter_globals import *
 class Splitter:
     """Helper class for scene and chapter splitting.
     
-    When importing scenes to yWriter, they may contain manuallyinserted scene and chapter dividers.
+    When importing scenes to yWriter, they may contain manually inserted scene and chapter dividers.
     The Splitter class updates a Novel instance by splitting such scenes and creating new chapters and scenes. 
     
     Public methods:

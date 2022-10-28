@@ -6,6 +6,7 @@ Published under the MIT License (https://opensource.org/licenses/mit-license.php
 """
 import re
 from pywriter.model.basic_element import BasicElement
+from pywriter.pywriter_globals import *
 
 
 class Scene(BasicElement):
@@ -220,14 +221,9 @@ class Scene(BasicElement):
     def sceneContent(self, text):
         """Set sceneContent updating word count and letter count."""
         self._sceneContent = text
-        text = re.sub('--|—|–|…', ' ', text)
-        # Make dashes separate words
-        text = re.sub('\[.+?\]|\/\*.+?\*\/|\.|\,|-', '', text)
-        # Remove comments and yWriter raw markup for word count; make hyphens join words
+        text = ADDITIONAL_WORD_LIMITS.sub(' ', text)
+        text = NO_WORD_LIMITS.sub('', text)
         wordList = text.split()
         self.wordCount = len(wordList)
-        text = re.sub('\[.+?\]|\/\*.+?\*\/', '', self._sceneContent)
-        # Remove yWriter raw markup for letter count
-        text = text.replace('\n', '')
-        text = text.replace('\r', '')
+        text = NON_LETTERS.sub('', self._sceneContent)
         self.letterCount = len(text)

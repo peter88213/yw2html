@@ -22,9 +22,6 @@ class ImportTargetFactory(FileFactory):
         Positional arguments:
             sourcePath -- str: path to the source file to convert.
 
-        Optional arguments:
-            suffix -- str: an indicator for the source file type.
-
         Required keyword arguments: 
             suffix -- str: target file name suffix.
 

@@ -12,6 +12,7 @@ from html import unescape
 import xml.etree.ElementTree as ET
 from pywriter.pywriter_globals import *
 from pywriter.model.novel import Novel
+from pywriter.model.id_generator import create_id
 from pywriter.model.splitter import Splitter
 from pywriter.yw.xml_indent import indent
 
@@ -41,6 +42,11 @@ class Yw7File(Novel):
     # Names of xml elements containing CDATA.
     # ElementTree.write omits CDATA tags, so they have to be inserted afterwards.
 
+    _PRJ_KWVAR = (
+        'Field_LanguageCode',
+        'Field_CountryCode',
+        )
+
     def __init__(self, filePath, **kwargs):
         """Initialize instance variables.
         
@@ -66,6 +72,488 @@ class Yw7File(Novel):
         Return a message beginning with the ERROR constant in case of error.
         Overrides the superclass method.
         """
+
+        def read_project(root):
+            #--- Read attributes at project level from the xml element tree.
+            prj = root.find('PROJECT')
+
+            if prj.find('Title') is not None:
+                self.title = prj.find('Title').text
+
+            if prj.find('AuthorName') is not None:
+                self.authorName = prj.find('AuthorName').text
+
+            if prj.find('Bio') is not None:
+                self.authorBio = prj.find('Bio').text
+
+            if prj.find('Desc') is not None:
+                self.desc = prj.find('Desc').text
+
+            if prj.find('FieldTitle1') is not None:
+                self.fieldTitle1 = prj.find('FieldTitle1').text
+
+            if prj.find('FieldTitle2') is not None:
+                self.fieldTitle2 = prj.find('FieldTitle2').text
+
+            if prj.find('FieldTitle3') is not None:
+                self.fieldTitle3 = prj.find('FieldTitle3').text
+
+            if prj.find('FieldTitle4') is not None:
+                self.fieldTitle4 = prj.find('FieldTitle4').text
+
+            #--- Initialize custom keyword variables.
+            for fieldName in self._PRJ_KWVAR:
+                self.kwVar[fieldName] = None
+
+            #--- Read project custom fields.
+            for prjFields in prj.findall('Fields'):
+                for fieldName in self._PRJ_KWVAR:
+                    field = prjFields.find(fieldName)
+                    if field is not None:
+                        self.kwVar[fieldName] = field.text
+
+            # This is for projects written with v7.6 - v7.10:
+            if self.kwVar['Field_LanguageCode']:
+                self.languageCode = self.kwVar['Field_LanguageCode']
+            if self.kwVar['Field_CountryCode']:
+                self.countryCode = self.kwVar['Field_CountryCode']
+
+        def read_locations(root):
+            #--- Read locations from the xml element tree.
+            self.srtLocations = []
+            # This is necessary for re-reading.
+            for loc in root.iter('LOCATION'):
+                lcId = loc.find('ID').text
+                self.srtLocations.append(lcId)
+                self.locations[lcId] = self.WE_CLASS()
+
+                if loc.find('Title') is not None:
+                    self.locations[lcId].title = loc.find('Title').text
+
+                if loc.find('ImageFile') is not None:
+                    self.locations[lcId].image = loc.find('ImageFile').text
+
+                if loc.find('Desc') is not None:
+                    self.locations[lcId].desc = loc.find('Desc').text
+
+                if loc.find('AKA') is not None:
+                    self.locations[lcId].aka = loc.find('AKA').text
+
+                if loc.find('Tags') is not None:
+                    if loc.find('Tags').text is not None:
+                        tags = string_to_list(loc.find('Tags').text)
+                        self.locations[lcId].tags = self._strip_spaces(tags)
+
+                #--- Initialize custom keyword variables.
+                for fieldName in self._LOC_KWVAR:
+                    self.locations[lcId].kwVar[fieldName] = None
+
+                #--- Read location custom fields.
+                for lcFields in loc.findall('Fields'):
+                    for fieldName in self._LOC_KWVAR:
+                        field = lcFields.find(fieldName)
+                        if field is not None:
+                            self.locations[lcId].kwVar[fieldName] = field.text
+
+        def read_items(root):
+            #--- Read items from the xml element tree.
+            self.srtItems = []
+            # This is necessary for re-reading.
+            for itm in root.iter('ITEM'):
+                itId = itm.find('ID').text
+                self.srtItems.append(itId)
+                self.items[itId] = self.WE_CLASS()
+
+                if itm.find('Title') is not None:
+                    self.items[itId].title = itm.find('Title').text
+
+                if itm.find('ImageFile') is not None:
+                    self.items[itId].image = itm.find('ImageFile').text
+
+                if itm.find('Desc') is not None:
+                    self.items[itId].desc = itm.find('Desc').text
+
+                if itm.find('AKA') is not None:
+                    self.items[itId].aka = itm.find('AKA').text
+
+                if itm.find('Tags') is not None:
+                    if itm.find('Tags').text is not None:
+                        tags = string_to_list(itm.find('Tags').text)
+                        self.items[itId].tags = self._strip_spaces(tags)
+
+                #--- Initialize custom keyword variables.
+                for fieldName in self._ITM_KWVAR:
+                    self.items[itId].kwVar[fieldName] = None
+
+                #--- Read item custom fields.
+                for itFields in itm.findall('Fields'):
+                    for fieldName in self._ITM_KWVAR:
+                        field = itFields.find(fieldName)
+                        if field is not None:
+                            self.items[itId].kwVar[fieldName] = field.text
+
+        def read_characters(root):
+            #--- Read characters from the xml element tree.
+            self.srtCharacters = []
+            # This is necessary for re-reading.
+            for crt in root.iter('CHARACTER'):
+                crId = crt.find('ID').text
+                self.srtCharacters.append(crId)
+                self.characters[crId] = self.CHARACTER_CLASS()
+
+                if crt.find('Title') is not None:
+                    self.characters[crId].title = crt.find('Title').text
+
+                if crt.find('ImageFile') is not None:
+                    self.characters[crId].image = crt.find('ImageFile').text
+
+                if crt.find('Desc') is not None:
+                    self.characters[crId].desc = crt.find('Desc').text
+
+                if crt.find('AKA') is not None:
+                    self.characters[crId].aka = crt.find('AKA').text
+
+                if crt.find('Tags') is not None:
+                    if crt.find('Tags').text is not None:
+                        tags = string_to_list(crt.find('Tags').text)
+                        self.characters[crId].tags = self._strip_spaces(tags)
+
+                if crt.find('Notes') is not None:
+                    self.characters[crId].notes = crt.find('Notes').text
+
+                if crt.find('Bio') is not None:
+                    self.characters[crId].bio = crt.find('Bio').text
+
+                if crt.find('Goals') is not None:
+                    self.characters[crId].goals = crt.find('Goals').text
+
+                if crt.find('FullName') is not None:
+                    self.characters[crId].fullName = crt.find('FullName').text
+
+                if crt.find('Major') is not None:
+                    self.characters[crId].isMajor = True
+                else:
+                    self.characters[crId].isMajor = False
+
+                #--- Initialize custom keyword variables.
+                for fieldName in self._CRT_KWVAR:
+                    self.characters[crId].kwVar[fieldName] = None
+
+                #--- Read character custom fields.
+                for crFields in crt.findall('Fields'):
+                    for fieldName in self._CRT_KWVAR:
+                        field = crFields.find(fieldName)
+                        if field is not None:
+                            self.characters[crId].kwVar[fieldName] = field.text
+
+        def read_projectnotes(root):
+            #--- Read project notes from the xml element tree.
+            self.srtPrjNotes = []
+            # This is necessary for re-reading.
+
+            try:
+                for pnt in root.find('PROJECTNOTES'):
+                    if pnt.find('ID') is not None:
+                        pnId = pnt.find('ID').text
+                        self.srtPrjNotes.append(pnId)
+                        self.projectNotes[pnId] = self.PN_CLASS()
+                        if pnt.find('Title') is not None:
+                            self.projectNotes[pnId].title = pnt.find('Title').text
+                        if pnt.find('Desc') is not None:
+                            self.projectNotes[pnId].desc = pnt.find('Desc').text
+
+                    #--- Initialize project note custom fields.
+                    for fieldName in self._PNT_KWVAR:
+                        self.projectNotes[pnId].kwVar[fieldName] = None
+
+                    #--- Read project note custom fields.
+                    for pnFields in pnt.findall('Fields'):
+                        field = pnFields.find(fieldName)
+                        if field is not None:
+                            self.projectNotes[pnId].kwVar[fieldName] = field.text
+            except:
+                pass
+
+        def read_projectvars(root):
+            #--- Read relevant project variables from the xml element tree.
+            try:
+                for projectvar in root.find('PROJECTVARS'):
+                    if projectvar.find('Title') is not None:
+                        title = projectvar.find('Title').text
+                        if title == 'Language':
+                            if projectvar.find('Desc') is not None:
+                                self.languageCode = projectvar.find('Desc').text
+
+                        elif title == 'Country':
+                            if projectvar.find('Desc') is not None:
+                                self.countryCode = projectvar.find('Desc').text
+
+                        elif title.startswith('lang='):
+                            try:
+                                __, langCode = title.split('=')
+                                if self.languages is None:
+                                    self.languages = []
+                                self.languages.append(langCode)
+                            except:
+                                pass
+            except:
+                pass
+
+        def read_scenes(root):
+            #--- Read attributes at scene level from the xml element tree.
+            for scn in root.iter('SCENE'):
+                scId = scn.find('ID').text
+                self.scenes[scId] = self.SCENE_CLASS()
+
+                if scn.find('Title') is not None:
+                    self.scenes[scId].title = scn.find('Title').text
+
+                if scn.find('Desc') is not None:
+                    self.scenes[scId].desc = scn.find('Desc').text
+
+                if scn.find('SceneContent') is not None:
+                    sceneContent = scn.find('SceneContent').text
+                    if sceneContent is not None:
+                        self.scenes[scId].sceneContent = sceneContent
+
+                #--- Read scene type.
+
+                # This is how yWriter 7.1.3.0 reads the scene type:
+                #
+                # Type   |<Unused>|Field_SceneType>|scType
+                #--------+--------+----------------+------
+                # Notes  | x      | 1              | 1
+                # Todo   | x      | 2              | 2
+                # Unused | -1     | N/A            | 3
+                # Unused | -1     | 0              | 3
+                # Normal | N/A    | N/A            | 0
+                # Normal | N/A    | 0              | 0
+
+                self.scenes[scId].scType = 0
+
+                #--- Initialize custom keyword variables.
+                for fieldName in self._SCN_KWVAR:
+                    self.scenes[scId].kwVar[fieldName] = None
+
+                for scFields in scn.findall('Fields'):
+                    #--- Read scene custom fields.
+                    for fieldName in self._SCN_KWVAR:
+                        field = scFields.find(fieldName)
+                        if field is not None:
+                            self.scenes[scId].kwVar[fieldName] = field.text
+
+                    # Read scene type, if any.
+                    if scFields.find('Field_SceneType') is not None:
+                        if scFields.find('Field_SceneType').text == '1':
+                            self.scenes[scId].scType = 1
+                        elif scFields.find('Field_SceneType').text == '2':
+                            self.scenes[scId].scType = 2
+                if scn.find('Unused') is not None:
+                    if self.scenes[scId].scType == 0:
+                        self.scenes[scId].scType = 3
+
+                #--- Export when RTF.
+                if scn.find('ExportCondSpecific') is None:
+                    self.scenes[scId].doNotExport = False
+                elif scn.find('ExportWhenRTF') is not None:
+                    self.scenes[scId].doNotExport = False
+                else:
+                    self.scenes[scId].doNotExport = True
+
+                if scn.find('Status') is not None:
+                    self.scenes[scId].status = int(scn.find('Status').text)
+
+                if scn.find('Notes') is not None:
+                    self.scenes[scId].notes = scn.find('Notes').text
+
+                if scn.find('Tags') is not None:
+                    if scn.find('Tags').text is not None:
+                        tags = string_to_list(scn.find('Tags').text)
+                        self.scenes[scId].tags = self._strip_spaces(tags)
+
+                if scn.find('Field1') is not None:
+                    self.scenes[scId].field1 = scn.find('Field1').text
+
+                if scn.find('Field2') is not None:
+                    self.scenes[scId].field2 = scn.find('Field2').text
+
+                if scn.find('Field3') is not None:
+                    self.scenes[scId].field3 = scn.find('Field3').text
+
+                if scn.find('Field4') is not None:
+                    self.scenes[scId].field4 = scn.find('Field4').text
+
+                if scn.find('AppendToPrev') is not None:
+                    self.scenes[scId].appendToPrev = True
+                else:
+                    self.scenes[scId].appendToPrev = False
+
+                if scn.find('SpecificDateTime') is not None:
+                    dateTime = scn.find('SpecificDateTime').text.split(' ')
+                    for dt in dateTime:
+                        if '-' in dt:
+                            self.scenes[scId].date = dt
+                        elif ':' in dt:
+                            self.scenes[scId].time = dt
+                else:
+                    if scn.find('Day') is not None:
+                        self.scenes[scId].day = scn.find('Day').text
+
+                    if scn.find('Hour') is not None:
+                        self.scenes[scId].hour = scn.find('Hour').text
+
+                    if scn.find('Minute') is not None:
+                        self.scenes[scId].minute = scn.find('Minute').text
+
+                if scn.find('LastsDays') is not None:
+                    self.scenes[scId].lastsDays = scn.find('LastsDays').text
+
+                if scn.find('LastsHours') is not None:
+                    self.scenes[scId].lastsHours = scn.find('LastsHours').text
+
+                if scn.find('LastsMinutes') is not None:
+                    self.scenes[scId].lastsMinutes = scn.find('LastsMinutes').text
+
+                if scn.find('ReactionScene') is not None:
+                    self.scenes[scId].isReactionScene = True
+                else:
+                    self.scenes[scId].isReactionScene = False
+
+                if scn.find('SubPlot') is not None:
+                    self.scenes[scId].isSubPlot = True
+                else:
+                    self.scenes[scId].isSubPlot = False
+
+                if scn.find('Goal') is not None:
+                    self.scenes[scId].goal = scn.find('Goal').text
+
+                if scn.find('Conflict') is not None:
+                    self.scenes[scId].conflict = scn.find('Conflict').text
+
+                if scn.find('Outcome') is not None:
+                    self.scenes[scId].outcome = scn.find('Outcome').text
+
+                if scn.find('ImageFile') is not None:
+                    self.scenes[scId].image = scn.find('ImageFile').text
+
+                if scn.find('Characters') is not None:
+                    for characters in scn.find('Characters').iter('CharID'):
+                        crId = characters.text
+                        if crId in self.srtCharacters:
+                            if self.scenes[scId].characters is None:
+                                self.scenes[scId].characters = []
+                            self.scenes[scId].characters.append(crId)
+
+                if scn.find('Locations') is not None:
+                    for locations in scn.find('Locations').iter('LocID'):
+                        lcId = locations.text
+                        if lcId in self.srtLocations:
+                            if self.scenes[scId].locations is None:
+                                self.scenes[scId].locations = []
+                            self.scenes[scId].locations.append(lcId)
+
+                if scn.find('Items') is not None:
+                    for items in scn.find('Items').iter('ItemID'):
+                        itId = items.text
+                        if itId in self.srtItems:
+                            if self.scenes[scId].items is None:
+                                self.scenes[scId].items = []
+                            self.scenes[scId].items.append(itId)
+
+        def read_chapters(root):
+            #--- Read attributes at chapter level from the xml element tree.
+            self.srtChapters = []
+            # This is necessary for re-reading.
+            for chp in root.iter('CHAPTER'):
+                chId = chp.find('ID').text
+                self.chapters[chId] = self.CHAPTER_CLASS()
+                self.srtChapters.append(chId)
+
+                if chp.find('Title') is not None:
+                    self.chapters[chId].title = chp.find('Title').text
+
+                if chp.find('Desc') is not None:
+                    self.chapters[chId].desc = chp.find('Desc').text
+
+                if chp.find('SectionStart') is not None:
+                    self.chapters[chId].chLevel = 1
+                else:
+                    self.chapters[chId].chLevel = 0
+
+                # This is how yWriter 7.1.3.0 reads the chapter type:
+                #
+                # Type   |<Unused>|<Type>|<ChapterType>|chType
+                # -------+--------+------+--------------------
+                # Normal | N/A    | N/A  | N/A         | 0
+                # Normal | N/A    | 0    | N/A         | 0
+                # Notes  | x      | 1    | N/A         | 1
+                # Unused | -1     | 0    | N/A         | 3
+                # Normal | N/A    | x    | 0           | 0
+                # Notes  | x      | x    | 1           | 1
+                # Todo   | x      | x    | 2           | 2
+                # Unused | -1     | x    | x           | 3
+
+                self.chapters[chId].chType = 0
+                if chp.find('Unused') is not None:
+                    yUnused = True
+                else:
+                    yUnused = False
+                if chp.find('ChapterType') is not None:
+                    # The file may be created with yWriter version 7.0.7.2+
+                    yChapterType = chp.find('ChapterType').text
+                    if yChapterType == '2':
+                        self.chapters[chId].chType = 2
+                    elif yChapterType == '1':
+                        self.chapters[chId].chType = 1
+                    elif yUnused:
+                        self.chapters[chId].chType = 3
+                else:
+                    # The file may be created with a yWriter version prior to 7.0.7.2
+                    if chp.find('Type') is not None:
+                        yType = chp.find('Type').text
+                        if yType == '1':
+                            self.chapters[chId].chType = 1
+                        elif yUnused:
+                            self.chapters[chId].chType = 3
+
+                self.chapters[chId].suppressChapterTitle = False
+                if self.chapters[chId].title is not None:
+                    if self.chapters[chId].title.startswith('@'):
+                        self.chapters[chId].suppressChapterTitle = True
+
+                #--- Initialize custom keyword variables.
+                for fieldName in self._CHP_KWVAR:
+                    self.chapters[chId].kwVar[fieldName] = None
+
+                #--- Read chapter fields.
+                for chFields in chp.findall('Fields'):
+                    if chFields.find('Field_SuppressChapterTitle') is not None:
+                        if chFields.find('Field_SuppressChapterTitle').text == '1':
+                            self.chapters[chId].suppressChapterTitle = True
+                    self.chapters[chId].isTrash = False
+                    if chFields.find('Field_IsTrash') is not None:
+                        if chFields.find('Field_IsTrash').text == '1':
+                            self.chapters[chId].isTrash = True
+                    self.chapters[chId].suppressChapterBreak = False
+                    if chFields.find('Field_SuppressChapterBreak') is not None:
+                        if chFields.find('Field_SuppressChapterBreak').text == '1':
+                            self.chapters[chId].suppressChapterBreak = True
+
+                    #--- Read chapter custom fields.
+                    for fieldName in self._CHP_KWVAR:
+                        field = chFields.find(fieldName)
+                        if field is not None:
+                            self.chapters[chId].kwVar[fieldName] = field.text
+
+                #--- Read chapter's scene list.
+                self.chapters[chId].srtScenes = []
+                if chp.find('Scenes') is not None:
+                    for scn in chp.find('Scenes').findall('ScID'):
+                        scId = scn.text
+                        if scId in self.scenes:
+                            self.chapters[chId].srtScenes.append(scId)
+
+        #--- Begin reading.
         if self.is_locked():
             return f'{ERROR}{_("yWriter seems to be open. Please close first")}.'
         try:
@@ -74,444 +562,15 @@ class Yw7File(Novel):
             return f'{ERROR}{_("Can not process file")}: "{os.path.normpath(self.filePath)}".'
 
         root = self.tree.getroot()
-
-        #--- Read locations from the xml element tree.
-        self.srtLocations = []
-        # This is necessary for re-reading.
-        for loc in root.iter('LOCATION'):
-            lcId = loc.find('ID').text
-            self.srtLocations.append(lcId)
-            self.locations[lcId] = self.WE_CLASS()
-
-            if loc.find('Title') is not None:
-                self.locations[lcId].title = loc.find('Title').text
-
-            if loc.find('ImageFile') is not None:
-                self.locations[lcId].image = loc.find('ImageFile').text
-
-            if loc.find('Desc') is not None:
-                self.locations[lcId].desc = loc.find('Desc').text
-
-            if loc.find('AKA') is not None:
-                self.locations[lcId].aka = loc.find('AKA').text
-
-            if loc.find('Tags') is not None:
-                if loc.find('Tags').text is not None:
-                    tags = string_to_list(loc.find('Tags').text)
-                    self.locations[lcId].tags = self._strip_spaces(tags)
-
-            #--- Initialize custom keyword variables.
-            for fieldName in self._LOC_KWVAR:
-                self.locations[lcId].kwVar[fieldName] = None
-
-            #--- Read location custom fields.
-            for lcFields in loc.findall('Fields'):
-                for fieldName in self._LOC_KWVAR:
-                    field = lcFields.find(fieldName)
-                    if field is not None:
-                        self.locations[lcId].kwVar[fieldName] = field.text
-
-        #--- Read items from the xml element tree.
-        self.srtItems = []
-        # This is necessary for re-reading.
-        for itm in root.iter('ITEM'):
-            itId = itm.find('ID').text
-            self.srtItems.append(itId)
-            self.items[itId] = self.WE_CLASS()
-
-            if itm.find('Title') is not None:
-                self.items[itId].title = itm.find('Title').text
-
-            if itm.find('ImageFile') is not None:
-                self.items[itId].image = itm.find('ImageFile').text
-
-            if itm.find('Desc') is not None:
-                self.items[itId].desc = itm.find('Desc').text
-
-            if itm.find('AKA') is not None:
-                self.items[itId].aka = itm.find('AKA').text
-
-            if itm.find('Tags') is not None:
-                if itm.find('Tags').text is not None:
-                    tags = string_to_list(itm.find('Tags').text)
-                    self.items[itId].tags = self._strip_spaces(tags)
-
-            #--- Initialize custom keyword variables.
-            for fieldName in self._ITM_KWVAR:
-                self.items[itId].kwVar[fieldName] = None
-
-            #--- Read item custom fields.
-            for itFields in itm.findall('Fields'):
-                for fieldName in self._ITM_KWVAR:
-                    field = itFields.find(fieldName)
-                    if field is not None:
-                        self.items[itId].kwVar[fieldName] = field.text
-
-        #--- Read characters from the xml element tree.
-        self.srtCharacters = []
-        # This is necessary for re-reading.
-        for crt in root.iter('CHARACTER'):
-            crId = crt.find('ID').text
-            self.srtCharacters.append(crId)
-            self.characters[crId] = self.CHARACTER_CLASS()
-
-            if crt.find('Title') is not None:
-                self.characters[crId].title = crt.find('Title').text
-
-            if crt.find('ImageFile') is not None:
-                self.characters[crId].image = crt.find('ImageFile').text
-
-            if crt.find('Desc') is not None:
-                self.characters[crId].desc = crt.find('Desc').text
-
-            if crt.find('AKA') is not None:
-                self.characters[crId].aka = crt.find('AKA').text
-
-            if crt.find('Tags') is not None:
-                if crt.find('Tags').text is not None:
-                    tags = string_to_list(crt.find('Tags').text)
-                    self.characters[crId].tags = self._strip_spaces(tags)
-
-            if crt.find('Notes') is not None:
-                self.characters[crId].notes = crt.find('Notes').text
-
-            if crt.find('Bio') is not None:
-                self.characters[crId].bio = crt.find('Bio').text
-
-            if crt.find('Goals') is not None:
-                self.characters[crId].goals = crt.find('Goals').text
-
-            if crt.find('FullName') is not None:
-                self.characters[crId].fullName = crt.find('FullName').text
-
-            if crt.find('Major') is not None:
-                self.characters[crId].isMajor = True
-            else:
-                self.characters[crId].isMajor = False
-
-            #--- Initialize custom keyword variables.
-            for fieldName in self._CRT_KWVAR:
-                self.characters[crId].kwVar[fieldName] = None
-
-            #--- Read character custom fields.
-            for crFields in crt.findall('Fields'):
-                for fieldName in self._CRT_KWVAR:
-                    field = crFields.find(fieldName)
-                    if field is not None:
-                        self.characters[crId].kwVar[fieldName] = field.text
-
-        #--- Read attributes at novel level from the xml element tree.
-        prj = root.find('PROJECT')
-
-        if prj.find('Title') is not None:
-            self.title = prj.find('Title').text
-
-        if prj.find('AuthorName') is not None:
-            self.authorName = prj.find('AuthorName').text
-
-        if prj.find('Bio') is not None:
-            self.authorBio = prj.find('Bio').text
-
-        if prj.find('Desc') is not None:
-            self.desc = prj.find('Desc').text
-
-        if prj.find('FieldTitle1') is not None:
-            self.fieldTitle1 = prj.find('FieldTitle1').text
-
-        if prj.find('FieldTitle2') is not None:
-            self.fieldTitle2 = prj.find('FieldTitle2').text
-
-        if prj.find('FieldTitle3') is not None:
-            self.fieldTitle3 = prj.find('FieldTitle3').text
-
-        if prj.find('FieldTitle4') is not None:
-            self.fieldTitle4 = prj.find('FieldTitle4').text
-
-        #--- Initialize custom keyword variables.
-        for fieldName in self._PRJ_KWVAR:
-            self.kwVar[fieldName] = None
-
-        #--- Read project custom fields.
-        for prjFields in prj.findall('Fields'):
-            for fieldName in self._PRJ_KWVAR:
-                field = prjFields.find(fieldName)
-                if field is not None:
-                    self.kwVar[fieldName] = field.text
-
-        #--- Read attributes at chapter level from the xml element tree.
-        self.srtChapters = []
-        # This is necessary for re-reading.
-        for chp in root.iter('CHAPTER'):
-            chId = chp.find('ID').text
-            self.chapters[chId] = self.CHAPTER_CLASS()
-            self.srtChapters.append(chId)
-
-            if chp.find('Title') is not None:
-                self.chapters[chId].title = chp.find('Title').text
-
-            if chp.find('Desc') is not None:
-                self.chapters[chId].desc = chp.find('Desc').text
-
-            if chp.find('SectionStart') is not None:
-                self.chapters[chId].chLevel = 1
-            else:
-                self.chapters[chId].chLevel = 0
-
-            # This is how yWriter 7.1.3.0 reads the chapter type:
-            #
-            # Type   |<Unused>|<Type>|<ChapterType>|chType
-            # -------+--------+------+--------------------
-            # Normal | N/A    | N/A  | N/A         | 0
-            # Normal | N/A    | 0    | N/A         | 0
-            # Notes  | x      | 1    | N/A         | 1
-            # Unused | -1     | 0    | N/A         | 3
-            # Normal | N/A    | x    | 0           | 0
-            # Notes  | x      | x    | 1           | 1
-            # Todo   | x      | x    | 2           | 2
-            # Unused | -1     | x    | x           | 3
-
-            self.chapters[chId].chType = 0
-            if chp.find('Unused') is not None:
-                yUnused = True
-            else:
-                yUnused = False
-            if chp.find('ChapterType') is not None:
-                # The file may be created with yWriter version 7.0.7.2+
-                yChapterType = chp.find('ChapterType').text
-                if yChapterType == '2':
-                    self.chapters[chId].chType = 2
-                elif yChapterType == '1':
-                    self.chapters[chId].chType = 1
-                elif yUnused:
-                    self.chapters[chId].chType = 3
-            else:
-                # The file may be created with a yWriter version prior to 7.0.7.2
-                if chp.find('Type') is not None:
-                    yType = chp.find('Type').text
-                    if yType == '1':
-                        self.chapters[chId].chType = 1
-                    elif yUnused:
-                        self.chapters[chId].chType = 3
-
-            self.chapters[chId].suppressChapterTitle = False
-            if self.chapters[chId].title is not None:
-                if self.chapters[chId].title.startswith('@'):
-                    self.chapters[chId].suppressChapterTitle = True
-
-            #--- Initialize custom keyword variables.
-            for fieldName in self._CHP_KWVAR:
-                self.chapters[chId].kwVar[fieldName] = None
-
-            #--- Read chapter fields.
-            for chFields in chp.findall('Fields'):
-                if chFields.find('Field_SuppressChapterTitle') is not None:
-                    if chFields.find('Field_SuppressChapterTitle').text == '1':
-                        self.chapters[chId].suppressChapterTitle = True
-                self.chapters[chId].isTrash = False
-                if chFields.find('Field_IsTrash') is not None:
-                    if chFields.find('Field_IsTrash').text == '1':
-                        self.chapters[chId].isTrash = True
-                self.chapters[chId].suppressChapterBreak = False
-                if chFields.find('Field_SuppressChapterBreak') is not None:
-                    if chFields.find('Field_SuppressChapterBreak').text == '1':
-                        self.chapters[chId].suppressChapterBreak = True
-
-                #--- Read chapter custom fields.
-                for fieldName in self._CHP_KWVAR:
-                    field = chFields.find(fieldName)
-                    if field is not None:
-                        self.chapters[chId].kwVar[fieldName] = field.text
-
-            self.chapters[chId].srtScenes = []
-            if chp.find('Scenes') is not None:
-                for scn in chp.find('Scenes').findall('ScID'):
-                    scId = scn.text
-                    self.chapters[chId].srtScenes.append(scId)
-
-        #--- Read attributes at scene level from the xml element tree.
-        for scn in root.iter('SCENE'):
-            scId = scn.find('ID').text
-            self.scenes[scId] = self.SCENE_CLASS()
-
-            if scn.find('Title') is not None:
-                self.scenes[scId].title = scn.find('Title').text
-
-            if scn.find('Desc') is not None:
-                self.scenes[scId].desc = scn.find('Desc').text
-
-            if scn.find('SceneContent') is not None:
-                sceneContent = scn.find('SceneContent').text
-                if sceneContent is not None:
-                    self.scenes[scId].sceneContent = sceneContent
-
-            #--- Read scene type.
-
-            # This is how yWriter 7.1.3.0 reads the scene type:
-            #
-            # Type   |<Unused>|Field_SceneType>|scType
-            #--------+--------+----------------+------
-            # Notes  | x      | 1              | 1
-            # Todo   | x      | 2              | 2
-            # Unused | -1     | N/A            | 3
-            # Unused | -1     | 0              | 3
-            # Normal | N/A    | N/A            | 0
-            # Normal | N/A    | 0              | 0
-
-            self.scenes[scId].scType = 0
-
-            #--- Initialize custom keyword variables.
-            for fieldName in self._SCN_KWVAR:
-                self.scenes[scId].kwVar[fieldName] = None
-
-            for scFields in scn.findall('Fields'):
-                #--- Read scene custom fields.
-                for fieldName in self._SCN_KWVAR:
-                    field = scFields.find(fieldName)
-                    if field is not None:
-                        self.scenes[scId].kwVar[fieldName] = field.text
-
-                # Read scene type, if any.
-                if scFields.find('Field_SceneType') is not None:
-                    if scFields.find('Field_SceneType').text == '1':
-                        self.scenes[scId].scType = 1
-                    elif scFields.find('Field_SceneType').text == '2':
-                        self.scenes[scId].scType = 2
-            if scn.find('Unused') is not None:
-                if self.scenes[scId].scType == 0:
-                    self.scenes[scId].scType = 3
-
-            #--- Export when RTF.
-            if scn.find('ExportCondSpecific') is None:
-                self.scenes[scId].doNotExport = False
-            elif scn.find('ExportWhenRTF') is not None:
-                self.scenes[scId].doNotExport = False
-            else:
-                self.scenes[scId].doNotExport = True
-
-            if scn.find('Status') is not None:
-                self.scenes[scId].status = int(scn.find('Status').text)
-
-            if scn.find('Notes') is not None:
-                self.scenes[scId].notes = scn.find('Notes').text
-
-            if scn.find('Tags') is not None:
-                if scn.find('Tags').text is not None:
-                    tags = string_to_list(scn.find('Tags').text)
-                    self.scenes[scId].tags = self._strip_spaces(tags)
-
-            if scn.find('Field1') is not None:
-                self.scenes[scId].field1 = scn.find('Field1').text
-
-            if scn.find('Field2') is not None:
-                self.scenes[scId].field2 = scn.find('Field2').text
-
-            if scn.find('Field3') is not None:
-                self.scenes[scId].field3 = scn.find('Field3').text
-
-            if scn.find('Field4') is not None:
-                self.scenes[scId].field4 = scn.find('Field4').text
-
-            if scn.find('AppendToPrev') is not None:
-                self.scenes[scId].appendToPrev = True
-            else:
-                self.scenes[scId].appendToPrev = False
-
-            if scn.find('SpecificDateTime') is not None:
-                dateTime = scn.find('SpecificDateTime').text.split(' ')
-                for dt in dateTime:
-                    if '-' in dt:
-                        self.scenes[scId].date = dt
-                    elif ':' in dt:
-                        self.scenes[scId].time = dt
-            else:
-                if scn.find('Day') is not None:
-                    self.scenes[scId].day = scn.find('Day').text
-
-                if scn.find('Hour') is not None:
-                    self.scenes[scId].hour = scn.find('Hour').text
-
-                if scn.find('Minute') is not None:
-                    self.scenes[scId].minute = scn.find('Minute').text
-
-            if scn.find('LastsDays') is not None:
-                self.scenes[scId].lastsDays = scn.find('LastsDays').text
-
-            if scn.find('LastsHours') is not None:
-                self.scenes[scId].lastsHours = scn.find('LastsHours').text
-
-            if scn.find('LastsMinutes') is not None:
-                self.scenes[scId].lastsMinutes = scn.find('LastsMinutes').text
-
-            if scn.find('ReactionScene') is not None:
-                self.scenes[scId].isReactionScene = True
-            else:
-                self.scenes[scId].isReactionScene = False
-
-            if scn.find('SubPlot') is not None:
-                self.scenes[scId].isSubPlot = True
-            else:
-                self.scenes[scId].isSubPlot = False
-
-            if scn.find('Goal') is not None:
-                self.scenes[scId].goal = scn.find('Goal').text
-
-            if scn.find('Conflict') is not None:
-                self.scenes[scId].conflict = scn.find('Conflict').text
-
-            if scn.find('Outcome') is not None:
-                self.scenes[scId].outcome = scn.find('Outcome').text
-
-            if scn.find('ImageFile') is not None:
-                self.scenes[scId].image = scn.find('ImageFile').text
-
-            if scn.find('Characters') is not None:
-                for crId in scn.find('Characters').iter('CharID'):
-                    if self.scenes[scId].characters is None:
-                        self.scenes[scId].characters = []
-                    self.scenes[scId].characters.append(crId.text)
-
-            if scn.find('Locations') is not None:
-                for lcId in scn.find('Locations').iter('LocID'):
-                    if self.scenes[scId].locations is None:
-                        self.scenes[scId].locations = []
-                    self.scenes[scId].locations.append(lcId.text)
-
-            if scn.find('Items') is not None:
-                for itId in scn.find('Items').iter('ItemID'):
-                    if self.scenes[scId].items is None:
-                        self.scenes[scId].items = []
-                    self.scenes[scId].items.append(itId.text)
-
+        read_project(root)
+        read_locations(root)
+        read_items(root)
+        read_characters(root)
+        read_projectvars(root)
+        read_projectnotes(root)
+        read_scenes(root)
+        read_chapters(root)
         self.adjust_scene_types()
-
-        #--- Read project notes from the xml element tree.
-        self.srtPrjNotes = []
-        # This is necessary for re-reading.
-
-        try:
-            for pnt in root.find('PROJECTNOTES'):
-                if pnt.find('ID') is not None:
-                    pnId = pnt.find('ID').text
-                    self.srtPrjNotes.append(pnId)
-                    self.projectNotes[pnId] = self.PN_CLASS()
-                    if pnt.find('Title') is not None:
-                        self.projectNotes[pnId].title = pnt.find('Title').text
-                    if pnt.find('Desc') is not None:
-                        self.projectNotes[pnId].desc = pnt.find('Desc').text
-
-                #--- Initialize project note custom fields.
-                for fieldName in self._PNT_KWVAR:
-                    self.projectNotes[pnId].kwVar[fieldName] = None
-
-                #--- Read project note custom fields.
-                for pnFields in pnt.findall('Fields'):
-                    field = pnFields.find(fieldName)
-                    if field is not None:
-                        self.projectNotes[pnId].kwVar[fieldName] = field.text
-
-        except:
-            pass
-
         return 'yWriter project data read in.'
 
     def merge(self, source):
@@ -578,7 +637,7 @@ class Yw7File(Novel):
                     try:
                         self.locations[lcId].kwVar[fieldName] = source.locations[lcId].kwVar[fieldName]
                     except:
-                        self.locations[lcId].kwVar[fieldName] = temploc[lcId].kwVar[fieldName]
+                        self.locations[lcId].kwVar[fieldName] = temploc[lcId].kwVar.get(fieldName, None)
 
         #--- Merge and re-order items.
         if source.srtItems:
@@ -617,7 +676,7 @@ class Yw7File(Novel):
                     try:
                         self.items[itId].kwVar[fieldName] = source.items[itId].kwVar[fieldName]
                     except:
-                        self.items[itId].kwVar[fieldName] = tempitm[itId].kwVar[fieldName]
+                        self.items[itId].kwVar[fieldName] = tempitm[itId].kwVar.get(fieldName, None)
 
         #--- Merge and re-order characters.
         if source.srtCharacters:
@@ -676,7 +735,7 @@ class Yw7File(Novel):
                     try:
                         self.characters[crId].kwVar[fieldName] = source.characters[crId].kwVar[fieldName]
                     except:
-                        self.characters[crId].kwVar[fieldName] = tempchr[crId].kwVar[fieldName]
+                        self.characters[crId].kwVar[fieldName] = tempchr[crId].kwVar.get(fieldName, None)
 
         #--- Merge and re-order projectNotes.
         if source.srtPrjNotes:
@@ -706,39 +765,50 @@ class Yw7File(Novel):
                     try:
                         self.projectNotes[pnId].kwVar[fieldName] = source.projectNotes[pnId].kwVar[fieldName]
                     except:
-                        self.projectNotes[pnId].kwVar[fieldName] = tempPrjn[pnId].kwVar[fieldName]
+                        self.projectNotes[pnId].kwVar[fieldName] = tempPrjn[pnId].kwVar.get(fieldName, None)
 
         #--- Merge scenes.
         sourceHasSceneContent = False
         for scId in source.scenes:
             if not scId in self.scenes:
                 self.scenes[scId] = self.SCENE_CLASS()
+
             if source.scenes[scId].title:
                 # avoids deleting the title, if it is empty by accident
                 self.scenes[scId].title = source.scenes[scId].title
             if source.scenes[scId].desc is not None:
                 self.scenes[scId].desc = source.scenes[scId].desc
+
             if source.scenes[scId].sceneContent is not None:
                 self.scenes[scId].sceneContent = source.scenes[scId].sceneContent
                 sourceHasSceneContent = True
             if source.scenes[scId].scType is not None:
                 self.scenes[scId].scType = source.scenes[scId].scType
+
             if source.scenes[scId].status is not None:
                 self.scenes[scId].status = source.scenes[scId].status
+
             if source.scenes[scId].notes is not None:
                 self.scenes[scId].notes = source.scenes[scId].notes
+
             if source.scenes[scId].tags is not None:
                 self.scenes[scId].tags = source.scenes[scId].tags
+
             if source.scenes[scId].field1 is not None:
                 self.scenes[scId].field1 = source.scenes[scId].field1
+
             if source.scenes[scId].field2 is not None:
                 self.scenes[scId].field2 = source.scenes[scId].field2
+
             if source.scenes[scId].field3 is not None:
                 self.scenes[scId].field3 = source.scenes[scId].field3
+
             if source.scenes[scId].field4 is not None:
                 self.scenes[scId].field4 = source.scenes[scId].field4
+
             if source.scenes[scId].appendToPrev is not None:
                 self.scenes[scId].appendToPrev = source.scenes[scId].appendToPrev
+
             if source.scenes[scId].date or source.scenes[scId].time:
                 if source.scenes[scId].date is not None:
                     self.scenes[scId].date = source.scenes[scId].date
@@ -747,43 +817,58 @@ class Yw7File(Novel):
             elif source.scenes[scId].minute or source.scenes[scId].hour or source.scenes[scId].day:
                 self.scenes[scId].date = None
                 self.scenes[scId].time = None
+
             if source.scenes[scId].minute is not None:
                 self.scenes[scId].minute = source.scenes[scId].minute
+
             if source.scenes[scId].hour is not None:
                 self.scenes[scId].hour = source.scenes[scId].hour
+
             if source.scenes[scId].day is not None:
                 self.scenes[scId].day = source.scenes[scId].day
+
             if source.scenes[scId].lastsMinutes is not None:
                 self.scenes[scId].lastsMinutes = source.scenes[scId].lastsMinutes
+
             if source.scenes[scId].lastsHours is not None:
                 self.scenes[scId].lastsHours = source.scenes[scId].lastsHours
+
             if source.scenes[scId].lastsDays is not None:
                 self.scenes[scId].lastsDays = source.scenes[scId].lastsDays
+
             if source.scenes[scId].isReactionScene is not None:
                 self.scenes[scId].isReactionScene = source.scenes[scId].isReactionScene
+
             if source.scenes[scId].isSubPlot is not None:
                 self.scenes[scId].isSubPlot = source.scenes[scId].isSubPlot
+
             if source.scenes[scId].goal is not None:
                 self.scenes[scId].goal = source.scenes[scId].goal
+
             if source.scenes[scId].conflict is not None:
                 self.scenes[scId].conflict = source.scenes[scId].conflict
+
             if source.scenes[scId].outcome is not None:
                 self.scenes[scId].outcome = source.scenes[scId].outcome
+
             if source.scenes[scId].characters is not None:
                 self.scenes[scId].characters = []
                 for crId in source.scenes[scId].characters:
                     if crId in self.characters:
                         self.scenes[scId].characters.append(crId)
+
             if source.scenes[scId].locations is not None:
                 self.scenes[scId].locations = []
                 for lcId in source.scenes[scId].locations:
                     if lcId in self.locations:
                         self.scenes[scId].locations.append(lcId)
+
             if source.scenes[scId].items is not None:
                 self.scenes[scId].items = []
                 for itId in source.scenes[scId].items:
                     if itId in self.items:
                         self.scenes[scId].items.append(itId)
+
             for fieldName in self._SCN_KWVAR:
                 try:
                     self.scenes[scId].kwVar[fieldName] = source.scenes[scId].kwVar[fieldName]
@@ -794,21 +879,29 @@ class Yw7File(Novel):
         for chId in source.chapters:
             if not chId in self.chapters:
                 self.chapters[chId] = self.CHAPTER_CLASS()
+
             if source.chapters[chId].title:
                 # avoids deleting the title, if it is empty by accident
                 self.chapters[chId].title = source.chapters[chId].title
+
             if source.chapters[chId].desc is not None:
                 self.chapters[chId].desc = source.chapters[chId].desc
+
             if source.chapters[chId].chLevel is not None:
                 self.chapters[chId].chLevel = source.chapters[chId].chLevel
+
             if source.chapters[chId].chType is not None:
                 self.chapters[chId].chType = source.chapters[chId].chType
+
             if source.chapters[chId].suppressChapterTitle is not None:
                 self.chapters[chId].suppressChapterTitle = source.chapters[chId].suppressChapterTitle
+
             if source.chapters[chId].suppressChapterBreak is not None:
                 self.chapters[chId].suppressChapterBreak = source.chapters[chId].suppressChapterBreak
+
             if source.chapters[chId].isTrash is not None:
                 self.chapters[chId].isTrash = source.chapters[chId].isTrash
+
             for fieldName in self._CHP_KWVAR:
                 try:
                     self.chapters[chId].kwVar[fieldName] = source.chapters[chId].kwVar[fieldName]
@@ -836,20 +929,37 @@ class Yw7File(Novel):
         if source.title:
             # avoids deleting the title, if it is empty by accident
             self.title = source.title
+
         if source.desc is not None:
             self.desc = source.desc
+
         if source.authorName is not None:
             self.authorName = source.authorName
+
         if source.authorBio is not None:
             self.authorBio = source.authorBio
+
         if source.fieldTitle1 is not None:
             self.fieldTitle1 = source.fieldTitle1
+
         if source.fieldTitle2 is not None:
             self.fieldTitle2 = source.fieldTitle2
+
         if source.fieldTitle3 is not None:
             self.fieldTitle3 = source.fieldTitle3
+
         if source.fieldTitle4 is not None:
             self.fieldTitle4 = source.fieldTitle4
+
+        if source.languageCode is not None:
+            self.languageCode = source.languageCode
+
+        if source.countryCode is not None:
+            self.countryCode = source.countryCode
+
+        if source.languages is not None:
+            self.languages = source.languages
+
         for fieldName in self._PRJ_KWVAR:
             try:
                 self.kwVar[fieldName] = source.kwVar[fieldName]
@@ -881,6 +991,8 @@ class Yw7File(Novel):
         if self.is_locked():
             return f'{ERROR}{_("yWriter seems to be open. Please close first")}.'
 
+        if self.languages is None:
+            self.get_languages()
         self._build_element_tree()
         message = self._write_element_tree(self)
         if message.startswith(ERROR):
@@ -972,7 +1084,7 @@ class Yw7File(Novel):
 
             #--- Write scene custom fields.
             for field in self._SCN_KWVAR:
-                if field in self.scenes[scId].kwVar and self.scenes[scId].kwVar[field]:
+                if self.scenes[scId].kwVar.get(field, None):
                     if scFields is None:
                         scFields = ET.SubElement(xmlScn, 'Fields')
                     try:
@@ -1129,7 +1241,7 @@ class Yw7File(Novel):
                 except(AttributeError):
                     ET.SubElement(xmlScn, 'ImageFile').text = prjScn.image
 
-            # Characters/locations/items
+            #--- Characters/locations/items
             if prjScn.characters is not None:
                 characters = xmlScn.find('Characters')
                 try:
@@ -1251,7 +1363,7 @@ class Yw7File(Novel):
 
             #--- Write chapter custom fields.
             for field in self._CHP_KWVAR:
-                if field in prjChp.kwVar and prjChp.kwVar[field]:
+                if prjChp.kwVar.get(field, None):
                     if chFields is None:
                         chFields = ET.SubElement(xmlChp, 'Fields')
                     try:
@@ -1296,7 +1408,7 @@ class Yw7File(Novel):
             #--- Write location custom fields.
             lcFields = xmlLoc.find('Fields')
             for field in self._LOC_KWVAR:
-                if field in self.locations[lcId].kwVar and self.locations[lcId].kwVar[field]:
+                if self.locations[lcId].kwVar.get(field, None):
                     if lcFields is None:
                         lcFields = ET.SubElement(xmlLoc, 'Fields')
                     try:
@@ -1317,6 +1429,18 @@ class Yw7File(Novel):
                 ET.SubElement(xmlPnt, 'Desc').text = prjPnt.desc
 
             ET.SubElement(xmlPnt, 'SortOrder').text = str(sortOrder)
+
+        def add_projectvariable(title, desc, tags):
+            # Note:
+            # prjVars, projectvars are caller's variables
+            pvId = create_id(prjVars)
+            prjVars.append(pvId)
+            # side effect
+            projectvar = ET.SubElement(projectvars, 'PROJECTVAR')
+            ET.SubElement(projectvar, 'ID').text = pvId
+            ET.SubElement(projectvar, 'Title').text = title
+            ET.SubElement(projectvar, 'Desc').text = desc
+            ET.SubElement(projectvar, 'Tags').text = tags
 
         def build_item_subtree(xmlItm, prjItm, sortOrder):
             if prjItm.title is not None:
@@ -1339,7 +1463,7 @@ class Yw7File(Novel):
             #--- Write item custom fields.
             itFields = xmlItm.find('Fields')
             for field in self._ITM_KWVAR:
-                if field in self.items[itId].kwVar and self.items[itId].kwVar[field]:
+                if self.items[itId].kwVar.get(field, None):
                     if itFields is None:
                         itFields = ET.SubElement(xmlItm, 'Fields')
                     try:
@@ -1388,7 +1512,7 @@ class Yw7File(Novel):
             #--- Write character custom fields.
             crFields = xmlCrt.find('Fields')
             for field in self._CRT_KWVAR:
-                if field in self.characters[crId].kwVar and self.characters[crId].kwVar[field]:
+                if self.characters[crId].kwVar.get(field, None):
                     if crFields is None:
                         crFields = ET.SubElement(xmlCrt, 'Fields')
                     try:
@@ -1456,10 +1580,20 @@ class Yw7File(Novel):
                 except(AttributeError):
                     ET.SubElement(xmlPrj, 'FieldTitle4').text = self.fieldTitle4
 
+            if self.languageCode:
+                self.kwVar['Field_LanguageCode'] = self.languageCode
+            if self.countryCode:
+                self.kwVar['Field_CountryCode'] = self.countryCode
+
             #--- Write project custom fields.
+
+            # This is for projects written with v7.6 - v7.10:
+            self.kwVar['Field_LanguageCode'] = None
+            self.kwVar['Field_CountryCode'] = None
+
             prjFields = xmlPrj.find('Fields')
             for field in self._PRJ_KWVAR:
-                setting = self.kwVar[field]
+                setting = self.kwVar.get(field, None)
                 if setting:
                     if prjFields is None:
                         prjFields = ET.SubElement(xmlPrj, 'Fields')
@@ -1566,6 +1700,59 @@ class Yw7File(Novel):
                 ET.SubElement(xmlPnt, 'ID').text = pnId
                 build_prjNote_subtree(xmlPnt, self.projectNotes[pnId], sortOrder)
 
+        #--- Process project variables.
+        if self.languages or self.languageCode or self.countryCode:
+            self.check_locale()
+            projectvars = root.find('PROJECTVARS')
+            if projectvars is None:
+                projectvars = ET.SubElement(root, 'PROJECTVARS')
+            prjVars = []
+            # list of all project variable IDs
+            languages = self.languages.copy()
+            hasLanguageCode = False
+            hasCountryCode = False
+            for projectvar in projectvars.findall('PROJECTVAR'):
+                prjVars.append(projectvar.find('ID').text)
+                title = projectvar.find('Title').text
+
+                # Collect language codes.
+                if title.startswith('lang='):
+                    try:
+                        __, langCode = title.split('=')
+                        languages.remove(langCode)
+                    except:
+                        pass
+
+                # Get the document's locale.
+                elif title == 'Language':
+                    projectvar.find('Desc').text = self.languageCode
+                    hasLanguageCode = True
+
+                elif title == 'Country':
+                    projectvar.find('Desc').text = self.countryCode
+                    hasCountryCode = True
+
+            # Define project variables for the missing locale.
+            if not hasLanguageCode:
+                add_projectvariable('Language',
+                                    self.languageCode,
+                                    '0')
+
+            if not hasCountryCode:
+                add_projectvariable('Country',
+                                    self.countryCode,
+                                    '0')
+
+            # Define project variables for the missing language code tags.
+            for langCode in languages:
+                add_projectvariable(f'lang={langCode}',
+                                    f'<HTM <SPAN LANG="{langCode}"> /HTM>',
+                                    '0')
+                add_projectvariable(f'/lang={langCode}',
+                                    f'<HTM </SPAN> /HTM>',
+                                    '0')
+                # adding new IDs to the prjVars list
+
         #--- Process scenes.
 
         # Save the original XML scene subtrees
@@ -1613,6 +1800,7 @@ class Yw7File(Novel):
                 scn.remove(scn.find('RTFFile'))
             except:
                 pass
+
         indent(root)
         self.tree = ET.ElementTree(root)
 
@@ -1691,18 +1879,18 @@ class Yw7File(Novel):
         """
         hasChanged = False
         for field in self._PRJ_KWVAR:
-            if self.kwVar[field]:
+            if self.kwVar.get(field, None):
                 self.kwVar[field] = ''
                 hasChanged = True
         for chId in self.chapters:
             # Deliberatey not iterate srtChapters: make sure to get all chapters.
             for field in self._CHP_KWVAR:
-                if self.chapters[chId].kwVar[field]:
+                if self.chapters[chId].kwVar.get(field, None):
                     self.chapters[chId].kwVar[field] = ''
                     hasChanged = True
         for scId in self.scenes:
             for field in self._SCN_KWVAR:
-                if self.scenes[scId].kwVar[field]:
+                if self.scenes[scId].kwVar.get(field, None):
                     self.scenes[scId].kwVar[field] = ''
                     hasChanged = True
         return hasChanged

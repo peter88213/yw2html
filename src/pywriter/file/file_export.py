@@ -151,6 +151,18 @@ class FileExport(Novel):
             self.srtPrjNotes = source.srtPrjNotes
             self.projectNotes = source.projectNotes
 
+        if source.kwVar:
+            self.kwVar = source.kwVar
+
+        if source.languageCode is not None:
+            self.languageCode = source.languageCode
+
+        if source.countryCode is not None:
+            self.countryCode = source.countryCode
+
+        if source.languages is not None:
+            self.languages = source.languages
+
         return 'Export data updated from novel.'
 
     def _get_fileHeaderMapping(self):

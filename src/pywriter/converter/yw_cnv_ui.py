@@ -84,6 +84,7 @@ class YwCnvUi(YwCnv):
         else:
             message = self.convert(source, target)
             self.ui.set_info_how(message)
+            self._delete_tempfile(source.filePath)
             if message.startswith(ERROR):
                 self.newFile = None
             else:

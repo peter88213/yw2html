@@ -7,6 +7,7 @@ For further information see https://github.com/peter88213/PyWriter
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
 from urllib.parse import quote
+import locale
 import os
 from pywriter.pywriter_globals import *
 from pywriter.model.basic_element import BasicElement
@@ -24,9 +25,11 @@ class Novel(BasicElement):
     of the information included in an yWriter project file).
 
     Public methods:
-        read() -- parse the file and get the instance variables.
-        merge(source) -- update instance variables from a source instance.
-        write() -- write instance variables to the file.
+        read() -- Parse the file and get the instance variables.
+        merge(source) -- Update instance variables from a source instance.
+        write() -- Write instance variables to the file.
+        get_languages() -- Determine the languages used in the document.
+        check_locale() -- Check the document's locale (language code and country code).
 
     Public instance variables:
         authorName -- str: author's name.
@@ -120,6 +123,11 @@ class Novel(BasicElement):
         # The order of the elements does not matter (the novel's order of the scenes is defined by
         # the order of the chapters and the order of the scenes within the chapters)
 
+        self.languages = None
+        # list of str
+        # List of non-document languages occurring as scene markup.
+        # Format: ll-CC, where ll is the language code, and CC is the country code.
+
         self.srtChapters = []
         # list of str
         # The novel's chapter IDs. The order of its elements corresponds to the novel's order of the chapters.
@@ -176,6 +184,9 @@ class Novel(BasicElement):
         self.projectPath = None
         # str
         # URL-coded path to the project directory.
+
+        self.languageCode = None
+        self.countryCode = None
 
         self.filePath = filePath
 
@@ -249,3 +260,46 @@ class Novel(BasicElement):
         This is a stub to be overridden by subclass methods.
         """
         return text.rstrip()
+
+    def get_languages(self):
+        """Determine the languages used in the document.
+        
+        Populate the self.languages list with all language codes found in the scene contents.        
+        Example:
+        - language markup: 'Standard text [lang=en-AU]Australian text[/lang=en-AU].'
+        - language code: 'en-AU'
+        """
+        self.languages = []
+        for scId in self.scenes:
+            text = self.scenes[scId].sceneContent
+            if text:
+                for language in get_languages(text):
+                    if not language in self.languages:
+                        self.languages.append(language)
+
+    def check_locale(self):
+        """Check the document's locale (language code and country code).
+        
+        If the locale is missing, set the system locale.  
+        If the locale doesn't look plausible, set "no language".        
+        """
+        if not self.languageCode or not self.countryCode:
+            # Language or country isn't set.
+            sysLng, sysCtr = locale.getlocale()[0].split('_')
+            self.languageCode = sysLng
+            self.countryCode = sysCtr
+            return
+
+        try:
+            # Plausibility check: code must have two characters.
+            if len(self.languageCode) == 2:
+                if len(self.countryCode) == 2:
+                    return
+                    # keep the setting
+        except:
+            # code isn't a string
+            pass
+        # Existing language or country field looks not plausible
+        self.languageCode = 'zxx'
+        self.countryCode = 'none'
+
