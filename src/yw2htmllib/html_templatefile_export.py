@@ -309,4 +309,4 @@ class HtmlTemplatefileExport(HtmlExport):
                 content = get_template(scId, self._SCENE_DIVIDER)
                 if content is not None:
                     self._sceneDivider = content
-        return (super().write())
+        super().write()
