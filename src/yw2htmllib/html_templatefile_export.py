@@ -59,73 +59,80 @@ class HtmlTemplatefileExport(HtmlExport):
         
         Extends the superclass constructor.
         """
+
+        def load_template(filePath):
+            try:
+                return read_html_file(filePath)
+            except:
+                return None
+
         super().__init__(filePath)
         templatePath = kwargs['template_path']
 
         # Project level.
-        content = read_html_file(f'{templatePath}/{self._HTML_HEADER}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._HTML_HEADER}{self.EXTENSION}')
         if content is not None:
             self._fileHeader = content
-        content = read_html_file(f'{templatePath}/{self._CHARACTER_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._CHARACTER_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._characterTemplate = content
-        content = read_html_file(f'{templatePath}/{self._LOCATION_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._LOCATION_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._locationTemplate = content
-        content = read_html_file(f'{templatePath}/{self._ITEM_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._ITEM_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._itemTemplate = content
-        content = read_html_file(f'{templatePath}/{self._HTML_FOOTER}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._HTML_FOOTER}{self.EXTENSION}')
         if content is not None:
             self._fileFooter = content
 
         # Chapter level.
-        content = read_html_file(f'{templatePath}/{self._PART_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._PART_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._partTemplate = content
-        content = read_html_file(f'{templatePath}/{self._CHAPTER_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._CHAPTER_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._chapterTemplate = content
-        content = read_html_file(f'{templatePath}/{self._CHAPTER_END_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._CHAPTER_END_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._chapterEndTemplate = content
-        content = read_html_file(f'{templatePath}/{self._UNUSED_CHAPTER_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._UNUSED_CHAPTER_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._unusedChapterTemplate = content
-        content = read_html_file(f'{templatePath}/{self._UNUSED_CHAPTER_END_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._UNUSED_CHAPTER_END_TEMPLATE}{self.EXTENSION}')
 
         if content is not None:
             self._unusedChapterEndTemplate = content
-        content = read_html_file(f'{templatePath}/{self._NOTES_CHAPTER_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._NOTES_CHAPTER_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._notesChapterTemplate = content
-        content = read_html_file(f'{templatePath}/{self._NOTES_CHAPTER_END_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._NOTES_CHAPTER_END_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._notesChapterEndTemplate = content
-        content = read_html_file(f'{templatePath}/{self._TODO_CHAPTER_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._TODO_CHAPTER_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._todoChapterTemplate = content
-        content = read_html_file(f'{templatePath}/{self._TODO_CHAPTER_END_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._TODO_CHAPTER_END_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._todoChapterEndTemplate = content
 
         # Scene level.
-        content = read_html_file(f'{templatePath}/{self._SCENE_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._SCENE_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._sceneTemplate = content
-        content = read_html_file(f'{templatePath}/{self._FIRST_SCENE_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._FIRST_SCENE_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._firstSceneTemplate = content
-        content = read_html_file(f'{templatePath}/{self._UNUSED_SCENE_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._UNUSED_SCENE_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._unusedSceneTemplate = content
-        content = read_html_file(f'{templatePath}/{self._NOTES_SCENE_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._NOTES_SCENE_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._notesSceneTemplate = content
-        content = read_html_file(f'{templatePath}/{self._TODO_SCENE_TEMPLATE}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._TODO_SCENE_TEMPLATE}{self.EXTENSION}')
         if content is not None:
             self._todoSceneTemplate = content
-        content = read_html_file(f'{templatePath}/{self._SCENE_DIVIDER}{self.EXTENSION}')
+        content = load_template(f'{templatePath}/{self._SCENE_DIVIDER}{self.EXTENSION}')
         if content is not None:
             self._sceneDivider = content
 
