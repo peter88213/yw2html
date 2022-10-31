@@ -68,49 +68,38 @@ class NormalOperation(unittest.TestCase):
     """Test case: Normal operation."""
 
     def setUp(self):
-
         try:
             os.mkdir(TEST_EXEC_PATH)
-
         except:
             pass
-
         remove_all_testfiles()
         copyfile(TEST_DATA_PATH + YW7, TEST_EXEC_PATH + YW7)
 
     def test_scenelist(self):
         os.chdir(TEST_EXEC_PATH)
-
         yw2html_.run(TEST_EXEC_PATH + YW7, TEMPLATE_PATH +
                      'scenelist', '_scenelist', True)
-
         self.assertEqual(read_file(TEST_EXEC_PATH + SCENELIST),
                          read_file(TEST_DATA_PATH + SCENELIST))
 
     def test_script(self):
         os.chdir(TEST_EXEC_PATH)
-
         yw2html_.run(TEST_EXEC_PATH + YW7, TEMPLATE_PATH +
                      'manuscript', '_manuscript', True)
-
         self.assertEqual(read_file(TEST_EXEC_PATH + SCRIPT),
                          read_file(TEST_DATA_PATH + SCRIPT))
 
     def test_characters(self):
         os.chdir(TEST_EXEC_PATH)
-
         yw2html_.run(TEST_EXEC_PATH + YW7, TEMPLATE_PATH +
                      'characters', '_characters', True)
-
         self.assertEqual(read_file(TEST_EXEC_PATH + CHARAS),
                          read_file(TEST_DATA_PATH + CHARAS))
 
     def test_templates_included(self):
         os.chdir(TEST_EXEC_PATH)
-
         copyfile(TEST_DATA_PATH + YW7_INCL, TEST_EXEC_PATH + YW7)
         yw2html_.run(TEST_EXEC_PATH + YW7, '', '_paperback', True)
-
         self.assertEqual(read_file(TEST_EXEC_PATH + PAPERBACK),
                          read_file(TEST_DATA_PATH + PAPERBACK))
 

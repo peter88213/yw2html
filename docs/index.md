@@ -12,9 +12,9 @@ The HTML templates can be defined "externally" via HTML files or "internally" vi
 ## Download and install
 
 
-[Download the latest release (version 2.0.7)](https://raw.githubusercontent.com/peter88213/yw2html/main/dist/yw2html_v2.0.7.zip)
+[Download the latest release (version 2.1.0)](https://raw.githubusercontent.com/peter88213/yw2html/main/dist/yw2html_v2.1.0.zip)
 
-- Unzip the downloaded zipfile "yw2html_v2.0.7.zip" into a new folder and open "README.md" for usage instructions.
+- Unzip the downloaded zipfile "yw2html_v2.1.0.zip" into a new folder and open "README.md" for usage instructions.
 
 [Changelog](changelog)
 

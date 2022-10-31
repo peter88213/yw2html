@@ -3,6 +3,7 @@
 	<name>yw2html</name>
 	<comment></comment>
 	<projects>
+		<project>PyWriter</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

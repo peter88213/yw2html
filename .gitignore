@@ -1,3 +1,6 @@
 /test/yw7/
 /build/
 *.pyc
+*.bak
+/test/yw2html.py
+/test/test_yw2html.py

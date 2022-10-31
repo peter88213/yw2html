@@ -4,6 +4,14 @@
 
 ## Changelog
 
+### v2.1.0
+
+- Add placeholders for country code and language code.
+- Library upgrade.
+- Error handling via exceptions instead of returned messages.
+
+Based on PyWriter v8.0.3
+
 ### v2.0.7
 
 - Update the PyWriter library for future Python versions.
