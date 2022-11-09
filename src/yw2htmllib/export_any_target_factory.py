@@ -38,4 +38,4 @@ class ExportAnyTargetFactory(FileFactory):
             targetFile = fileClass(f'{fileName}{suffix}{fileClass.EXTENSION}', **kwargs)
             return None, targetFile
 
-        raise Error(f'File type of "{os.path.normpath(sourcePath)}" not supported.')
+        raise Error(f'File type of "{norm_path(sourcePath)}" not supported.')
