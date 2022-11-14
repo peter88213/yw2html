@@ -4,13 +4,15 @@
 
 ## Changelog
 
-### v2.1.0
+### v2.1.1
 
 - Add placeholders for country code and language code.
 - Library upgrade.
-- Error handling via exceptions instead of returned messages.
+- Fix a bug where attempting to save a write-protected file raises an
+uncaught exception.
+- Revise error handling: Throw exceptions instead of returning error messages.
 
-Based on PyWriter v8.0.3
+Based on PyWriter v8.0.8
 
 ### v2.0.7
 
