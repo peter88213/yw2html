@@ -5,15 +5,12 @@ For more information, see the [project homepage](https://peter88213.github.io/yw
 
 ## Development
 
-*yw2html* depends on the [pywriter](https://github.com/peter88213/PyWriter) library which must be present in your file system. It is organized as an Eclipse PyDev project. The official release branch on GitHub is *main*.
+*yw2html* is organized as an Eclipse PyDev project. The official release branch on GitHub is *main*.
 
 ### Mandatory directory structure for building the application script
 
 ```
 .
-├── PyWriter/
-│   └── src/
-│       └── pywriter/
 └── yw2html/
     ├── src/
     ├── test/
