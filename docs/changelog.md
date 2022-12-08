@@ -4,6 +4,13 @@
 
 ## Changelog
 
+### v2.1.2
+
+- Modify "shebang" line to make the script run with Python 3.11 under
+Windows.
+
+Based on PyWriter v8.0.8
+
 ### v2.1.1
 
 - Add placeholders for country code and language code.
