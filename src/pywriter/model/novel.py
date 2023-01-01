@@ -290,7 +290,11 @@ class Novel(BasicElement):
         """
         if not self.languageCode or not self.countryCode:
             # Language or country isn't set.
-            sysLng, sysCtr = locale.getlocale()[0].split('_')
+            try:
+                sysLng, sysCtr = locale.getlocale()[0].split('_')
+            except:
+                # Fallback for old Windows versions.
+                sysLng, sysCtr = locale.getdefaultlocale()[0].split('_')
             self.languageCode = sysLng
             self.countryCode = sysCtr
             return
