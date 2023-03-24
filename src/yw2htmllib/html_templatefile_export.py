@@ -1,10 +1,10 @@
 """Provide a class for HTML file representation based on template files.
 
-Copyright (c) 2022 Peter Triesberger
+Copyright (c) 2023 Peter Triesberger
 For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
-from pywriter.html.html_fop import read_html_file
+from yw2htmllib.html_fop import read_html_file
 from yw2htmllib.html_export import HtmlExport
 
 
@@ -52,10 +52,10 @@ class HtmlTemplatefileExport(HtmlExport):
         """Read templates from files, if any.
 
         Positional arguments:
-            filePath -- str: path to the file represented by the Novel instance.
+            filePath: str -- path to the file represented by the Novel instance.
             
         Required keyword arguments:
-            template_path -- str: template directory path.
+            template_path: str -- template directory path.
         
         Extends the superclass constructor.
         """
@@ -140,8 +140,8 @@ class HtmlTemplatefileExport(HtmlExport):
         """Return a mapping dictionary for a chapter section. 
 
         Positional arguments:
-            chId -- str: chapter ID.
-            chapterNumber -- int: chapter number.
+            chId: str -- chapter ID.
+            chapterNumber: int -- chapter number.
 
         Extends the superclass method.
         """

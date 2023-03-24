@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="yw2html" basedir=".">
-	<property name="version" value="2.1.1" />
+	<property name="version" value="2.1.4" />
 	<property name="test-app" value="yw2html" />
 	<!-- This is a project-specific build script -->
 	
-	<property name="source-path" location="../src" />
 	<property name="test-path" location="../test" />
 	<property name="build-path" location="../build" />
 	<property name="dist-path" location="../dist" />
@@ -15,7 +14,7 @@
 	<target name="build" description="inline all library modules">
 		<delete file="${test-path}/${test-app}.py" />
 		<exec executable="python" failonerror="true">
-		    <arg value="${source-path}/build_${test-app}.py"/>
+		    <arg value="build_${test-app}.py"/>
 		</exec>
 	</target>
 

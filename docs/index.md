@@ -7,14 +7,14 @@ The HTML templates can be defined "externally" via HTML files or "internally" vi
 
 ## Requirements
 
-- [Python](https://www.python.org/) from version 3.6 to 3.10. Beware: Version 3.11 is not recommended.
+- [Python](https://www.python.org/) version 3.6+.
 
 ## Download and install
 
 
-[Download the latest release (version 2.1.1)](https://raw.githubusercontent.com/peter88213/yw2html/main/dist/yw2html_v2.1.1.zip)
+[Download the latest release (version 2.1.4)](https://raw.githubusercontent.com/peter88213/yw2html/main/dist/yw2html_v2.1.4.zip)
 
-- Unzip the downloaded zipfile "yw2html_v2.1.1.zip" into a new folder and open "README.md" for usage instructions.
+- Unzip the downloaded zipfile "yw2html_v2.1.4.zip" into a new folder and open "README.md" for usage instructions.
 
 [Changelog](changelog)
 
