@@ -1,10 +1,10 @@
 """Provide a class for HTML file representation based on template files.
 
-Copyright (c) 2022 Peter Triesberger
+Copyright (c) 2023 Peter Triesberger
 For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
-from pywriter.html.html_fop import read_html_file
+from yw2htmllib.html_fop import read_html_file
 from yw2htmllib.html_export import HtmlExport
 
 
@@ -52,10 +52,10 @@ class HtmlTemplatefileExport(HtmlExport):
         """Read templates from files, if any.
 
         Positional arguments:
-            filePath -- str: path to the file represented by the Novel instance.
+            filePath: str -- path to the file represented by the Novel instance.
             
         Required keyword arguments:
-            template_path -- str: template directory path.
+            template_path: str -- template directory path.
         
         Extends the superclass constructor.
         """
@@ -140,8 +140,8 @@ class HtmlTemplatefileExport(HtmlExport):
         """Return a mapping dictionary for a chapter section. 
 
         Positional arguments:
-            chId -- str: chapter ID.
-            chapterNumber -- int: chapter number.
+            chId: str -- chapter ID.
+            chapterNumber: int -- chapter number.
 
         Extends the superclass method.
         """
@@ -219,7 +219,7 @@ class HtmlTemplatefileExport(HtmlExport):
         else:
             chapterMapping['ChNumberEnglish'] = ''
             chapterMapping['ChNumberRoman'] = ''
-        if self.chapters[chId].suppressChapterTitle:
+        if self.novel.chapters[chId].suppressChapterTitle:
             chapterMapping['Title'] = ''
         return chapterMapping
 
@@ -234,21 +234,21 @@ class HtmlTemplatefileExport(HtmlExport):
             
             Return scene content if title matches. Otherwise return None.
             """
-            if self.scenes[scId].title == title:
-                content = self.scenes[scId].sceneContent
+            if self.novel.scenes[scId].title == title:
+                content = self.novel.scenes[scId].sceneContent
             else:
                 content = None
             return content
 
         # Find template chapter.
-        for chId in self.chapters:
-            if self.chapters[chId].chType != 3:
+        for chId in self.novel.chapters:
+            if self.novel.chapters[chId].chType != 3:
                 continue
 
-            if self.chapters[chId].title != self._TEMPLATE_CHAPTER_TITLE:
+            if self.novel.chapters[chId].title != self._TEMPLATE_CHAPTER_TITLE:
                 continue
 
-            for scId in self.chapters[chId].srtScenes:
+            for scId in self.novel.chapters[chId].srtScenes:
 
                 # Project level.
                 content = get_template(scId, self._HTML_HEADER)

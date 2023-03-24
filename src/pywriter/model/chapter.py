@@ -1,6 +1,6 @@
 """Provide a class for yWriter chapter representation.
 
-Copyright (c) 2022 Peter Triesberger
+Copyright (c) 2023 Peter Triesberger
 For further information see https://github.com/peter88213/PyWriter
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
@@ -11,12 +11,12 @@ class Chapter(BasicElement):
     """yWriter chapter representation.
     
     Public instance variables:
-        chLevel -- int: chapter level (part/chapter).
-        chType -- int: chapter type (Normal/Notes/Todo/Unused).
-        suppressChapterTitle -- bool: uppress chapter title when exporting.
-        isTrash -- bool: True, if the chapter is the project's trash bin.
-        suppressChapterBreak -- bool: Suppress chapter break when exporting.
-        srtScenes -- list of str: the chapter's sorted scene IDs.        
+        chLevel: int -- chapter level (part/chapter).
+        chType: int -- chapter type (Normal/Notes/Todo/Unused).
+        suppressChapterTitle: bool -- uppress chapter title when exporting.
+        isTrash: bool -- True, if the chapter is the project's trash bin.
+        suppressChapterBreak: bool -- Suppress chapter break when exporting.
+        srtScenes: list of str -- the chapter's sorted scene IDs.        
     """
 
     def __init__(self):
@@ -26,14 +26,12 @@ class Chapter(BasicElement):
         """
         super().__init__()
 
-        self.chLevel = None
-        # int
+        self.chLevel: int = None
         # xml: <SectionStart>
         # 0 = chapter level
         # 1 = section level ("this chapter begins a section")
 
-        self.chType = None
-        # int
+        self.chType: int = None
         # 0 = Normal
         # 1 = Notes
         # 2 = Todo
@@ -66,24 +64,20 @@ class Chapter(BasicElement):
         # Todo   | -1     | 1    | 2           | 2
         # Unused | -1     | 1    | 0           | 3
 
-        self.suppressChapterTitle = None
-        # bool
+        self.suppressChapterTitle: bool = None
         # xml: <Fields><Field_SuppressChapterTitle> 1
         # True: Chapter heading not to be displayed in written document.
         # False: Chapter heading to be displayed in written document.
 
-        self.isTrash = None
-        # bool
+        self.isTrash: bool = None
         # xml: <Fields><Field_IsTrash> 1
         # True: This chapter is the yw7 project's "trash bin".
         # False: This chapter is not a "trash bin".
 
-        self.suppressChapterBreak = None
-        # bool
+        self.suppressChapterBreak: bool = None
         # xml: <Fields><Field_SuppressChapterBreak> 0
 
-        self.srtScenes = []
-        # list of str
+        self.srtScenes: list[str] = []
         # xml: <Scenes><ScID>
         # The chapter's scene IDs. The order of its elements
         # corresponds to the chapter's order of the scenes.

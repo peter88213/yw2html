@@ -1,6 +1,6 @@
 """Provide a factory class for a yWriter object to read.
 
-Copyright (c) 2022 Peter Triesberger
+Copyright (c) 2023 Peter Triesberger
 For further information see https://github.com/peter88213/PyWriter
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
@@ -20,7 +20,7 @@ class ExportSourceFactory(FileFactory):
         """Instantiate a source object for conversion from a yWriter project.
 
         Positional arguments:
-            sourcePath -- str: path to the source file to convert.
+            sourcePath: str -- path to the source file to convert.
 
         Return a tuple with two elements:
         - sourceFile: a YwFile subclass instance

@@ -1,6 +1,6 @@
 """Provide a project specific factory class for any export target object.
 
-Copyright (c) 2022 Peter Triesberger
+Copyright (c) 2023 Peter Triesberger
 For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
@@ -16,13 +16,13 @@ class ExportAnyTargetFactory(FileFactory):
         """Instantiate a target object for conversion to any format.
 
         Positional arguments:
-            sourcePath -- str: path to the source file to convert.
+            sourcePath: str -- path to the source file to convert.
 
         Optional arguments:
-            suffix -- str: an indicator for the target file type.
+            suffix: str -- an indicator for the target file type.
 
         Required keyword arguments: 
-            suffix -- str: target file name suffix.
+            suffix: str -- target file name suffix.
 
         Return a tuple with two elements:
         - sourceFile: None

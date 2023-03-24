@@ -1,6 +1,6 @@
 """Provide a class for HTML file representation.
 
-Copyright (c) 2022 Peter Triesberger
+Copyright (c) 2023 Peter Triesberger
 For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
@@ -68,7 +68,7 @@ strong {font-weight:normal; text-transform: uppercase}
             text -- string to convert.
         
         Optional arguments:
-            quick -- bool: if True, apply a conversion mode for one-liners without formatting.
+            quick: bool -- if True, apply a conversion mode for one-liners without formatting.
         
         Overrides the superclass method.
         """
