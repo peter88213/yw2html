@@ -7,7 +7,13 @@ For more information, see the [project homepage](https://peter88213.github.io/yw
 
 *yw2html* is organized as an Eclipse PyDev project. The official release branch on GitHub is *main*.
 
-### Mandatory directory structure for building the application script
+### Conventions
+
+See https://github.com/peter88213/PyWriter/blob/main/docs/conventions.md
+
+Exceptions:
+- No localization is required.
+- The directory structure is modified to minimize dependencies:
 
 ```
 .
@@ -18,16 +24,11 @@ For more information, see the [project homepage](https://peter88213.github.io/yw
         └── build.xml
 ```
 
-### Conventions
-
-- Minimum Python version is 3.6. 
-- The Python **source code formatting** follows widely the [PEP 8](https://www.python.org/dev/peps/pep-0008/) style guide, except the maximum line length, which is 120 characters here.
-
 ### Development tools
 
 - [Python](https://python.org) version 3.10.8
 - [Eclipse IDE](https://eclipse.org) with [PyDev](https://pydev.org) and [EGit](https://www.eclipse.org/egit/)
-- [Apache Ant](https://ant.apache.org/) for building the application script
+- Apache Ant for building the application script
 
 ## Credits
 
