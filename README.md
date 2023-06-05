@@ -1,4 +1,4 @@
-# yw2html - HTML export with templates from yWriter 6/7
+# yw2html - HTML export with custom templates from yWriter 7
 
 For more information, see the [project homepage](https://peter88213.github.io/yw2html) with description and download instructions.
 
@@ -26,7 +26,7 @@ Exceptions:
 
 ### Development tools
 
-- [Python](https://python.org) version 3.10.8
+- [Python](https://python.org) version 3.10
 - [Eclipse IDE](https://eclipse.org) with [PyDev](https://pydev.org) and [EGit](https://www.eclipse.org/egit/)
 - Apache Ant for building the application script
 
