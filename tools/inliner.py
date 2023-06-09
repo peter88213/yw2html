@@ -1,4 +1,4 @@
-""" Build python scripts for the PyWriter based distributions.
+"""Build a Python script for a PyWriter based application.
         
 In order to distribute single scripts without dependencies, 
 this script "inlines" all modules imported from the pywriter package.
