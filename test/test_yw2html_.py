@@ -1,7 +1,6 @@
-""" Regression test for the yw2html project.
+"""Regression test for the yw2html project.
 
-Test suite for yw2html.pyw.
-
+Copyright (c) 2023 Peter Triesberger
 For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
