@@ -1,11 +1,9 @@
-""" Build a python script for the yw2html distribution.
+"""Build a Python script for the yw2html distribution.
         
 In order to distribute a single script without dependencies, 
 this script "inlines" all modules imported from the.pyriter package.
 
-The.pyriter project (see see https://github.com/peter88213.pyriter)
-must be located on the same directory level as the yw2html project. 
-
+Copyright (c) 2023 Peter Triesberger
 For further information see https://github.com/peter88213/yw2html
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
