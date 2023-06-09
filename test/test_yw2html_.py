@@ -1,4 +1,4 @@
-""" Python unit tests for the yw2html project.
+""" Regression test for the yw2html project.
 
 Test suite for yw2html.pyw.
 
