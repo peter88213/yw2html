@@ -5,21 +5,20 @@ For further information see https://github.com/peter88213/PyWriter
 Published under the MIT License (https://opensource.org/licenses/mit-license.php)
 """
 import re
-from typing import Pattern
 from pywriter.model.basic_element import BasicElement
 from pywriter.pywriter_globals import *
 
 #--- Regular expressions for counting words and characters like in LibreOffice.
 # See: https://help.libreoffice.org/latest/en-GB/text/swriter/guide/words_count.html
 
-ADDITIONAL_WORD_LIMITS: Pattern = re.compile('--|—|–')
+ADDITIONAL_WORD_LIMITS = re.compile('--|—|–')
 # this is to be replaced by spaces, thus making dashes and dash replacements word limits
 
-NO_WORD_LIMITS: Pattern = re.compile('\[.+?\]|\/\*.+?\*\/|-|^\>', re.MULTILINE)
+NO_WORD_LIMITS = re.compile('\[.+?\]|\/\*.+?\*\/|-|^\>', re.MULTILINE)
 # this is to be replaced by empty strings, thus excluding markup and comments from
 # word counting, and making hyphens join words
 
-NON_LETTERS: Pattern = re.compile('\[.+?\]|\/\*.+?\*\/|\n|\r')
+NON_LETTERS = re.compile('\[.+?\]|\/\*.+?\*\/|\n|\r')
 # this is to be replaced by empty strings, thus excluding markup, comments, and linefeeds
 # from letter counting
 
@@ -58,16 +57,24 @@ class Scene(BasicElement):
         lastsHours: str -- scene duration: hours.
         lastsDays: str -- scene duration: days. 
         image: str --  path to an image related to the scene. 
+        scnArcs: str -- Semicolon-separated arc titles.
+        scnMode: str -- Mode of discourse (Narration/Dramatic action/Dialogue/Description/Exposition).
     """
-    STATUS: set = (None, 'Outline', 'Draft', '1st Edit', '2nd Edit', 'Done')
+    STATUS = [None,
+                    'Outline',
+                    'Draft',
+                    '1st Edit',
+                    '2nd Edit',
+                    'Done'
+                    ]
     # Emulate an enumeration for the scene status
     # Since the items are used to replace text,
     # they may contain spaces. This is why Enum cannot be used here.
 
-    ACTION_MARKER: str = 'A'
-    REACTION_MARKER: str = 'R'
-    NULL_DATE: str = '0001-01-01'
-    NULL_TIME: str = '00:00:00'
+    ACTION_MARKER = 'A'
+    REACTION_MARKER = 'R'
+    NULL_DATE = '0001-01-01'
+    NULL_TIME = '00:00:00'
 
     def __init__(self):
         """Initialize instance variables.
@@ -76,19 +83,19 @@ class Scene(BasicElement):
         """
         super().__init__()
 
-        self._sceneContent: str = None
+        self._sceneContent = None
         # xml: <SceneContent>
         # Scene text with yW7 raw markup.
 
-        self.wordCount: int = 0
+        self.wordCount = 0
         # xml: <WordCount>
         # To be updated by the sceneContent setter
 
-        self.letterCount: int = 0
+        self.letterCount = 0
         # xml: <LetterCount>
         # To be updated by the sceneContent setter
 
-        self.scType: int = None
+        self.scType = None
         # Scene type (Normal/Notes/Todo/Unused).
         #
         # xml: <Unused>
@@ -114,10 +121,10 @@ class Scene(BasicElement):
         # Todo   | -1     | 2              | 2
         # Unused | -1     | 0              | 3
 
-        self.doNotExport: bool = None
+        self.doNotExport = None
         # xml: <ExportCondSpecific><ExportWhenRTF>
 
-        self.status: int = None
+        self.status = None
         # xml: <Status>
         # 1 - Outline
         # 2 - Draft
@@ -126,90 +133,89 @@ class Scene(BasicElement):
         # 5 - Done
         # See also the STATUS list for conversion.
 
-        self.notes: str = None
+        self.notes = None
         # xml: <Notes>
 
-        self.tags: list[str] = None
+        self.tags = None
         # xml: <Tags>
 
-        self.field1: str = None
+        self.field1 = None
         # xml: <Field1>
 
-        self.field2: str = None
+        self.field2 = None
         # xml: <Field2>
 
-        self.field3: str = None
+        self.field3 = None
         # xml: <Field3>
 
-        self.field4: str = None
+        self.field4 = None
         # xml: <Field4>
 
-        self.appendToPrev: bool = None
+        self.appendToPrev = None
         # xml: <AppendToPrev> -1
 
-        self.isReactionScene: bool = None
+        self.isReactionScene = None
         # xml: <ReactionScene> -1
 
-        self.isSubPlot: bool = None
+        self.isSubPlot = None
         # xml: <SubPlot> -1
 
-        self.goal: str = None
+        self.goal = None
         # xml: <Goal>
 
-        self.conflict: str = None
+        self.conflict = None
         # xml: <Conflict>
 
-        self.outcome: str = None
+        self.outcome = None
         # xml: <Outcome>
 
-        self.characters: list[str] = None
+        self.characters = None
         # xml: <Characters><CharID>
 
-        self.locations: list[str] = None
+        self.locations = None
         # xml: <Locations><LocID>
 
-        self.items: list[str] = None
+        self.items = None
         # xml: <Items><ItemID>
 
-        self.date: str = None
+        self.date = None
         # yyyy-mm-dd
         # xml: <SpecificDateMode>-1
         # xml: <SpecificDateTime>1900-06-01 20:38:00
 
-        self.time: str = None
+        self.time = None
         # hh:mm:ss
         # xml: <SpecificDateMode>-1
         # xml: <SpecificDateTime>1900-06-01 20:38:00
 
-        self.day: str = None
+        self.day = None
         # xml: <Day>
 
-        self.lastsMinutes: str = None
+        self.lastsMinutes = None
         # xml: <LastsMinutes>
 
-        self.lastsHours: str = None
+        self.lastsHours = None
         # xml: <LastsHours>
 
-        self.lastsDays: str = None
+        self.lastsDays = None
         # xml: <LastsDays>
 
-        self.image: str = None
+        self.image = None
         # xml: <ImageFile>
 
-        self.scnArcs: str = None
+        self.scnArcs = None
         # xml: <Field_SceneArcs>
         # Semicolon-separated arc titles.
         # Example: 'A' for 'A-Storyline'.
         # If the scene is "Todo" type, an assigned single arc
         # should be defined by it.
 
-        self.scnStyle: str = None
-        # xml: <Field_SceneStyle>
-        # May be 'explaining', 'descriptive', or 'summarizing'.
-        # None is the default, meaning 'staged'.
+        self.scnMode = None
+        # xml: <Field_SceneMode>
+        # Mode of discourse.
 
     @property
-    def sceneContent(self) -> str:
+    def sceneContent(self):
         return self._sceneContent
 
     @sceneContent.setter

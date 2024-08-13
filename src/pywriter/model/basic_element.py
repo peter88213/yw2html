@@ -17,11 +17,11 @@ class BasicElement:
 
     def __init__(self):
         """Initialize instance variables."""
-        self.title: str = None
+        self.title = None
         # xml: <Title>
 
-        self.desc: str = None
+        self.desc = None
         # xml: <Desc>
 
-        self.kwVar: dict[str, str] = {}
+        self.kwVar = {}
         # Optional key/value instance variables for customization.

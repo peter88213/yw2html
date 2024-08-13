@@ -76,6 +76,30 @@ class FileExport(File):
         self._locationFilter = Filter()
         self._itemFilter = Filter()
 
+    def write(self):
+        """Write instance variables to the export file.
+        
+        Create a template-based output file. 
+        Return a message in case of success.
+        Raise the "Error" exception in case of error. 
+        """
+        text = self._get_text()
+        backedUp = False
+        if os.path.isfile(self.filePath):
+            try:
+                os.replace(self.filePath, f'{self.filePath}.bak')
+            except:
+                raise Error(f'{_("Cannot overwrite file")}: "{norm_path(self.filePath)}".')
+            else:
+                backedUp = True
+        try:
+            with open(self.filePath, 'w', encoding='utf-8') as f:
+                f.write(text)
+        except:
+            if backedUp:
+                os.replace(f'{self.filePath}.bak', self.filePath)
+            raise Error(f'{_("Cannot write file")}: "{norm_path(self.filePath)}".')
+
     def _get_fileHeaderMapping(self):
         """Return a mapping dictionary for the project section.
         
@@ -94,6 +118,21 @@ class FileExport(File):
             Country=self.novel.countryCode,
         )
         return projectTemplateMapping
+
+    def _convert_from_yw(self, text, quick=False):
+        """Return text, converted from yw7 markup to target format.
+        
+        Positional arguments:
+            text -- string to convert.
+        
+        Optional arguments:
+            quick: bool -- if True, apply a conversion mode for one-liners without formatting.
+        
+        Overrides the superclass method.
+        """
+        if text is None:
+            text = ''
+        return(text)
 
     def _get_chapterMapping(self, chId, chapterNumber):
         """Return a mapping dictionary for a chapter section.
@@ -118,6 +157,251 @@ class FileExport(File):
             Country=self.novel.countryCode,
         )
         return chapterMapping
+
+    def _get_chapters(self):
+        """Process the chapters and nested scenes.
+        
+        Iterate through the sorted chapter list and apply the templates, 
+        substituting placeholders according to the chapter mapping dictionary.
+        For each chapter call the processing of its included scenes.
+        Skip chapters not accepted by the chapter filter.
+        Return a list of strings.
+        This is a template method that can be extended or overridden by subclasses.
+        """
+        lines = []
+        chapterNumber = 0
+        sceneNumber = 0
+        wordsTotal = 0
+        lettersTotal = 0
+        for chId in self.novel.srtChapters:
+            dispNumber = 0
+            if not self._chapterFilter.accept(self, chId):
+                continue
+
+            # The order counts; be aware that "Todo" and "Notes" chapters are
+            # always unused.
+            # Has the chapter only scenes not to be exported?
+            sceneCount = 0
+            notExportCount = 0
+            doNotExport = False
+            template = None
+            for scId in self.novel.chapters[chId].srtScenes:
+                sceneCount += 1
+                if self.novel.scenes[scId].doNotExport:
+                    notExportCount += 1
+            if sceneCount > 0 and notExportCount == sceneCount:
+                doNotExport = True
+            if self.novel.chapters[chId].chType == 2:
+                # Chapter is "Todo" type.
+                if self.novel.chapters[chId].chLevel == 1:
+                    # Chapter is "Todo Part" type.
+                    if self._todoPartTemplate:
+                        template = Template(self._todoPartTemplate)
+                elif self._todoChapterTemplate:
+                    template = Template(self._todoChapterTemplate)
+            elif self.novel.chapters[chId].chType == 1:
+                # Chapter is "Notes" type.
+                if self.novel.chapters[chId].chLevel == 1:
+                    # Chapter is "Notes Part" type.
+                    if self._notesPartTemplate:
+                        template = Template(self._notesPartTemplate)
+                elif self._notesChapterTemplate:
+                    template = Template(self._notesChapterTemplate)
+            elif self.novel.chapters[chId].chType == 3:
+                # Chapter is "unused" type.
+                if self._unusedChapterTemplate:
+                    template = Template(self._unusedChapterTemplate)
+            elif doNotExport:
+                if self._notExportedChapterTemplate:
+                    template = Template(self._notExportedChapterTemplate)
+            elif self.novel.chapters[chId].chLevel == 1 and self._partTemplate:
+                template = Template(self._partTemplate)
+            else:
+                template = Template(self._chapterTemplate)
+                chapterNumber += 1
+                dispNumber = chapterNumber
+            if template is not None:
+                lines.append(template.safe_substitute(self._get_chapterMapping(chId, dispNumber)))
+
+            #--- Process scenes.
+            sceneLines, sceneNumber, wordsTotal, lettersTotal = self._get_scenes(
+                chId, sceneNumber, wordsTotal, lettersTotal, doNotExport)
+            lines.extend(sceneLines)
+
+            #--- Process chapter ending.
+            template = None
+            if self.novel.chapters[chId].chType == 2:
+                if self._todoChapterEndTemplate:
+                    template = Template(self._todoChapterEndTemplate)
+            elif self.novel.chapters[chId].chType == 1:
+                if self._notesChapterEndTemplate:
+                    template = Template(self._notesChapterEndTemplate)
+            elif self.novel.chapters[chId].chType == 3:
+                if self._unusedChapterEndTemplate:
+                    template = Template(self._unusedChapterEndTemplate)
+            elif doNotExport:
+                if self._notExportedChapterEndTemplate:
+                    template = Template(self._notExportedChapterEndTemplate)
+            elif self._chapterEndTemplate:
+                template = Template(self._chapterEndTemplate)
+            if template is not None:
+                lines.append(template.safe_substitute(self._get_chapterMapping(chId, dispNumber)))
+        return lines
+
+    def _get_characterMapping(self, crId):
+        """Return a mapping dictionary for a character section.
+        
+        Positional arguments:
+            crId: str -- character ID.
+        
+        This is a template method that can be extended or overridden by subclasses.
+        """
+        if self.novel.characters[crId].tags is not None:
+            tags = list_to_string(self.novel.characters[crId].tags, divider=self._DIVIDER)
+        else:
+            tags = ''
+        if self.novel.characters[crId].isMajor:
+            characterStatus = Character.MAJOR_MARKER
+        else:
+            characterStatus = Character.MINOR_MARKER
+
+        characterMapping = dict(
+            ID=crId,
+            Title=self._convert_from_yw(self.novel.characters[crId].title, True),
+            Desc=self._convert_from_yw(self.novel.characters[crId].desc),
+            Tags=self._convert_from_yw(tags),
+            Image=self.novel.characters[crId].image,
+            AKA=self._convert_from_yw(self.novel.characters[crId].aka, True),
+            Notes=self._convert_from_yw(self.novel.characters[crId].notes),
+            Bio=self._convert_from_yw(self.novel.characters[crId].bio),
+            Goals=self._convert_from_yw(self.novel.characters[crId].goals),
+            FullName=self._convert_from_yw(self.novel.characters[crId].fullName, True),
+            Status=characterStatus,
+            ProjectName=self._convert_from_yw(self.projectName),
+            ProjectPath=self.projectPath,
+        )
+        return characterMapping
+
+    def _get_characters(self):
+        """Process the characters.
+        
+        Iterate through the sorted character list and apply the template, 
+        substituting placeholders according to the character mapping dictionary.
+        Skip characters not accepted by the character filter.
+        Return a list of strings.
+        This is a template method that can be extended or overridden by subclasses.
+        """
+        if self._characterSectionHeading:
+            lines = [self._characterSectionHeading]
+        else:
+            lines = []
+        template = Template(self._characterTemplate)
+        for crId in self.novel.srtCharacters:
+            if self._characterFilter.accept(self, crId):
+                lines.append(template.safe_substitute(self._get_characterMapping(crId)))
+        return lines
+
+    def _get_fileHeader(self):
+        """Process the file header.
+        
+        Apply the file header template, substituting placeholders 
+        according to the file header mapping dictionary.
+        Return a list of strings.
+        
+        This is a template method that can be extended or overridden by subclasses.
+        """
+        lines = []
+        template = Template(self._fileHeader)
+        lines.append(template.safe_substitute(self._get_fileHeaderMapping()))
+        return lines
+
+    def _get_itemMapping(self, itId):
+        """Return a mapping dictionary for an item section.
+        
+        Positional arguments:
+            itId: str -- item ID.
+        
+        This is a template method that can be extended or overridden by subclasses.
+        """
+        if self.novel.items[itId].tags is not None:
+            tags = list_to_string(self.novel.items[itId].tags, divider=self._DIVIDER)
+        else:
+            tags = ''
+
+        itemMapping = dict(
+            ID=itId,
+            Title=self._convert_from_yw(self.novel.items[itId].title, True),
+            Desc=self._convert_from_yw(self.novel.items[itId].desc),
+            Tags=self._convert_from_yw(tags, True),
+            Image=self.novel.items[itId].image,
+            AKA=self._convert_from_yw(self.novel.items[itId].aka, True),
+            ProjectName=self._convert_from_yw(self.projectName, True),
+            ProjectPath=self.projectPath,
+        )
+        return itemMapping
+
+    def _get_items(self):
+        """Process the items. 
+        
+        Iterate through the sorted item list and apply the template, 
+        substituting placeholders according to the item mapping dictionary.
+        Skip items not accepted by the item filter.
+        Return a list of strings.
+        This is a template method that can be extended or overridden by subclasses.
+        """
+        if self._itemSectionHeading:
+            lines = [self._itemSectionHeading]
+        else:
+            lines = []
+        template = Template(self._itemTemplate)
+        for itId in self.novel.srtItems:
+            if self._itemFilter.accept(self, itId):
+                lines.append(template.safe_substitute(self._get_itemMapping(itId)))
+        return lines
+
+    def _get_locationMapping(self, lcId):
+        """Return a mapping dictionary for a location section.
+        
+        Positional arguments:
+            lcId: str -- location ID.
+        
+        This is a template method that can be extended or overridden by subclasses.
+        """
+        if self.novel.locations[lcId].tags is not None:
+            tags = list_to_string(self.novel.locations[lcId].tags, divider=self._DIVIDER)
+        else:
+            tags = ''
+
+        locationMapping = dict(
+            ID=lcId,
+            Title=self._convert_from_yw(self.novel.locations[lcId].title, True),
+            Desc=self._convert_from_yw(self.novel.locations[lcId].desc),
+            Tags=self._convert_from_yw(tags, True),
+            Image=self.novel.locations[lcId].image,
+            AKA=self._convert_from_yw(self.novel.locations[lcId].aka, True),
+            ProjectName=self._convert_from_yw(self.projectName, True),
+            ProjectPath=self.projectPath,
+        )
+        return locationMapping
+
+    def _get_locations(self):
+        """Process the locations.
+        
+        Iterate through the sorted location list and apply the template, 
+        substituting placeholders according to the location mapping dictionary.
+        Skip locations not accepted by the location filter.
+        Return a list of strings.
+        This is a template method that can be extended or overridden by subclasses.
+        """
+        if self._locationSectionHeading:
+            lines = [self._locationSectionHeading]
+        else:
+            lines = []
+        template = Template(self._locationTemplate)
+        for lcId in self.novel.srtLocations:
+            if self._locationFilter.accept(self, lcId):
+                lines.append(template.safe_substitute(self._get_locationMapping(lcId)))
+        return lines
 
     def _get_sceneMapping(self, scId, sceneNumber, wordsTotal, lettersTotal):
         """Return a mapping dictionary for a scene section.
@@ -263,121 +547,6 @@ class FileExport(File):
         )
         return sceneMapping
 
-    def _get_characterMapping(self, crId):
-        """Return a mapping dictionary for a character section.
-        
-        Positional arguments:
-            crId: str -- character ID.
-        
-        This is a template method that can be extended or overridden by subclasses.
-        """
-        if self.novel.characters[crId].tags is not None:
-            tags = list_to_string(self.novel.characters[crId].tags, divider=self._DIVIDER)
-        else:
-            tags = ''
-        if self.novel.characters[crId].isMajor:
-            characterStatus = Character.MAJOR_MARKER
-        else:
-            characterStatus = Character.MINOR_MARKER
-
-        characterMapping = dict(
-            ID=crId,
-            Title=self._convert_from_yw(self.novel.characters[crId].title, True),
-            Desc=self._convert_from_yw(self.novel.characters[crId].desc),
-            Tags=self._convert_from_yw(tags),
-            Image=self.novel.characters[crId].image,
-            AKA=self._convert_from_yw(self.novel.characters[crId].aka, True),
-            Notes=self._convert_from_yw(self.novel.characters[crId].notes),
-            Bio=self._convert_from_yw(self.novel.characters[crId].bio),
-            Goals=self._convert_from_yw(self.novel.characters[crId].goals),
-            FullName=self._convert_from_yw(self.novel.characters[crId].fullName, True),
-            Status=characterStatus,
-            ProjectName=self._convert_from_yw(self.projectName),
-            ProjectPath=self.projectPath,
-        )
-        return characterMapping
-
-    def _get_locationMapping(self, lcId):
-        """Return a mapping dictionary for a location section.
-        
-        Positional arguments:
-            lcId: str -- location ID.
-        
-        This is a template method that can be extended or overridden by subclasses.
-        """
-        if self.novel.locations[lcId].tags is not None:
-            tags = list_to_string(self.novel.locations[lcId].tags, divider=self._DIVIDER)
-        else:
-            tags = ''
-
-        locationMapping = dict(
-            ID=lcId,
-            Title=self._convert_from_yw(self.novel.locations[lcId].title, True),
-            Desc=self._convert_from_yw(self.novel.locations[lcId].desc),
-            Tags=self._convert_from_yw(tags, True),
-            Image=self.novel.locations[lcId].image,
-            AKA=self._convert_from_yw(self.novel.locations[lcId].aka, True),
-            ProjectName=self._convert_from_yw(self.projectName, True),
-            ProjectPath=self.projectPath,
-        )
-        return locationMapping
-
-    def _get_itemMapping(self, itId):
-        """Return a mapping dictionary for an item section.
-        
-        Positional arguments:
-            itId: str -- item ID.
-        
-        This is a template method that can be extended or overridden by subclasses.
-        """
-        if self.novel.items[itId].tags is not None:
-            tags = list_to_string(self.novel.items[itId].tags, divider=self._DIVIDER)
-        else:
-            tags = ''
-
-        itemMapping = dict(
-            ID=itId,
-            Title=self._convert_from_yw(self.novel.items[itId].title, True),
-            Desc=self._convert_from_yw(self.novel.items[itId].desc),
-            Tags=self._convert_from_yw(tags, True),
-            Image=self.novel.items[itId].image,
-            AKA=self._convert_from_yw(self.novel.items[itId].aka, True),
-            ProjectName=self._convert_from_yw(self.projectName, True),
-            ProjectPath=self.projectPath,
-        )
-        return itemMapping
-
-    def _get_prjNoteMapping(self, pnId):
-        """Return a mapping dictionary for a project note.
-        
-        Positional arguments:
-            pnId: str -- project note ID.
-        
-        This is a template method that can be extended or overridden by subclasses.
-        """
-        itemMapping = dict(
-            ID=pnId,
-            Title=self._convert_from_yw(self.novel.projectNotes[pnId].title, True),
-            Desc=self._convert_from_yw(self.novel.projectNotes[pnId].desc, True),
-            ProjectName=self._convert_from_yw(self.projectName, True),
-            ProjectPath=self.projectPath,
-        )
-        return itemMapping
-
-    def _get_fileHeader(self):
-        """Process the file header.
-        
-        Apply the file header template, substituting placeholders 
-        according to the file header mapping dictionary.
-        Return a list of strings.
-        
-        This is a template method that can be extended or overridden by subclasses.
-        """
-        lines = []
-        template = Template(self._fileHeader)
-        lines.append(template.safe_substitute(self._get_fileHeaderMapping()))
-        return lines
-
     def _get_scenes(self, chId, sceneNumber, wordsTotal, lettersTotal, doNotExport):
         """Process the scenes.
         
@@ -461,152 +630,22 @@ class FileExport(File):
             firstSceneInChapter = False
         return lines, sceneNumber, wordsTotal, lettersTotal
 
-    def _get_chapters(self):
-        """Process the chapters and nested scenes.
+    def _get_prjNoteMapping(self, pnId):
+        """Return a mapping dictionary for a project note.
         
-        Iterate through the sorted chapter list and apply the templates, 
-        substituting placeholders according to the chapter mapping dictionary.
-        For each chapter call the processing of its included scenes.
-        Skip chapters not accepted by the chapter filter.
-        Return a list of strings.
+        Positional arguments:
+            pnId: str -- project note ID.
+        
         This is a template method that can be extended or overridden by subclasses.
         """
-        lines = []
-        chapterNumber = 0
-        sceneNumber = 0
-        wordsTotal = 0
-        lettersTotal = 0
-        for chId in self.novel.srtChapters:
-            dispNumber = 0
-            if not self._chapterFilter.accept(self, chId):
-                continue
-
-            # The order counts; be aware that "Todo" and "Notes" chapters are
-            # always unused.
-            # Has the chapter only scenes not to be exported?
-            sceneCount = 0
-            notExportCount = 0
-            doNotExport = False
-            template = None
-            for scId in self.novel.chapters[chId].srtScenes:
-                sceneCount += 1
-                if self.novel.scenes[scId].doNotExport:
-                    notExportCount += 1
-            if sceneCount > 0 and notExportCount == sceneCount:
-                doNotExport = True
-            if self.novel.chapters[chId].chType == 2:
-                # Chapter is "Todo" type.
-                if self.novel.chapters[chId].chLevel == 1:
-                    # Chapter is "Todo Part" type.
-                    if self._todoPartTemplate:
-                        template = Template(self._todoPartTemplate)
-                elif self._todoChapterTemplate:
-                    template = Template(self._todoChapterTemplate)
-            elif self.novel.chapters[chId].chType == 1:
-                # Chapter is "Notes" type.
-                if self.novel.chapters[chId].chLevel == 1:
-                    # Chapter is "Notes Part" type.
-                    if self._notesPartTemplate:
-                        template = Template(self._notesPartTemplate)
-                elif self._notesChapterTemplate:
-                    template = Template(self._notesChapterTemplate)
-            elif self.novel.chapters[chId].chType == 3:
-                # Chapter is "unused" type.
-                if self._unusedChapterTemplate:
-                    template = Template(self._unusedChapterTemplate)
-            elif doNotExport:
-                if self._notExportedChapterTemplate:
-                    template = Template(self._notExportedChapterTemplate)
-            elif self.novel.chapters[chId].chLevel == 1 and self._partTemplate:
-                template = Template(self._partTemplate)
-            else:
-                template = Template(self._chapterTemplate)
-                chapterNumber += 1
-                dispNumber = chapterNumber
-            if template is not None:
-                lines.append(template.safe_substitute(self._get_chapterMapping(chId, dispNumber)))
-
-            #--- Process scenes.
-            sceneLines, sceneNumber, wordsTotal, lettersTotal = self._get_scenes(
-                chId, sceneNumber, wordsTotal, lettersTotal, doNotExport)
-            lines.extend(sceneLines)
-
-            #--- Process chapter ending.
-            template = None
-            if self.novel.chapters[chId].chType == 2:
-                if self._todoChapterEndTemplate:
-                    template = Template(self._todoChapterEndTemplate)
-            elif self.novel.chapters[chId].chType == 1:
-                if self._notesChapterEndTemplate:
-                    template = Template(self._notesChapterEndTemplate)
-            elif self.novel.chapters[chId].chType == 3:
-                if self._unusedChapterEndTemplate:
-                    template = Template(self._unusedChapterEndTemplate)
-            elif doNotExport:
-                if self._notExportedChapterEndTemplate:
-                    template = Template(self._notExportedChapterEndTemplate)
-            elif self._chapterEndTemplate:
-                template = Template(self._chapterEndTemplate)
-            if template is not None:
-                lines.append(template.safe_substitute(self._get_chapterMapping(chId, dispNumber)))
-        return lines
-
-    def _get_characters(self):
-        """Process the characters.
-        
-        Iterate through the sorted character list and apply the template, 
-        substituting placeholders according to the character mapping dictionary.
-        Skip characters not accepted by the character filter.
-        Return a list of strings.
-        This is a template method that can be extended or overridden by subclasses.
-        """
-        if self._characterSectionHeading:
-            lines = [self._characterSectionHeading]
-        else:
-            lines = []
-        template = Template(self._characterTemplate)
-        for crId in self.novel.srtCharacters:
-            if self._characterFilter.accept(self, crId):
-                lines.append(template.safe_substitute(self._get_characterMapping(crId)))
-        return lines
-
-    def _get_locations(self):
-        """Process the locations.
-        
-        Iterate through the sorted location list and apply the template, 
-        substituting placeholders according to the location mapping dictionary.
-        Skip locations not accepted by the location filter.
-        Return a list of strings.
-        This is a template method that can be extended or overridden by subclasses.
-        """
-        if self._locationSectionHeading:
-            lines = [self._locationSectionHeading]
-        else:
-            lines = []
-        template = Template(self._locationTemplate)
-        for lcId in self.novel.srtLocations:
-            if self._locationFilter.accept(self, lcId):
-                lines.append(template.safe_substitute(self._get_locationMapping(lcId)))
-        return lines
-
-    def _get_items(self):
-        """Process the items. 
-        
-        Iterate through the sorted item list and apply the template, 
-        substituting placeholders according to the item mapping dictionary.
-        Skip items not accepted by the item filter.
-        Return a list of strings.
-        This is a template method that can be extended or overridden by subclasses.
-        """
-        if self._itemSectionHeading:
-            lines = [self._itemSectionHeading]
-        else:
-            lines = []
-        template = Template(self._itemTemplate)
-        for itId in self.novel.srtItems:
-            if self._itemFilter.accept(self, itId):
-                lines.append(template.safe_substitute(self._get_itemMapping(itId)))
-        return lines
+        itemMapping = dict(
+            ID=pnId,
+            Title=self._convert_from_yw(self.novel.projectNotes[pnId].title, True),
+            Desc=self._convert_from_yw(self.novel.projectNotes[pnId].desc, True),
+            ProjectName=self._convert_from_yw(self.projectName, True),
+            ProjectPath=self.projectPath,
+        )
+        return itemMapping
 
     def _get_projectNotes(self):
         """Process the project notes. 
@@ -638,45 +677,6 @@ class FileExport(File):
         lines.extend(self._get_projectNotes())
         lines.append(self._fileFooter)
         return ''.join(lines)
-
-    def write(self):
-        """Write instance variables to the export file.
-        
-        Create a template-based output file. 
-        Return a message in case of success.
-        Raise the "Error" exception in case of error. 
-        """
-        text = self._get_text()
-        backedUp = False
-        if os.path.isfile(self.filePath):
-            try:
-                os.replace(self.filePath, f'{self.filePath}.bak')
-            except:
-                raise Error(f'{_("Cannot overwrite file")}: "{norm_path(self.filePath)}".')
-            else:
-                backedUp = True
-        try:
-            with open(self.filePath, 'w', encoding='utf-8') as f:
-                f.write(text)
-        except:
-            if backedUp:
-                os.replace(f'{self.filePath}.bak', self.filePath)
-            raise Error(f'{_("Cannot write file")}: "{norm_path(self.filePath)}".')
-
-    def _convert_from_yw(self, text, quick=False):
-        """Return text, converted from yw7 markup to target format.
-        
-        Positional arguments:
-            text -- string to convert.
-        
-        Optional arguments:
-            quick: bool -- if True, apply a conversion mode for one-liners without formatting.
-        
-        Overrides the superclass method.
-        """
-        if text is None:
-            text = ''
-        return(text)
 
     def _remove_inline_code(self, text):
         """Remove inline raw code from text and return the result."""

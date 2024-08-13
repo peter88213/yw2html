@@ -28,8 +28,6 @@ yw2html looks for a unused chapter named **html templates**. HTML templates can 
 The title of the scene is the same as the name of the template file would be, but without the *.html* extension.
 External HTML templates are overridden by internally defined templates, if any.
 
-In the release zipfile, you find a yWriter sample project with internally defined HTML templates in the `examples\add-on` subdirectory.
-
 ## Examples
 The downloaded zip file includes a directory named *examples* containing a *template* directory with example templates for different purposes and some example batch files showing the correct commands. You can launch the batch files by dragging and dropping your yWriter project on the icons. The results will be written to the yWriter project directory.
 

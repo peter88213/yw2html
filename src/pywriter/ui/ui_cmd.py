@@ -13,8 +13,8 @@ class UiCmd(Ui):
     
     Public methods:
         ask_yes_no(text) -- query yes or no at the console.
-        set_info_what(message) -- show what the converter is going to do.
         set_info_how(message) -- show how the converter is doing.
+        set_info_what(message) -- show what the converter is going to do.
         show_warning(message) -- Display a warning message.
     """
 
@@ -43,17 +43,6 @@ class UiCmd(Ui):
         else:
             return False
 
-    def set_info_what(self, message):
-        """Show what the converter is going to do.
-        
-        Positional arguments:
-            message -- message to be printed at the console. 
-            
-        Print the message.
-        Overrides the superclass method.
-        """
-        print(message)
-
     def set_info_how(self, message):
         """Show how the converter is doing.
 
@@ -66,6 +55,17 @@ class UiCmd(Ui):
         if message.startswith('!'):
             message = f'FAIL: {message.split("!", maxsplit=1)[1].strip()}'
         self.infoHowText = message
+        print(message)
+
+    def set_info_what(self, message):
+        """Show what the converter is going to do.
+        
+        Positional arguments:
+            message -- message to be printed at the console. 
+            
+        Print the message.
+        Overrides the superclass method.
+        """
         print(message)
 
     def show_warning(self, message):

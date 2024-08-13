@@ -26,12 +26,12 @@ class Chapter(BasicElement):
         """
         super().__init__()
 
-        self.chLevel: int = None
+        self.chLevel = None
         # xml: <SectionStart>
         # 0 = chapter level
         # 1 = section level ("this chapter begins a section")
 
-        self.chType: int = None
+        self.chType = None
         # 0 = Normal
         # 1 = Notes
         # 2 = Todo
@@ -64,20 +64,20 @@ class Chapter(BasicElement):
         # Todo   | -1     | 1    | 2           | 2
         # Unused | -1     | 1    | 0           | 3
 
-        self.suppressChapterTitle: bool = None
+        self.suppressChapterTitle = None
         # xml: <Fields><Field_SuppressChapterTitle> 1
         # True: Chapter heading not to be displayed in written document.
         # False: Chapter heading to be displayed in written document.
 
-        self.isTrash: bool = None
+        self.isTrash = None
         # xml: <Fields><Field_IsTrash> 1
         # True: This chapter is the yw7 project's "trash bin".
         # False: This chapter is not a "trash bin".
 
-        self.suppressChapterBreak: bool = None
+        self.suppressChapterBreak = None
         # xml: <Fields><Field_SuppressChapterBreak> 0
 
-        self.srtScenes: list[str] = []
+        self.srtScenes = []
         # xml: <Scenes><ScID>
         # The chapter's scene IDs. The order of its elements
         # corresponds to the chapter's order of the scenes.

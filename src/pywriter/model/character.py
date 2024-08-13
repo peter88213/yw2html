@@ -17,24 +17,24 @@ class Character(WorldElement):
         fullName: str -- full name (the title inherited may be a short name).
         isMajor: bool -- True, if it's a major character.
     """
-    MAJOR_MARKER: str = 'Major'
-    MINOR_MARKER: str = 'Minor'
+    MAJOR_MARKER = 'Major'
+    MINOR_MARKER = 'Minor'
 
     def __init__(self):
         """Extends the superclass constructor by adding instance variables."""
         super().__init__()
 
-        self.notes: str = None
+        self.notes = None
         # xml: <Notes>
 
-        self.bio: str = None
+        self.bio = None
         # xml: <Bio>
 
-        self.goals: str = None
+        self.goals = None
         # xml: <Goals>
 
-        self.fullName: str = None
+        self.fullName = None
         # xml: <FullName>
 
-        self.isMajor: bool = None
+        self.isMajor = None
         # xml: <Major>

@@ -4,6 +4,12 @@
 
 ## Changelog
 
+### v2.1.5
+
+- Reading .yw7 files created with the iOS yWriter version.
+
+Based on PyWriter v12.19.0
+
 ### v2.1.4
 
 - Library update.
