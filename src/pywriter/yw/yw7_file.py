@@ -151,7 +151,10 @@ class Yw7File(File):
                 # saving memory
                 self.tree = ET.ElementTree(root)
         except:
-            raise Error(f'{_("Can not process file")}: "{norm_path(self.filePath)}".')
+            try:
+                self.tree = ET.parse(self.filePath)
+            except Exception as ex:
+                raise Error(f'{_("Can not process file")} - {str(ex)}')
 
         self._read_project(root)
         self._read_locations(root)
@@ -1133,8 +1136,8 @@ class Yw7File(File):
         newlines = ['<?xml version="1.0" encoding="utf-8"?>']
         for line in lines:
             for tag in self._CDATA_TAGS:
-                line = re.sub(f'\<{tag}\>', f'<{tag}><![CDATA[', line)
-                line = re.sub(f'\<\/{tag}\>', f']]></{tag}>', line)
+                line = re.sub(fr'\<{tag}\>', f'<{tag}><![CDATA[', line)
+                line = re.sub(fr'\<\/{tag}\>', f']]></{tag}>', line)
             newlines.append(line)
         text = '\n'.join(newlines)
         text = text.replace('[CDATA[ \n', '[CDATA[')

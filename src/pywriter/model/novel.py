@@ -9,7 +9,7 @@ import re
 from pywriter.pywriter_globals import *
 from pywriter.model.basic_element import BasicElement
 
-LANGUAGE_TAG = re.compile('\[lang=(.*?)\]')
+LANGUAGE_TAG = re.compile(r'\[lang=(.*?)\]')
 
 
 class Novel(BasicElement):

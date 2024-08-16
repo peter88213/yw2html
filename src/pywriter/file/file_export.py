@@ -684,7 +684,7 @@ class FileExport(File):
             text = text.replace('<RTFBRK>', '')
             YW_SPECIAL_CODES = ('HTM', 'TEX', 'RTF', 'epub', 'mobi', 'rtfimg')
             for specialCode in YW_SPECIAL_CODES:
-                text = re.sub(f'\<{specialCode} .+?\/{specialCode}\>', '', text)
+                text = re.sub(fr'\<{specialCode} .+?\/{specialCode}\>', '', text)
         else:
             text = ''
         return text
