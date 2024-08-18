@@ -4,36 +4,42 @@
 
 ## Changelog
 
+### Version 2.1.7
+
+- Strip illegal characters before parsing yw7 input.
+
+Based on PyWriter version 12.19.6
+
 ### Version 2.1.6
 
 - Refactor for future Python versions.
 
-Based on PyWriter version 12.19.4
+Based on PyWriter 12.19.4
 
 ### Version 2.1.5
 
 - Reading .yw7 files created with the iOS yWriter version.
 
-Based on PyWriter version 12.19.0
+Based on PyWriter 12.19.0
 
 ### Version 2.1.4
 
 - Library update.
 
-Based on PyWriter version 12.1.3
+Based on PyWriter 12.1.3
 
 ### Version 2.1.3
 
 - Make it run with old Windows versions.
 
-Based on PyWriter version 8.0.11
+Based on PyWriter 8.0.11
 
 ### Version 2.1.2
 
 - Modify "shebang" line to make the script run with Python 3.11 under
 Windows.
 
-Based on PyWriter version 8.0.8
+Based on PyWriter 8.0.8
 
 ### Version 2.1.1
 
@@ -43,50 +49,50 @@ Based on PyWriter version 8.0.8
 uncaught exception.
 - Revise error handling: Throw exceptions instead of returning error messages.
 
-Based on PyWriter version 8.0.8
+Based on PyWriter 8.0.8
 
 ### Version 2.0.7
 
 - Update the PyWriter library for future Python versions.
 - Count words like in LibreOffice. See: https://help.libreoffice.org/latest/en-GB/text/swriter/guide/words_count.html.
 
-Based on PyWriter version 7.14.2
+Based on PyWriter 7.14.2
 
 ### Version 2.0.6 Optional release
 
 - Code refactoring and library update.
 
-Based on PyWriter version 7.2.1
+Based on PyWriter 7.2.1
 
 ### Version 2.0.5 Bugfix release
 
 - Fix and refactor inline code removal.
 
-Based on PyWriter version 5.16.1
+Based on PyWriter 5.16.1
 
 ### Version 2.0.4 Consider inline code
 
 - Remove inline code when exporting.
 
-Based on PyWriter version 5.12.5
+Based on PyWriter 5.12.5
 
 ### Version 2.0.3 Improved word counting
 
 - Fix word counting considering ellipses.
 
-Based on PyWriter version 5.12.4
+Based on PyWriter 5.12.4
 
 ### Version 2.0.2 Improved word counting
 
 - Fix word counting considering comments, hyphens, and dashes.
 
-Based on PyWriter version 5.12.3
+Based on PyWriter 5.12.3
 
 ### Version 2.0.1
 
 - Improve code and documentation quality.
 
-Based on PyWriter version 5.0.2
+Based on PyWriter 5.0.2
 
 ### Version 2.0.0
 
@@ -96,13 +102,13 @@ Based on PyWriter version 5.0.2
 - Add $AuthorBio placeholder.
 - Improve the overall code quality.
 
-Based on PyWriter version 5.0.0
+Based on PyWriter 5.0.0
 
 ### Version 1.8.0 Drop the support of the .yw6 file format.
 
 Since yWriter5, yWriter6 and yWriter7 all use .yw7 now, the .yw6 conversion is dispensable.
 
-Based on PyWriter version 3.28.2
+Based on PyWriter 3.28.2
 
 ### Version 1.6.3 Bugfix release
 
@@ -110,7 +116,7 @@ This release is strongly recommended.
 Fix a regression from PyWriter v3.12.5. causing a crash if a scene has an 
 hour, but no minute set.
 
-Based on PyWriter version 3.16.4
+Based on PyWriter 3.16.4
 
 ### Version 1.6.2 Bugfix
 
@@ -118,18 +124,18 @@ Based on PyWriter version 3.16.4
 - Preprocess date/time information before export.
 - Add more examples.
 
-Based on PyWriter version 3.12.5
+Based on PyWriter 3.12.5
 
 ### Version 1.6.1 Fix "chapter end" template processing
 
-Based on PyWriter version 3.12.3
+Based on PyWriter 3.12.3
 
 ### Version 1.6.0 Add a special template for scenes at the beginning of the chapter
 
 New:
 - first_scene_template.html
 
-Based on PyWriter version 3.12.0
+Based on PyWriter 3.12.0
 
 ### Version 1.4.0 Add alternative chapter count designs
 
@@ -137,13 +143,13 @@ New:
 - $ChNumberEnglish: Chapter number written out in English
 - $ChNumberRoman: Chapter number in Roman numbers
 
-Based on PyWriter version 3.10.2
+Based on PyWriter 3.10.2
 
 ### Version 1.2.2 Optional update
 
 - Major refactoring of the yw7 file processing.
 
-Based on PyWriter version 3.8.0
+Based on PyWriter 3.8.0
 
 ### Version 1.2.1 Optional update
 
@@ -152,19 +158,19 @@ work on non-Windows operating systems.
 
 - Make the YwCnvUi.open_newFile() method os-independent.
 
-Based on PyWriter version 3.6.7
+Based on PyWriter 3.6.7
 
 ### Version 1.2.0 Optional update
 
 - Update the underlying class library with changed API for better maintainability.
 
-Based on PyWriter version 3.0.0
+Based on PyWriter 3.0.0
 
 ### Version 1.1.2 Bugfix
 
 Fix a bug setting the suffix erroneously to None.
 
-Based on PyWriter version 2.17.4 (development version)
+Based on PyWriter 2.17.4 (development version)
 
 
 ### Version 1.1.0 Make GUI customization easier
@@ -173,7 +179,7 @@ The converter is now even more loosely coupled with its user interface.
 This should make it easier for application developers to customize user interaction, 
 and use any GUI framework.
 
-Based on PyWriter version 2.17.0 (development version)
+Based on PyWriter 2.17.0 (development version)
 
 
 ### Version 1.0.1 Optional update
@@ -182,7 +188,7 @@ Refactor the code
 - Move the HtmlExport class to the Pywriter library.
 - Replace it by the MyExport subclass.
 
-Based on PyWriter version 2.15.1
+Based on PyWriter 2.15.1
 
 
 ### Version 1.0.0 Rename the script and change the user interface
@@ -209,7 +215,7 @@ That is because a real support would require considering nesting and
 multi paragraph formatting. That would make everything too complicated, 
 considering that such formatting is not common in a fictional prose text.
 
-Based on PyWriter version 2.9.0
+Based on PyWriter 2.9.0
 
 ### Version 0.8.0
 
@@ -218,7 +224,7 @@ Process all yWriter formatting tags.
 - Discard alignment.
 - Discard highlighting.
 
-Based on PyWriter version 2.8.0
+Based on PyWriter 2.8.0
 
 ### Version 0.7.2
 

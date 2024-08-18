@@ -13,7 +13,7 @@ def indent(elem, level=0):
     Source: http://effbot.org/zone/element-lib.htm#prettyprint
     """
     i = f'\n{level * "  "}'
-    if elem:
+    if len(elem):
         if not elem.text or not elem.text.strip():
             elem.text = f'{i}  '
         if not elem.tail or not elem.tail.strip():

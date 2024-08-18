@@ -140,22 +140,23 @@ class Yw7File(File):
             raise Error(f'{_("yWriter seems to be open. Please close first")}.')
         try:
             try:
-                self.tree = ET.parse(self.filePath)
-                root = self.tree.getroot()
+                with open(self.filePath, 'r', encoding='utf-8') as f:
+                    xmlText = f.read()
             except:
                 # yw7 file may be UTF-16 encoded, with a wrong XML header (yWriter for iOS)
                 with open(self.filePath, 'r', encoding='utf-16') as f:
                     xmlText = f.read()
-                root = ET.fromstring(xmlText)
-                xmlText = None
-                # saving memory
-                self.tree = ET.ElementTree(root)
         except:
             try:
                 self.tree = ET.parse(self.filePath)
             except Exception as ex:
                 raise Error(f'{_("Can not process file")} - {str(ex)}')
 
+        xmlText = re.sub('[\x00-\x08|\x0b-\x0c|\x0e-\x1f]', '', xmlText)
+        root = ET.fromstring(xmlText)
+        xmlText = None
+        # saving memory
+        self.tree = ET.ElementTree(root)
         self._read_project(root)
         self._read_locations(root)
         self._read_items(root)
