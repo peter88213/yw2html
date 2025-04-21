@@ -4,6 +4,13 @@
 
 ## Changelog
 
+
+### Version 2.1.8 
+
+- Fixed $ProjectName placeholder creation.
+
+Based on PyWriter 12.19.6
+
 ### Version 2.1.7
 
 - Strip illegal characters before parsing yw7 input.

@@ -35,6 +35,7 @@ class ExportAnyTargetFactory(FileFactory):
         for fileClass in self._fileClasses:
             if suffix is None:
                 suffix = ''
+            fileClass.SUFFIX = suffix
             targetFile = fileClass(f'{fileName}{suffix}{fileClass.EXTENSION}', **kwargs)
             return None, targetFile
 
